@@ -1,6 +1,8 @@
 package com.flightring;
 
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SlabBlock;
+import net.minecraft.world.level.block.WallBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.PushReaction;
@@ -31,6 +33,48 @@ public final class ModBlocks {
                     .lightLevel(state -> 11)
                     .noLootTable()
                     .pushReaction(PushReaction.BLOCK));
+
+    // ---- 云层之上 the_cloud 的方块（M1）-----------------------------------------------
+    // 材料链：云块 ×9 → 厚云块 → 厚云砖 → 台阶 / 墙；厚云砖同时是云门的门框（M4）。
+
+    /** 云块：外壳，踩上去会像蜘蛛网一样缓慢下陷并穿透；带飞行戒指时可当普通方块站立。 */
+    public static final DeferredBlock<Block> CLOUD_BLOCK = BLOCKS.registerBlock(
+            "cloud_block",
+            CloudBlock::new,
+            properties -> properties.strength(0.2F)
+                    .sound(SoundType.SNOW)
+                    .noOcclusion()
+                    .isSuffocating((state, level, pos) -> false)
+                    .isViewBlocking((state, level, pos) -> false)
+                    .isValidSpawn((state, level, pos, type) -> false));
+
+    /** 厚云块：实心内核，可站立、可刷怪。 */
+    public static final DeferredBlock<Block> THICK_CLOUD_BLOCK = BLOCKS.registerBlock(
+            "thick_cloud_block",
+            Block::new,
+            properties -> properties.strength(0.6F)
+                    .sound(SoundType.SNOW)
+                    .noOcclusion()
+                    .isViewBlocking((state, level, pos) -> false));
+
+    /** 厚云砖块：建筑方块，也是云门的门框。 */
+    public static final DeferredBlock<Block> THICK_CLOUD_BRICKS = BLOCKS.registerBlock(
+            "thick_cloud_bricks",
+            Block::new,
+            properties -> properties.strength(0.8F)
+                    .sound(SoundType.SNOW));
+
+    public static final DeferredBlock<Block> THICK_CLOUD_SLAB = BLOCKS.registerBlock(
+            "thick_cloud_slab",
+            SlabBlock::new,
+            properties -> properties.strength(0.8F)
+                    .sound(SoundType.SNOW));
+
+    public static final DeferredBlock<Block> THICK_CLOUD_WALL = BLOCKS.registerBlock(
+            "thick_cloud_wall",
+            WallBlock::new,
+            properties -> properties.strength(0.8F)
+                    .sound(SoundType.SNOW));
 
     private ModBlocks() {
     }

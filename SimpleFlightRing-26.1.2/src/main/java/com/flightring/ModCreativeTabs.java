@@ -26,6 +26,12 @@ public class ModCreativeTabs {
                         }
                         // The soul-fed sculk ring is deliberately NOT listed here: it is a quest
                         // step, so it only exists once a player has fed it a Warden's soul.
+                        // 云层之上的方块（M1）
+                        output.accept(new ItemStack(ModItems.CLOUD_BLOCK_ITEM.get()));
+                        output.accept(new ItemStack(ModItems.THICK_CLOUD_BLOCK_ITEM.get()));
+                        output.accept(new ItemStack(ModItems.THICK_CLOUD_BRICKS_ITEM.get()));
+                        output.accept(new ItemStack(ModItems.THICK_CLOUD_SLAB_ITEM.get()));
+                        output.accept(new ItemStack(ModItems.THICK_CLOUD_WALL_ITEM.get()));
                         output.accept(new ItemStack(ModItems.INDESTRUCTIBLE_CORE.get()));
                         output.accept(new ItemStack(ModItems.REFORGE_STONE.get()));
                         // The directed stone is one item whose name follows its mode, so show both kinds here.

@@ -3,6 +3,7 @@ package com.flightring;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Unit;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -62,6 +63,19 @@ public class ModItems {
      * together with a ring to roll a new affix (see the reforge command and the anvil handler). A plain
      * stackable material.
      */
+
+    // ---- 云层之上的方块物品（M1）-----------------------------------------------------
+    public static final DeferredItem<BlockItem> CLOUD_BLOCK_ITEM =
+            ITEMS.registerSimpleBlockItem("cloud_block", () -> ModBlocks.CLOUD_BLOCK.get());
+    public static final DeferredItem<BlockItem> THICK_CLOUD_BLOCK_ITEM =
+            ITEMS.registerSimpleBlockItem("thick_cloud_block", () -> ModBlocks.THICK_CLOUD_BLOCK.get());
+    public static final DeferredItem<BlockItem> THICK_CLOUD_BRICKS_ITEM =
+            ITEMS.registerSimpleBlockItem("thick_cloud_bricks", () -> ModBlocks.THICK_CLOUD_BRICKS.get());
+    public static final DeferredItem<BlockItem> THICK_CLOUD_SLAB_ITEM =
+            ITEMS.registerSimpleBlockItem("thick_cloud_slab", () -> ModBlocks.THICK_CLOUD_SLAB.get());
+    public static final DeferredItem<BlockItem> THICK_CLOUD_WALL_ITEM =
+            ITEMS.registerSimpleBlockItem("thick_cloud_wall", () -> ModBlocks.THICK_CLOUD_WALL.get());
+
     public static final DeferredItem<Item> REFORGE_STONE =
             ITEMS.registerItem("reforge_stone", Item::new, new Item.Properties());
 

@@ -435,6 +435,31 @@ public class FlightHandler {
         return isUsableRing(stack) && stack.has(ModDataComponents.INDESTRUCTIBLE.get()) == wantInfinite;
     }
 
+
+    /**
+     * True when the player carries a flight ring that still has flight time left, wherever it is:
+     * Curios flight ring slot, main inventory or offhand (backpacks are deliberately not scanned here,
+     * so client and server always agree - this runs inside collision code on both sides).
+     * <p>
+     * Used by {@link CloudBlock}: a ring lets the player stand on clouds without sinking.
+     */
+    public static boolean hasUsableRing(Player player) {
+        if (CuriosCompat.isLoaded() && isUsableRing(CuriosCompat.findRingInSlot(player))) {
+            return true;
+        }
+        for (ItemStack stack : player.getInventory().items) {
+            if (isUsableRing(stack)) {
+                return true;
+            }
+        }
+        for (ItemStack stack : player.getInventory().offhand) {
+            if (isUsableRing(stack)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static boolean isUsableRing(ItemStack stack) {
         return stack.getItem() instanceof FlightRingItem
                 && (stack.has(ModDataComponents.INDESTRUCTIBLE.get()) || stack.getDamageValue() < stack.getMaxDamage());

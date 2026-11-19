@@ -139,7 +139,7 @@ tasks.withType(ProcessResources).configureEach {
     }
 }
 
-// Copy the built mod jar into the workspace's shared build folder (D:\DshWorkSpace\MCMODuild),
+// Copy the built mod jar into the workspace's shared build folder (D:\DshWorkSpace\Minecraft\build),
 // which is where every project drops its jars - several projects emit more than one jar per build, so a
 // dedicated folder beats littering the workspace root. Implemented as an imperative copy so Gradle does not
 // track that folder (it holds other projects' jars too).
