@@ -242,5 +242,39 @@
         "type": "file"
       }
     ]
+  },
+  "block.thick_cloud_chest.open": {
+    "subtitle": "subtitles.simpleflightring.thick_cloud_chest.open",
+    "sounds": [
+      {
+        "name": "simpleflightring:block/thick_cloud_chest/open1",
+        "type": "file"
+      },
+      {
+        "name": "simpleflightring:block/thick_cloud_chest/open2",
+        "type": "file"
+      },
+      {
+        "name": "simpleflightring:block/thick_cloud_chest/open3",
+        "type": "file"
+      }
+    ]
+  },
+  "block.thick_cloud_chest.close": {
+    "subtitle": "subtitles.simpleflightring.thick_cloud_chest.close",
+    "sounds": [
+      {
+        "name": "simpleflightring:block/thick_cloud_chest/close1",
+        "type": "file"
+      },
+      {
+        "name": "simpleflightring:block/thick_cloud_chest/close2",
+        "type": "file"
+      },
+      {
+        "name": "simpleflightring:block/thick_cloud_chest/close3",
+        "type": "file"
+      }
+    ]
   }
 }
