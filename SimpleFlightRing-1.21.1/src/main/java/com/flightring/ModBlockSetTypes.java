@@ -23,14 +23,15 @@ public final class ModBlockSetTypes {
             true,   // can be activated by arrows
             BlockSetType.PressurePlateSensitivity.EVERYTHING,
             SoundType.SNOW,
-            SoundEvents.WOODEN_DOOR_CLOSE,
-            SoundEvents.WOODEN_DOOR_OPEN,
-            SoundEvents.WOODEN_TRAPDOOR_CLOSE,
-            SoundEvents.WOODEN_TRAPDOOR_OPEN,
-            SoundEvents.WOODEN_PRESSURE_PLATE_CLICK_OFF,
-            SoundEvents.WOODEN_PRESSURE_PLATE_CLICK_ON,
-            SoundEvents.WOODEN_BUTTON_CLICK_OFF,
-            SoundEvents.WOODEN_BUTTON_CLICK_ON));
+            // 木门的开关声在云上太"硬"，整套换成羊毛的放置/破坏声（用户 2026-11-19）
+            SoundEvents.WOOL_BREAK,
+            SoundEvents.WOOL_PLACE,
+            SoundEvents.WOOL_BREAK,
+            SoundEvents.WOOL_PLACE,
+            SoundEvents.WOOL_BREAK,
+            SoundEvents.WOOL_PLACE,
+            SoundEvents.WOOL_BREAK,
+            SoundEvents.WOOL_PLACE));
 
     private ModBlockSetTypes() {
     }
