@@ -213,19 +213,15 @@
     "subtitle": "subtitles.simpleflightring.thick_cloud_door.open",
     "sounds": [
       {
-        "name": "dig/cloth1",
+        "name": "simpleflightring:block/thick_cloud_door/open1",
         "type": "file"
       },
       {
-        "name": "dig/cloth2",
+        "name": "simpleflightring:block/thick_cloud_door/open2",
         "type": "file"
       },
       {
-        "name": "dig/cloth3",
-        "type": "file"
-      },
-      {
-        "name": "dig/cloth4",
+        "name": "simpleflightring:block/thick_cloud_door/open3",
         "type": "file"
       }
     ]
@@ -234,19 +230,15 @@
     "subtitle": "subtitles.simpleflightring.thick_cloud_door.close",
     "sounds": [
       {
-        "name": "dig/cloth1",
+        "name": "simpleflightring:block/thick_cloud_door/close1",
         "type": "file"
       },
       {
-        "name": "dig/cloth2",
+        "name": "simpleflightring:block/thick_cloud_door/close2",
         "type": "file"
       },
       {
-        "name": "dig/cloth3",
-        "type": "file"
-      },
-      {
-        "name": "dig/cloth4",
+        "name": "simpleflightring:block/thick_cloud_door/close3",
         "type": "file"
       }
     ]
