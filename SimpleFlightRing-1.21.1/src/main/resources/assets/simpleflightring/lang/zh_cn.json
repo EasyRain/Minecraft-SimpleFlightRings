@@ -14,6 +14,8 @@
   "subtitles.simpleflightring.thick_cloud_chest.place": "厚云箱子：被放置",
   "subtitles.simpleflightring.thick_cloud_chest.step": "踩在厚云箱子上",
   "subtitles.simpleflightring.thick_cloud_chest.hit": "厚云箱子：被敲击",
+  "subtitles.simpleflightring.thick_cloud_chest.open": "厚云箱子：打开",
+  "subtitles.simpleflightring.thick_cloud_chest.close": "厚云箱子：关闭",
   "subtitles.simpleflightring.thick_cloud_chest.fall": "落在厚云箱子上",
   "fml.menu.mods.info.description.simpleflightring": "戴上戒指即可像创造模式一样飞行：双击空格起飞，按住空格上升、Shift 下降。飞行每秒消耗 1 点耐久；六阶戒指可逐级合成升级，另有八枚遗迹戒指，各带独特能力。",
   "item.simpleflightring.wood_flight_ring": "木飞行戒指",

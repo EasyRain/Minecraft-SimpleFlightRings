@@ -14,6 +14,8 @@
   "subtitles.simpleflightring.thick_cloud_chest.place": "Thick Cloud Chest: Placed",
   "subtitles.simpleflightring.thick_cloud_chest.step": "Footsteps on a thick cloud chest",
   "subtitles.simpleflightring.thick_cloud_chest.hit": "Thick Cloud Chest: Hit",
+  "subtitles.simpleflightring.thick_cloud_chest.open": "Thick Cloud Chest: Opens",
+  "subtitles.simpleflightring.thick_cloud_chest.close": "Thick Cloud Chest: Closes",
   "subtitles.simpleflightring.thick_cloud_chest.fall": "Landed on a thick cloud chest",
   "fml.menu.mods.info.description.simpleflightring": "Wear a flight ring and fly like in creative mode: double-tap Space to take off, hold Space to rise, Shift to descend. Flight costs 1 durability per second; the six tiers of rings upgrade into each other, and eight relic rings each carry an ability of their own.",
   "item.simpleflightring.wood_flight_ring": "Wooden Flight Ring",

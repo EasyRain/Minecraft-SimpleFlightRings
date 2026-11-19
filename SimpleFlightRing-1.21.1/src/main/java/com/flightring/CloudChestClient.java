@@ -1,5 +1,9 @@
 package com.flightring;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.blockentity.ChestRenderer;
 import net.minecraft.client.resources.model.Material;
@@ -10,6 +14,11 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
+import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
 
 /**
  * 厚云箱子的客户端部分：贴图入图集 + 渲染器。
@@ -40,6 +49,46 @@ public final class CloudChestClient {
     @SubscribeEvent
     public static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerBlockEntityRenderer(ModBlockEntities.THICK_CLOUD_CHEST.get(), CloudChestRenderer::new);
+    }
+
+    /**
+     * 3D 手持/展示模型。
+     * <p>
+     * 原版箱子物品的模型是 {@code builtin/entity}：真正画它的是 {@link BlockEntityWithoutLevelRenderer}，
+     * 它拿一个真实的 {@code ChestBlockEntity} 交给方块实体渲染器画。我们照做 —— 建一个自己的箱子实体
+     * （无世界也能画，{@code ChestRenderer} 会走"没有 level"的分支），挂上我们的渲染器就得到 3D 箱子物品。
+     */
+    @SubscribeEvent
+    public static void onRegisterClientExtensions(RegisterClientExtensionsEvent event) {
+        event.registerItem(new IClientItemExtensions() {
+            private CloudChestItemRenderer renderer;
+
+            @Override
+            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
+                if (this.renderer == null) {
+                    this.renderer = new CloudChestItemRenderer();
+                }
+                return this.renderer;
+            }
+        }, ModItems.THICK_CLOUD_CHEST_ITEM.get());
+    }
+
+    /** 物品专属渲染器：把物品画成一个真实的箱子方块实体。 */
+    public static final class CloudChestItemRenderer extends BlockEntityWithoutLevelRenderer {
+
+        private final ThickCloudChestBlockEntity chest =
+                new ThickCloudChestBlockEntity(BlockPos.ZERO, ModBlocks.THICK_CLOUD_CHEST.get().defaultBlockState());
+
+        public CloudChestItemRenderer() {
+            super(Minecraft.getInstance().getBlockEntityRenderDispatcher(), Minecraft.getInstance().getEntityModels());
+        }
+
+        @Override
+        public void renderByItem(ItemStack stack, ItemDisplayContext context, PoseStack poseStack,
+                                 MultiBufferSource buffer, int packedLight, int packedOverlay) {
+            Minecraft.getInstance().getBlockEntityRenderDispatcher()
+                    .renderItem(this.chest, poseStack, buffer, packedLight, packedOverlay);
+        }
     }
 
     /** 复用原版箱子模型，只换材质（单箱 / 双箱左右两半各一张）。 */

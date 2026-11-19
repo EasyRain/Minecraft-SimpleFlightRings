@@ -75,6 +75,21 @@ public class ThickCloudChestBlockEntity extends ChestBlockEntity {
         }
     }
 
+
+    /**
+     * 关键：父类的 {@code recheckOpen()} 会把**父类那个私有计数器**重新核对一遍。
+     * 方块每 5 tick 会被 {@code scheduleTick} 调度一次（计数器自己排的），此时 {@code recheckOpeners}
+     * 发现玩家正开着容器，就会走父类计数器的 {@code onOpen} —— 于是**原版箱子音效又响了一遍**，
+     * 和我们的叠在一起（用户 2026-11-19 实测就是这个现象）。
+     * 所以这里也一起覆写，让"重新核对"只走我们自己的计数器。
+     */
+    @Override
+    public void recheckOpen() {
+        if (!this.remove) {
+            this.cloudOpeners.recheckOpeners(this.getLevel(), this.getBlockPos(), this.getBlockState());
+        }
+    }
+
     /** 与原版 {@code ChestBlockEntity#playSound} 同样的定位规则：双箱只在右半边播一次。 */
     private static void playCloudSound(Level level, BlockPos pos, BlockState state, SoundEvent event) {
         ChestType type = state.getValue(ChestBlock.TYPE);
