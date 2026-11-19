@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "building",
   "key": {
-    "#": "simpleflightring:thick_cloud_bricks"
+    "#": "simpleflightring:thick_cloud_block"
   },
   "pattern": [
     "###",

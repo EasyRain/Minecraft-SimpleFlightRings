@@ -1,6 +1,7 @@
 package com.flightring;
 
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.WallBlock;
@@ -78,6 +79,15 @@ public final class ModBlocks {
             properties -> new StairBlock(net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(), properties),
             properties -> properties.strength(0.8F)
                     .sound(SoundType.SNOW));
+
+    /** 厚云门：云房子的门（BlockSetType 决定音效与开关行为）。 */
+    public static final DeferredBlock<Block> THICK_CLOUD_DOOR = BLOCKS.registerBlock(
+            "thick_cloud_door",
+            properties -> new DoorBlock(ModBlockSetTypes.CLOUD, properties),
+            properties -> properties.strength(0.8F)
+                    .sound(SoundType.SNOW)
+                    .noOcclusion()
+                    .pushReaction(PushReaction.DESTROY));
 
     public static final DeferredBlock<Block> THICK_CLOUD_WALL = BLOCKS.registerBlock(
             "thick_cloud_wall",
