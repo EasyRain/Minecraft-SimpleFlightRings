@@ -80,6 +80,14 @@ public final class ModBlocks {
             properties -> properties.strength(0.8F)
                     .sound(ModSounds.THICK_SOUND_TYPE));
 
+    /** 厚云箱子：单箱/大箱照原版逻辑，开关盖用我们自己的音效（26.x 由 ChestBlock 构造函数接收）。 */
+    public static final DeferredBlock<Block> THICK_CLOUD_CHEST = BLOCKS.registerBlock(
+            "thick_cloud_chest",
+            ThickCloudChestBlock::new,
+            properties -> properties.strength(2.0F)
+                    .sound(ModSounds.CHEST_SOUND_TYPE)
+                    .noOcclusion());
+
     /** 厚云门：云房子的门（BlockSetType 决定音效与开关行为）。 */
     public static final DeferredBlock<Block> THICK_CLOUD_DOOR = BLOCKS.registerBlock(
             "thick_cloud_door",

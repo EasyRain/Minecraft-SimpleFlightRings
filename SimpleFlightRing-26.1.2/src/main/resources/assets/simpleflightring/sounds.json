@@ -276,5 +276,110 @@
         "type": "file"
       }
     ]
+  },
+  "block.thick_cloud_chest.break": {
+    "subtitle": "subtitles.simpleflightring.thick_cloud_chest.break",
+    "sounds": [
+      {
+        "name": "dig/snow1",
+        "type": "file"
+      },
+      {
+        "name": "dig/snow2",
+        "type": "file"
+      },
+      {
+        "name": "dig/snow3",
+        "type": "file"
+      },
+      {
+        "name": "dig/snow4",
+        "type": "file"
+      }
+    ]
+  },
+  "block.thick_cloud_chest.place": {
+    "subtitle": "subtitles.simpleflightring.thick_cloud_chest.place",
+    "sounds": [
+      {
+        "name": "dig/snow1",
+        "type": "file"
+      },
+      {
+        "name": "dig/snow2",
+        "type": "file"
+      },
+      {
+        "name": "dig/snow3",
+        "type": "file"
+      },
+      {
+        "name": "dig/snow4",
+        "type": "file"
+      }
+    ]
+  },
+  "block.thick_cloud_chest.hit": {
+    "subtitle": "subtitles.simpleflightring.thick_cloud_chest.hit",
+    "sounds": [
+      {
+        "name": "dig/snow1",
+        "type": "file"
+      },
+      {
+        "name": "dig/snow2",
+        "type": "file"
+      },
+      {
+        "name": "dig/snow3",
+        "type": "file"
+      },
+      {
+        "name": "dig/snow4",
+        "type": "file"
+      }
+    ]
+  },
+  "block.thick_cloud_chest.step": {
+    "subtitle": "subtitles.simpleflightring.thick_cloud_chest.step",
+    "sounds": [
+      {
+        "name": "step/snow1",
+        "type": "file"
+      },
+      {
+        "name": "step/snow2",
+        "type": "file"
+      },
+      {
+        "name": "step/snow3",
+        "type": "file"
+      },
+      {
+        "name": "step/snow4",
+        "type": "file"
+      }
+    ]
+  },
+  "block.thick_cloud_chest.fall": {
+    "subtitle": "subtitles.simpleflightring.thick_cloud_chest.fall",
+    "sounds": [
+      {
+        "name": "step/snow1",
+        "type": "file"
+      },
+      {
+        "name": "step/snow2",
+        "type": "file"
+      },
+      {
+        "name": "step/snow3",
+        "type": "file"
+      },
+      {
+        "name": "step/snow4",
+        "type": "file"
+      }
+    ]
   }
 }

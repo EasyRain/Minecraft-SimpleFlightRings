@@ -56,6 +56,8 @@ public class ModItems {
             ITEMS.registerSimpleBlockItem("thick_cloud_slab", () -> ModBlocks.THICK_CLOUD_SLAB.get());
     public static final DeferredItem<BlockItem> THICK_CLOUD_STAIRS_ITEM =
             ITEMS.registerSimpleBlockItem("thick_cloud_stairs", () -> ModBlocks.THICK_CLOUD_STAIRS.get());
+    public static final DeferredItem<BlockItem> THICK_CLOUD_CHEST_ITEM =
+            ITEMS.registerSimpleBlockItem("thick_cloud_chest", () -> ModBlocks.THICK_CLOUD_CHEST.get());
     public static final DeferredItem<BlockItem> THICK_CLOUD_DOOR_ITEM =
             ITEMS.registerSimpleBlockItem("thick_cloud_door", () -> ModBlocks.THICK_CLOUD_DOOR.get());
     public static final DeferredItem<BlockItem> THICK_CLOUD_WALL_ITEM =
