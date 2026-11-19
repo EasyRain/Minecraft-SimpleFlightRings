@@ -6,8 +6,8 @@
     "X": "simpleflightring:thick_cloud_block"
   },
   "pattern": [
-    "###",
-    "XXX"
+    "XXX",
+    "###"
   ],
   "result": {
     "count": 1,

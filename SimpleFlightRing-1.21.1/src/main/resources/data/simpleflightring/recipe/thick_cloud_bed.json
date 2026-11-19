@@ -10,8 +10,8 @@
     }
   },
   "pattern": [
-    "###",
-    "XXX"
+    "XXX",
+    "###"
   ],
   "result": {
     "count": 1,
