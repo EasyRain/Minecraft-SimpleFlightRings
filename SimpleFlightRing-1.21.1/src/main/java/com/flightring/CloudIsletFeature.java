@@ -22,7 +22,8 @@ import net.minecraft.world.level.storage.loot.LootTable;
  * 云屿 —— 主世界高空的漂浮小岛，**整座只由云块组成**（用户 2026-11-19 定：不要厚云块），
  * 岛上放一个我们自己的厚云箱子当战利品。
  * <p>
- * 形状是一个压扁的椭球 + 底下几根垂下来的"云根"，全部只往空气里放方块，所以不会切进地形。
+ * 形状是一个压扁的椭球，只往空气里放方块，所以不会切进地形。
+ * （用户 2026-11-19：底下垂的"云根"随机起来很怪，去掉。）
  * 箱子放在岛顶中心，面朝随机水平方向，战利品表给 {@code simpleflightring:chests/cloud_islet}
  * （云块 + 厚云砖 + 少量矿物：够玩家凑出第一座云门）。
  */
@@ -73,20 +74,6 @@ public class CloudIsletFeature extends Feature<NoneFeatureConfiguration> {
 
         if (placed < 24) {
             return false;
-        }
-
-        // 底下垂 2~4 根"云根"，更像漂浮岛
-        int roots = 2 + random.nextInt(3);
-        for (int i = 0; i < roots; i++) {
-            int dx = random.nextInt(radiusXZ * 2 + 1) - radiusXZ;
-            int dz = random.nextInt(radiusXZ * 2 + 1) - radiusXZ;
-            int length = 2 + random.nextInt(3);
-            for (int k = 1; k <= length; k++) {
-                BlockPos pos = origin.offset(dx, -radiusY - k, dz);
-                if (level.isEmptyBlock(pos)) {
-                    level.setBlock(pos, cloud, Block.UPDATE_CLIENTS);
-                }
-            }
         }
 
         placeChest(level, random, origin.above(radiusY + 1));
