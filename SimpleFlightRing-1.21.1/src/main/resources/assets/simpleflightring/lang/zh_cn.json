@@ -225,11 +225,8 @@
   "ring_affix.simpleflightring.line": "%s：%s",
   "hud.simpleflightring.flight_time_long": "飞行时间：%sH %sM %sS",
   "hud.simpleflightring.energy": "%s/%s",
-
   "simpleflightring.configuration.title": "简易飞行戒指",
-
   "neoforge.configuration.uitext.section": "%s",
-
   "simpleflightring.command.locate.no_pool": "群系池还没建立（先进入过一次世界）",
   "simpleflightring.command.reforge.done": "已重铸为：%s",
   "simpleflightring.command.reforge.not_a_ring": "主手需要拿着一枚飞行戒指",
@@ -298,7 +295,6 @@
   "simpleflightring.configuration.excludeFunctionalBiomes": "跳过纯功能性群系",
   "simpleflightring.configuration.logPool": "记录群系池日志",
   "simpleflightring.configuration.logLayout": "记录岛屿布局日志",
-
   "simpleflightring.configuration.showFlightTimer.tooltip": "在 HUD 上显示飞行时间倒计时。",
   "simpleflightring.configuration.hideWhileChatOpen.tooltip": "打开聊天框时把倒计时藏起来。",
   "simpleflightring.configuration.hudXPercent.tooltip": "HUD 水平位置，取屏幕宽度的百分比（0~100）；倒计时与能量条共用。",
@@ -331,5 +327,17 @@
   "simpleflightring.configuration.excludeFeaturelessBiomes.tooltip": "跳过所有没有地物的群系（默认开启）。",
   "simpleflightring.configuration.excludeFunctionalBiomes.tooltip": "跳过看起来纯功能性群系（无地物、无维度标签，默认开启）。",
   "simpleflightring.configuration.logPool.tooltip": "启动时把群系池的取舍结果打印到日志。",
-  "simpleflightring.configuration.logLayout.tooltip": "启动时把岛屿布局（种子、格、间距）打印到日志。"
+  "simpleflightring.configuration.logLayout.tooltip": "启动时把岛屿布局（种子、格、间距）打印到日志。",
+  "subtitles.simpleflightring.cloud_block.break": "云块：被破坏",
+  "subtitles.simpleflightring.cloud_block.place": "云块：被放置",
+  "subtitles.simpleflightring.cloud_block.step": "踩在云上",
+  "subtitles.simpleflightring.cloud_block.hit": "云块：被敲击",
+  "subtitles.simpleflightring.cloud_block.fall": "落在云上",
+  "subtitles.simpleflightring.thick_cloud.break": "厚云块：被破坏",
+  "subtitles.simpleflightring.thick_cloud.place": "厚云块：被放置",
+  "subtitles.simpleflightring.thick_cloud.step": "踩在厚云上",
+  "subtitles.simpleflightring.thick_cloud.hit": "厚云块：被敲击",
+  "subtitles.simpleflightring.thick_cloud.fall": "落在厚云上",
+  "subtitles.simpleflightring.thick_cloud_door.open": "厚云门：打开",
+  "subtitles.simpleflightring.thick_cloud_door.close": "厚云门：关闭"
 }

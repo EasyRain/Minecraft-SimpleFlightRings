@@ -1,6 +1,5 @@
 package com.flightring;
 
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
 
@@ -23,15 +22,16 @@ public final class ModBlockSetTypes {
             true,   // can be activated by arrows
             BlockSetType.PressurePlateSensitivity.EVERYTHING,
             SoundType.SNOW,
-            // 木门的开关声在云上太"硬"，整套换成羊毛的放置/破坏声（用户 2026-11-19）
-            SoundEvents.WOOL_BREAK,
-            SoundEvents.WOOL_PLACE,
-            SoundEvents.WOOL_BREAK,
-            SoundEvents.WOOL_PLACE,
-            SoundEvents.WOOL_BREAK,
-            SoundEvents.WOOL_PLACE,
-            SoundEvents.WOOL_BREAK,
-            SoundEvents.WOOL_PLACE));
+            // 木门的开关声在云上太"硬"，整套换成羊毛的音色（用户 2026-11-19）；
+            // 用我们自己的 SoundEvent，字幕才会显示"厚云门：打开/关闭"而不是"方块：被放置"
+            ModSounds.DOOR_CLOSE,
+            ModSounds.DOOR_OPEN,
+            ModSounds.DOOR_CLOSE,
+            ModSounds.DOOR_OPEN,
+            ModSounds.DOOR_CLOSE,
+            ModSounds.DOOR_OPEN,
+            ModSounds.DOOR_CLOSE,
+            ModSounds.DOOR_OPEN));
 
     private ModBlockSetTypes() {
     }

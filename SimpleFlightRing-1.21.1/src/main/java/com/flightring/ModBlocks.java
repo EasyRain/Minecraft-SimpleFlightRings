@@ -44,7 +44,7 @@ public final class ModBlocks {
             "cloud_block",
             CloudBlock::new,
             BlockBehaviour.Properties.of().strength(0.2F)
-                    .sound(SoundType.SNOW)
+                    .sound(ModSounds.CLOUD_SOUND_TYPE)
                     .noOcclusion()
                     .isSuffocating((state, level, pos) -> false)
                     .isViewBlocking((state, level, pos) -> false)
@@ -55,7 +55,7 @@ public final class ModBlocks {
             "thick_cloud_block",
             Block::new,
             BlockBehaviour.Properties.of().strength(0.6F)
-                    .sound(SoundType.SNOW)
+                    .sound(ModSounds.THICK_SOUND_TYPE)
                     .noOcclusion()
                     .isViewBlocking((state, level, pos) -> false));
 
@@ -64,13 +64,13 @@ public final class ModBlocks {
             "thick_cloud_bricks",
             Block::new,
             BlockBehaviour.Properties.of().strength(0.8F)
-                    .sound(SoundType.SNOW));
+                    .sound(ModSounds.THICK_SOUND_TYPE));
 
     public static final DeferredBlock<Block> THICK_CLOUD_SLAB = BLOCKS.registerBlock(
             "thick_cloud_slab",
             SlabBlock::new,
             BlockBehaviour.Properties.of().strength(0.8F)
-                    .sound(SoundType.SNOW));
+                    .sound(ModSounds.THICK_SOUND_TYPE));
 
 
     /** 厚云楼梯（楼梯只需 baseState 供 codec 用，行为上不依赖它，所以这里用石头占位避免注册期取 .get()）。 */
@@ -78,14 +78,14 @@ public final class ModBlocks {
             "thick_cloud_stairs",
             properties -> new StairBlock(net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(), properties),
             BlockBehaviour.Properties.of().strength(0.8F)
-                    .sound(SoundType.SNOW));
+                    .sound(ModSounds.THICK_SOUND_TYPE));
 
     /** 厚云门：云房子的门（BlockSetType 决定音效与开关行为）。 */
     public static final DeferredBlock<Block> THICK_CLOUD_DOOR = BLOCKS.registerBlock(
             "thick_cloud_door",
             properties -> new DoorBlock(ModBlockSetTypes.CLOUD, properties),
             BlockBehaviour.Properties.of().strength(0.8F)
-                    .sound(SoundType.SNOW)
+                    .sound(ModSounds.THICK_SOUND_TYPE)
                     .noOcclusion()
                     .pushReaction(PushReaction.DESTROY));
 
@@ -93,7 +93,7 @@ public final class ModBlocks {
             "thick_cloud_wall",
             WallBlock::new,
             BlockBehaviour.Properties.of().strength(0.8F)
-                    .sound(SoundType.SNOW));
+                    .sound(ModSounds.THICK_SOUND_TYPE));
 
     private ModBlocks() {
     }

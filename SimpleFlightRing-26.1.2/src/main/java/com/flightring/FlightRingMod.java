@@ -27,6 +27,7 @@ public class FlightRingMod {
         ModDataComponents.COMPONENTS.register(modEventBus);
         ModLootFunctions.LOOT_FUNCTIONS.register(modEventBus);
         ModMobEffects.EFFECTS.register(modEventBus);
+        ModSounds.SOUNDS.register(modEventBus);
         ModAttributes.ATTRIBUTES.register(modEventBus);
         ModParticles.PARTICLES.register(modEventBus);
         // M2: the broken dimension's biome source / chunk generator / snow feature are all codec-based

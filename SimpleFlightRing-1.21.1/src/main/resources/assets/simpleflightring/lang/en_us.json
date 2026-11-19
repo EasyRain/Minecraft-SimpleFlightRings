@@ -225,11 +225,8 @@
   "ring_affix.simpleflightring.line": "%s: %s",
   "hud.simpleflightring.flight_time_long": "Flight time: %sH %sM %sS",
   "hud.simpleflightring.energy": "%s/%s",
-
   "simpleflightring.configuration.title": "Simple Flight Rings",
-
   "neoforge.configuration.uitext.section": "%s",
-
   "simpleflightring.command.locate.no_pool": "The biome pool does not exist yet (enter a world once first)",
   "simpleflightring.command.reforge.done": "Reforged into: %s",
   "simpleflightring.command.reforge.not_a_ring": "Hold a flight ring in your main hand",
@@ -298,7 +295,6 @@
   "simpleflightring.configuration.excludeFunctionalBiomes": "Skip purely functional biomes",
   "simpleflightring.configuration.logPool": "Log the biome pool",
   "simpleflightring.configuration.logLayout": "Log the island layout",
-
   "simpleflightring.configuration.showFlightTimer.tooltip": "Show the flight time countdown on the HUD.",
   "simpleflightring.configuration.hideWhileChatOpen.tooltip": "Hide the countdown while the chat screen is open.",
   "simpleflightring.configuration.hudXPercent.tooltip": "Horizontal HUD position, as a percentage of the screen width (0-100). Applies to both the countdown and the energy bar.",
@@ -331,5 +327,17 @@
   "simpleflightring.configuration.excludeFeaturelessBiomes.tooltip": "Skip every biome that lists no placed feature (on by default).",
   "simpleflightring.configuration.excludeFunctionalBiomes.tooltip": "Skip biomes that look purely functional (no features, no dimension tag; on by default).",
   "simpleflightring.configuration.logPool.tooltip": "Print the biome pool decisions to the log at startup.",
-  "simpleflightring.configuration.logLayout.tooltip": "Print the island layout (seed, grid, gaps) to the log at startup."
+  "simpleflightring.configuration.logLayout.tooltip": "Print the island layout (seed, grid, gaps) to the log at startup.",
+  "subtitles.simpleflightring.cloud_block.break": "Cloud Block: Broken",
+  "subtitles.simpleflightring.cloud_block.place": "Cloud Block: Placed",
+  "subtitles.simpleflightring.cloud_block.step": "Footsteps on clouds",
+  "subtitles.simpleflightring.cloud_block.hit": "Cloud Block: Hit",
+  "subtitles.simpleflightring.cloud_block.fall": "Landed on clouds",
+  "subtitles.simpleflightring.thick_cloud.break": "Thick Cloud: Broken",
+  "subtitles.simpleflightring.thick_cloud.place": "Thick Cloud: Placed",
+  "subtitles.simpleflightring.thick_cloud.step": "Footsteps on thick cloud",
+  "subtitles.simpleflightring.thick_cloud.hit": "Thick Cloud: Hit",
+  "subtitles.simpleflightring.thick_cloud.fall": "Landed on thick cloud",
+  "subtitles.simpleflightring.thick_cloud_door.open": "Thick Cloud Door: Opens",
+  "subtitles.simpleflightring.thick_cloud_door.close": "Thick Cloud Door: Closes"
 }

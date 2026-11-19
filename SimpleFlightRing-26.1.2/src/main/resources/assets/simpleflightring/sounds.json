@@ -1,0 +1,254 @@
+{
+  "block.cloud_block.break": {
+    "subtitle": "subtitles.simpleflightring.cloud_block.break",
+    "sounds": [
+      {
+        "name": "dig/snow1",
+        "type": "file"
+      },
+      {
+        "name": "dig/snow2",
+        "type": "file"
+      },
+      {
+        "name": "dig/snow3",
+        "type": "file"
+      },
+      {
+        "name": "dig/snow4",
+        "type": "file"
+      }
+    ]
+  },
+  "block.cloud_block.place": {
+    "subtitle": "subtitles.simpleflightring.cloud_block.place",
+    "sounds": [
+      {
+        "name": "dig/snow1",
+        "type": "file"
+      },
+      {
+        "name": "dig/snow2",
+        "type": "file"
+      },
+      {
+        "name": "dig/snow3",
+        "type": "file"
+      },
+      {
+        "name": "dig/snow4",
+        "type": "file"
+      }
+    ]
+  },
+  "block.cloud_block.step": {
+    "subtitle": "subtitles.simpleflightring.cloud_block.step",
+    "sounds": [
+      {
+        "name": "step/snow1",
+        "type": "file"
+      },
+      {
+        "name": "step/snow2",
+        "type": "file"
+      },
+      {
+        "name": "step/snow3",
+        "type": "file"
+      },
+      {
+        "name": "step/snow4",
+        "type": "file"
+      }
+    ]
+  },
+  "block.cloud_block.hit": {
+    "subtitle": "subtitles.simpleflightring.cloud_block.hit",
+    "sounds": [
+      {
+        "name": "dig/snow1",
+        "type": "file"
+      },
+      {
+        "name": "dig/snow2",
+        "type": "file"
+      },
+      {
+        "name": "dig/snow3",
+        "type": "file"
+      },
+      {
+        "name": "dig/snow4",
+        "type": "file"
+      }
+    ]
+  },
+  "block.cloud_block.fall": {
+    "subtitle": "subtitles.simpleflightring.cloud_block.fall",
+    "sounds": [
+      {
+        "name": "step/snow1",
+        "type": "file"
+      },
+      {
+        "name": "step/snow2",
+        "type": "file"
+      },
+      {
+        "name": "step/snow3",
+        "type": "file"
+      },
+      {
+        "name": "step/snow4",
+        "type": "file"
+      }
+    ]
+  },
+  "block.thick_cloud.break": {
+    "subtitle": "subtitles.simpleflightring.thick_cloud.break",
+    "sounds": [
+      {
+        "name": "dig/snow1",
+        "type": "file"
+      },
+      {
+        "name": "dig/snow2",
+        "type": "file"
+      },
+      {
+        "name": "dig/snow3",
+        "type": "file"
+      },
+      {
+        "name": "dig/snow4",
+        "type": "file"
+      }
+    ]
+  },
+  "block.thick_cloud.place": {
+    "subtitle": "subtitles.simpleflightring.thick_cloud.place",
+    "sounds": [
+      {
+        "name": "dig/snow1",
+        "type": "file"
+      },
+      {
+        "name": "dig/snow2",
+        "type": "file"
+      },
+      {
+        "name": "dig/snow3",
+        "type": "file"
+      },
+      {
+        "name": "dig/snow4",
+        "type": "file"
+      }
+    ]
+  },
+  "block.thick_cloud.step": {
+    "subtitle": "subtitles.simpleflightring.thick_cloud.step",
+    "sounds": [
+      {
+        "name": "step/snow1",
+        "type": "file"
+      },
+      {
+        "name": "step/snow2",
+        "type": "file"
+      },
+      {
+        "name": "step/snow3",
+        "type": "file"
+      },
+      {
+        "name": "step/snow4",
+        "type": "file"
+      }
+    ]
+  },
+  "block.thick_cloud.hit": {
+    "subtitle": "subtitles.simpleflightring.thick_cloud.hit",
+    "sounds": [
+      {
+        "name": "dig/snow1",
+        "type": "file"
+      },
+      {
+        "name": "dig/snow2",
+        "type": "file"
+      },
+      {
+        "name": "dig/snow3",
+        "type": "file"
+      },
+      {
+        "name": "dig/snow4",
+        "type": "file"
+      }
+    ]
+  },
+  "block.thick_cloud.fall": {
+    "subtitle": "subtitles.simpleflightring.thick_cloud.fall",
+    "sounds": [
+      {
+        "name": "step/snow1",
+        "type": "file"
+      },
+      {
+        "name": "step/snow2",
+        "type": "file"
+      },
+      {
+        "name": "step/snow3",
+        "type": "file"
+      },
+      {
+        "name": "step/snow4",
+        "type": "file"
+      }
+    ]
+  },
+  "block.thick_cloud_door.open": {
+    "subtitle": "subtitles.simpleflightring.thick_cloud_door.open",
+    "sounds": [
+      {
+        "name": "dig/cloth1",
+        "type": "file"
+      },
+      {
+        "name": "dig/cloth2",
+        "type": "file"
+      },
+      {
+        "name": "dig/cloth3",
+        "type": "file"
+      },
+      {
+        "name": "dig/cloth4",
+        "type": "file"
+      }
+    ]
+  },
+  "block.thick_cloud_door.close": {
+    "subtitle": "subtitles.simpleflightring.thick_cloud_door.close",
+    "sounds": [
+      {
+        "name": "dig/cloth1",
+        "type": "file"
+      },
+      {
+        "name": "dig/cloth2",
+        "type": "file"
+      },
+      {
+        "name": "dig/cloth3",
+        "type": "file"
+      },
+      {
+        "name": "dig/cloth4",
+        "type": "file"
+      }
+    ]
+  }
+}

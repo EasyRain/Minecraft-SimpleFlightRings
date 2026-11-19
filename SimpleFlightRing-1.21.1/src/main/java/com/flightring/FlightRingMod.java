@@ -30,6 +30,7 @@ public class FlightRingMod {
         ModDataComponents.COMPONENTS.register(modEventBus);
         ModLootFunctions.LOOT_FUNCTIONS.register(modEventBus);
         ModMobEffects.EFFECTS.register(modEventBus);
+        ModSounds.SOUNDS.register(modEventBus);
         ModAttributes.ATTRIBUTES.register(modEventBus);
         ModParticles.PARTICLES.register(modEventBus);
         ModWorldGen.BIOME_SOURCES.register(modEventBus);
