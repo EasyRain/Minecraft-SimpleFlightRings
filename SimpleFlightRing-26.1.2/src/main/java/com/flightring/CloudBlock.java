@@ -2,6 +2,7 @@ package com.flightring;
 
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.InsideBlockEffectApplier;
 import net.minecraft.world.entity.player.Player;
@@ -62,6 +63,16 @@ public class CloudBlock extends Block {
             }
         }
         return Shapes.empty();
+    }
+
+    /**
+     * Culls the faces between two neighbouring cloud blocks. Without this the inner faces of a cloud body are
+     * still drawn, and because the block is translucent they pile up into a visible "sheet in the middle" -
+     * the same reason vanilla glass skips rendering between two glass blocks.
+     */
+    @Override
+    protected boolean skipRendering(BlockState state, BlockState neighbour, Direction direction) {
+        return neighbour.is(this) || super.skipRendering(state, neighbour, direction);
     }
 
     /** Everyone else slowly sinks through, exactly like cobweb (which also resets the fall distance). */
