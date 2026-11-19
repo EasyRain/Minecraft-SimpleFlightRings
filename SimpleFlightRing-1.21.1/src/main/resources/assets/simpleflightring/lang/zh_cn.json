@@ -347,5 +347,6 @@
   "subtitles.simpleflightring.thick_cloud.hit": "厚云块：被敲击",
   "subtitles.simpleflightring.thick_cloud.fall": "落在厚云上",
   "subtitles.simpleflightring.thick_cloud_door.open": "厚云门：打开",
-  "subtitles.simpleflightring.thick_cloud_door.close": "厚云门：关闭"
+  "subtitles.simpleflightring.thick_cloud_door.close": "厚云门：关闭",
+  "block.simpleflightring.thick_cloud_bed": "厚云床"
 }

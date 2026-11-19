@@ -347,5 +347,6 @@
   "subtitles.simpleflightring.thick_cloud.hit": "Thick Cloud: Hit",
   "subtitles.simpleflightring.thick_cloud.fall": "Landed on thick cloud",
   "subtitles.simpleflightring.thick_cloud_door.open": "Thick Cloud Door: Opens",
-  "subtitles.simpleflightring.thick_cloud_door.close": "Thick Cloud Door: Closes"
+  "subtitles.simpleflightring.thick_cloud_door.close": "Thick Cloud Door: Closes",
+  "block.simpleflightring.thick_cloud_bed": "Thick Cloud Bed"
 }

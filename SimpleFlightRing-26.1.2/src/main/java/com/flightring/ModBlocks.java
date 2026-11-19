@@ -80,6 +80,14 @@ public final class ModBlocks {
             properties -> properties.strength(0.8F)
                     .sound(ModSounds.THICK_SOUND_TYPE));
 
+    /** 厚云床：睡觉/重生点照原版，渲染器单独换成厚云贴图。 */
+    public static final DeferredBlock<Block> THICK_CLOUD_BED = BLOCKS.registerBlock(
+            "thick_cloud_bed",
+            ThickCloudBedBlock::new,
+            properties -> properties.strength(0.2F)
+                    .sound(ModSounds.CHEST_SOUND_TYPE)
+                    .noOcclusion());
+
     /** 厚云箱子：单箱/大箱照原版逻辑，开关盖用我们自己的音效（26.x 由 ChestBlock 构造函数接收）。 */
     public static final DeferredBlock<Block> THICK_CLOUD_CHEST = BLOCKS.registerBlock(
             "thick_cloud_chest",

@@ -18,6 +18,11 @@ public final class ModBlockEntities {
             () -> new BlockEntityType<>(ThickCloudChestBlockEntity::new,
                     Set.of(ModBlocks.THICK_CLOUD_CHEST.get())));
 
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<ThickCloudBedBlockEntity>>
+            THICK_CLOUD_BED = BLOCK_ENTITIES.register("thick_cloud_bed",
+            () -> new BlockEntityType<>(ThickCloudBedBlockEntity::new,
+                    Set.of(ModBlocks.THICK_CLOUD_BED.get())));
+
     private ModBlockEntities() {
     }
 }
