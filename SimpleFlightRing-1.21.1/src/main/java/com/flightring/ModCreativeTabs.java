@@ -31,6 +31,7 @@ public class ModCreativeTabs {
                         output.accept(new ItemStack(ModItems.THICK_CLOUD_BLOCK_ITEM.get()));
                         output.accept(new ItemStack(ModItems.THICK_CLOUD_BRICKS_ITEM.get()));
                         output.accept(new ItemStack(ModItems.THICK_CLOUD_SLAB_ITEM.get()));
+                        output.accept(new ItemStack(ModItems.THICK_CLOUD_STAIRS_ITEM.get()));
                         output.accept(new ItemStack(ModItems.THICK_CLOUD_WALL_ITEM.get()));
                         output.accept(new ItemStack(ModItems.INDESTRUCTIBLE_CORE.get()));
                         output.accept(new ItemStack(ModItems.REFORGE_STONE.get()));

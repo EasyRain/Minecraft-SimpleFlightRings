@@ -33,8 +33,8 @@ public class CloudBlock extends Block {
 
     public static final MapCodec<CloudBlock> CODEC = simpleCodec(CloudBlock::new);
 
-    /** Sink speed while inside: 40% horizontal, 8% vertical (cobweb is 25% / 5%). */
-    private static final Vec3 SINK_SPEED = new Vec3(0.4D, 0.08D, 0.4D);
+    /** Sink speed while inside: 50% horizontal, 30% vertical (cobweb is 25% / 5%; clouds sink faster). */
+    private static final Vec3 SINK_SPEED = new Vec3(0.5D, 0.3D, 0.5D);
 
     public CloudBlock(Properties properties) {
         super(properties);

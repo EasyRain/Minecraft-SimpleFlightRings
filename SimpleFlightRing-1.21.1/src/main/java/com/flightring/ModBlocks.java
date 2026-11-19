@@ -2,6 +2,7 @@ package com.flightring;
 
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SlabBlock;
+import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.WallBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -67,6 +68,14 @@ public final class ModBlocks {
     public static final DeferredBlock<Block> THICK_CLOUD_SLAB = BLOCKS.registerBlock(
             "thick_cloud_slab",
             SlabBlock::new,
+            BlockBehaviour.Properties.of().strength(0.8F)
+                    .sound(SoundType.SNOW));
+
+
+    /** 厚云楼梯（楼梯只需 baseState 供 codec 用，行为上不依赖它，所以这里用石头占位避免注册期取 .get()）。 */
+    public static final DeferredBlock<Block> THICK_CLOUD_STAIRS = BLOCKS.registerBlock(
+            "thick_cloud_stairs",
+            properties -> new StairBlock(net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(), properties),
             BlockBehaviour.Properties.of().strength(0.8F)
                     .sound(SoundType.SNOW));
 

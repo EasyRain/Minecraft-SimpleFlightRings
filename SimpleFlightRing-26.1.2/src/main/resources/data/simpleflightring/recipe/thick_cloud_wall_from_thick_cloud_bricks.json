@@ -3,6 +3,6 @@
   "ingredient": "simpleflightring:thick_cloud_bricks",
   "result": {
     "count": 1,
-    "id": "simpleflightring:thick_cloud_wall_from_thick_cloud_bricks"
+    "id": "simpleflightring:thick_cloud_wall"
   }
 }
