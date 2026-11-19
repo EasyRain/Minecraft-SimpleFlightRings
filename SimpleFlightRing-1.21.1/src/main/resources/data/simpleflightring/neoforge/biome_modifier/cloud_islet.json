@@ -1,0 +1,6 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": "#minecraft:is_overworld",
+  "features": "simpleflightring:cloud_islet",
+  "step": "surface_structures"
+}

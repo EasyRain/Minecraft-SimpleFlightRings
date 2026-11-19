@@ -41,6 +41,10 @@ public final class ModWorldGen {
     public static final DeferredHolder<Feature<?>, BrokenSnowFeature> BROKEN_SNOW =
             FEATURES.register("broken_snow", () -> new BrokenSnowFeature(NoneFeatureConfiguration.CODEC));
 
+    /** {@code simpleflightring:cloud_islet} - 主世界高空的云屿（整座云块 + 我们的箱子）。 */
+    public static final DeferredHolder<Feature<?>, CloudIsletFeature> CLOUD_ISLET =
+            FEATURES.register("cloud_islet", () -> new CloudIsletFeature(NoneFeatureConfiguration.CODEC));
+
     private ModWorldGen() {
     }
 }
