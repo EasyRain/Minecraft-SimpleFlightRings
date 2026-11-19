@@ -3,5 +3,6 @@
   "textures": {
     "bottom": "simpleflightring:block/thick_cloud_door_bottom",
     "top": "simpleflightring:block/thick_cloud_door_top"
-  }
+  },
+  "render_type": "minecraft:cutout"
 }
