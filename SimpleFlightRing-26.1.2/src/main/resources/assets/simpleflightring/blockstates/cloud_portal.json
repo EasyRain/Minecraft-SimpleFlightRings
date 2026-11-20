@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "simpleflightring:block/cloud_portal_ns"
+    },
+    "axis=z": {
+      "model": "simpleflightring:block/cloud_portal_ew"
+    }
+  }
+}
