@@ -33,7 +33,7 @@ public final class CloudPortalIgnite {
         if (event.getEntity().isShiftKeyDown()) {
             return;
         }
-        if (!holdsOrCarriesEnderRing(event.getEntity())) {
+        if (!holdsOrCarriesRing(event.getEntity())) {
             return;
         }
         BlockPos clicked = event.getPos();
@@ -53,25 +53,15 @@ public final class CloudPortalIgnite {
     }
 
     /**
-     * 只有**末影戒指**能点亮云门（用户 2026-11-20：之前随便一枚戒指都行，太宽了）。
-     * 拿在手上、副手、或戴着（Curios 槽/背包）都算，但必须是末影戒指那一枚。
+     * 任意飞行戒指都能点亮云门（用户 2026-11-20：不要限定成末影戒指）。
+     * 拿在手上、副手、或带在身上（Curios 槽 / 背包）都算。
      */
-    private static boolean holdsOrCarriesEnderRing(net.minecraft.world.entity.player.Player player) {
-        ItemStack enderRing = new ItemStack(ModItems.RELIC_RINGS.get(RelicRing.ENDER).get());
-        if (ItemStack.isSameItem(player.getMainHandItem(), enderRing)
-                || ItemStack.isSameItem(player.getOffhandItem(), enderRing)) {
+    private static boolean holdsOrCarriesRing(net.minecraft.world.entity.player.Player player) {
+        if (player.getMainHandItem().getItem() instanceof FlightRingItem
+                || player.getOffhandItem().getItem() instanceof FlightRingItem) {
             return true;
         }
-        if (CuriosCompat.isLoaded()
-                && ItemStack.isSameItem(CuriosCompat.findRingInSlot(player), enderRing)) {
-            return true;
-        }
-        for (ItemStack stack : player.getInventory().getNonEquipmentItems()) {
-            if (ItemStack.isSameItem(stack, enderRing)) {
-                return true;
-            }
-        }
-        return false;
+        return FlightHandler.hasUsableRing(player);
     }
 
     /** 把门洞填成云门方块（复用现成的量框结果）。 */

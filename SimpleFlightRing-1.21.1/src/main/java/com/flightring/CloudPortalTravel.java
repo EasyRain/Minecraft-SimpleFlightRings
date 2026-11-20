@@ -119,15 +119,15 @@ public final class CloudPortalTravel {
                     level.setBlock(frameOrigin.relative(axis, i).above(j), air, 2);
                 }
             }
-            // 底边、顶边
+            // 底边（y-1）、顶边（y+3）
             for (int i = 0; i < 4; i++) {
                 level.setBlock(frameOrigin.relative(axis, i).below(), brick, 2);
-                level.setBlock(frameOrigin.relative(axis, i).above(4), brick, 2);
+                level.setBlock(frameOrigin.relative(axis, i).above(3), brick, 2);
             }
-            // 左右立柱
-            for (int j = 0; j < 4; j++) {
-                level.setBlock(frameOrigin.below().above(j), brick, 2);
-                level.setBlock(frameOrigin.relative(axis, 3).below().above(j), brick, 2);
+            // 左右立柱：门洞那 3 格高（y .. y+2），不含底边和顶边
+            for (int j = 0; j < 3; j++) {
+                level.setBlock(frameOrigin.above(j), brick, 2);
+                level.setBlock(frameOrigin.relative(axis, 3).above(j), brick, 2);
             }
             // 门洞：2 宽 × 3 高
             for (int i = 1; i <= 2; i++) {

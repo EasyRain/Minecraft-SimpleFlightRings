@@ -54,6 +54,11 @@ public final class BrokenPortalConversion {
         if (!isFlightRing(event.getItemStack())) {
             return;
         }
+        // 厚云砖也是 isPortalFrame（为了给云门量框），但它属于云门：
+        // 这里直接让路，否则用别的戒指点厚云砖框会被改造成"破碎传送门"（用户 2026-11-20 实测）。
+        if (event.getLevel().getBlockState(event.getPos()).is(ModBlocks.THICK_CLOUD_BRICKS.get())) {
+            return;
+        }
         if (!isPortalAction(event.getLevel(), event.getPos(), event.getFace())) {
             return;
         }
