@@ -12,6 +12,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -93,6 +94,46 @@ public final class BrokenPortalTravel {
         return transition(target, rect, entity);
     }
 
+    /** 云维度找不到任何岛面时的兜底高度（云层主层在 256 附近）。 */
+    private static final int CLOUD_FALLBACK_Y = 300;
+
+    /**
+     * 决定"对方那一侧"应该在什么位置开门。
+     * <p>
+     * 这是云门必须单独处理的一点（用户 2026-11-20）：主世界地面大多在 y≈70，而云维度的
+     * 地形在 y≈250~300 —— 直接把 y 搬过去会在虚空里建门。所以：
+     * <ul>
+     *   <li><b>去云维度</b>：在目标 (x,z) 附近螺旋找一列真的有岛面的地方，用它的高度；</li>
+     *   <li><b>回主世界</b>：用当地地表高度（{@link Heightmap.Types#MOTION_BLOCKING_NO_LEAVES}）。</li>
+     * </ul>
+     * 之后 {@code build} 里的 {@code findSurface} 会从该高度往下找地面：落在岛上就不加地台，
+     * 只有真的一点地面都没有时才铺垫台。
+     */
+    private static BlockPos resolveTarget(ServerLevel level, BlockPos portalPos, boolean cloud) {
+        int x = portalPos.getX();
+        int z = portalPos.getZ();
+        int minY = level.getMinBuildHeight() + 8;
+        if (cloud) {
+            level.getChunkAt(new BlockPos(x, minY, z));
+            for (int r = 0; r <= 96; r += 8) {
+                for (int dx = -r; dx <= r; dx += 4) {
+                    for (int dz = -r; dz <= r; dz += 4) {
+                        if (Math.max(Math.abs(dx), Math.abs(dz)) != r) {
+                            continue;
+                        }
+                        int h = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x + dx, z + dz);
+                        if (h > minY) {
+                            return new BlockPos(x + dx, h, z + dz);
+                        }
+                    }
+                }
+            }
+            return new BlockPos(x, CLOUD_FALLBACK_Y, z);
+        }
+        int h = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
+        return new BlockPos(x, Math.max(h, minY), z);
+    }
+
     /** 云维度，见 {@code data/simpleflightring/dimension/the_cloud.json}。 */
     public static final ResourceKey<Level> CLOUD_DIMENSION = ResourceKey.create(
             Registries.DIMENSION,
@@ -105,7 +146,8 @@ public final class BrokenPortalTravel {
             return null;
         }
         Direction.Axis axis = axisOf(from.getBlockState(portalPos));
-        BrokenPortalFrames.Rect rect = findOrBuild(target, portalPos, axis,
+        BlockPos wanted = resolveTarget(target, portalPos, true);
+        BrokenPortalFrames.Rect rect = findOrBuild(target, wanted, axis,
                 ModBlocks.THICK_CLOUD_BRICKS.get().defaultBlockState(),
                 ModBlocks.CLOUD_PORTAL.get().defaultBlockState().setValue(CloudPortalBlock.AXIS, axis));
         return transition(target, rect, entity);
@@ -115,7 +157,8 @@ public final class BrokenPortalTravel {
     public static DimensionTransition backFromCloud(ServerLevel from, Entity entity, BlockPos portalPos) {
         ServerLevel target = from.getServer().overworld();
         Direction.Axis axis = axisOf(from.getBlockState(portalPos));
-        BrokenPortalFrames.Rect rect = findOrBuild(target, portalPos, axis,
+        BlockPos wanted = resolveTarget(target, portalPos, false);
+        BrokenPortalFrames.Rect rect = findOrBuild(target, wanted, axis,
                 ModBlocks.THICK_CLOUD_BRICKS.get().defaultBlockState(),
                 ModBlocks.CLOUD_PORTAL.get().defaultBlockState().setValue(CloudPortalBlock.AXIS, axis));
         return transition(target, rect, entity);
