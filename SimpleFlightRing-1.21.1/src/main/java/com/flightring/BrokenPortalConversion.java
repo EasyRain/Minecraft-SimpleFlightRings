@@ -179,7 +179,13 @@ public final class BrokenPortalConversion {
      */
     public static int formInFrame(ServerLevel level, BlockPos clicked, @Nullable Direction clickedFace) {
         Direction front = clickedFace == null ? Direction.UP : clickedFace;
-        return tryForm(level, clicked.relative(front));
+        BlockPos inside = clicked.relative(front);
+        // 门洞里已经是门方块：什么都不做，否则连点会把激活音效重复播放很多遍
+        BlockState insideState = level.getBlockState(inside);
+        if (insideState.is(ModBlocks.CLOUD_PORTAL.get()) || insideState.is(ModBlocks.BROKEN_PORTAL.get())) {
+            return 0;
+        }
+        return tryForm(level, inside);
     }
 
     /** Forms a portal in either horizontal axis at one inner position; returns 0 when there is none. */

@@ -29,6 +29,15 @@ public class CloudPortalBlock extends BrokenPortalBlock {
         return CODEC;
     }
 
+    /**
+     * 允许被流体替换 —— 原版下界门就是这样被水桶"顶掉"的：
+     * 水替换掉一格门之后，门洞不再完整，其余门方块会因邻居更新整座消失。
+     */
+    @Override
+    public boolean canBeReplaced(BlockState state, net.minecraft.world.level.material.Fluid fluid) {
+        return true;
+    }
+
     @Nullable
     @Override
     public DimensionTransition getPortalDestination(ServerLevel level, Entity entity, BlockPos pos) {
