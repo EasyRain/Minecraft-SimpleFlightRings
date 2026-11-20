@@ -120,7 +120,10 @@ public class CloudChunkGenerator extends ChunkGenerator {
         }
         double band = 1.0 - t * t;
         double detail = CloudNoise.value3(x, y * 1.6, z, DETAIL_SCALE, SEED_DETAIL);
-        return mask * band * BAND_WEIGHT + detail * DETAIL;
+        // 三维噪声只在岛屿内部起作用：边缘（mask 小）把它的权重压到 0，
+        // 否则"带 × 遮罩"本来就贴着阈值，噪声一冒头就单独成一根竖条 —— 也就是岛边那一溜溜"鳍"。
+        double detailWeight = DETAIL * CloudNoise.smoothstep(0.02, 0.32, mask);
+        return mask * band * BAND_WEIGHT + detail * detailWeight;
     }
 
     /** 内部洞穴：三维噪声高于阈值的格子掏空（顶面两层不掏，保证地表完整）。 */
