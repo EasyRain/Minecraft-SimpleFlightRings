@@ -2,6 +2,8 @@ package com.flightring;
 
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
+
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -33,6 +35,11 @@ public class CloudBlock extends Block {
 
     public static final MapCodec<CloudBlock> CODEC = simpleCodec(CloudBlock::new);
 
+    /** 云维度：在这个维度里，除了玩家以外的生物可以直接站上云块。 */
+    private static final net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> THE_CLOUD =
+            net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.DIMENSION,
+                    ResourceLocation.fromNamespaceAndPath(FlightRingMod.MODID, "the_cloud"));
+
     /** Sink speed while inside: 50% horizontal, 30% vertical (cobweb is 25% / 5%; clouds sink faster). */
     private static final Vec3 SINK_SPEED = new Vec3(0.5D, 0.3D, 0.5D);
 
@@ -54,10 +61,11 @@ public class CloudBlock extends Block {
                                            CollisionContext context) {
         if (context instanceof EntityCollisionContext entityContext) {
             Entity entity = entityContext.getEntity();
-            if (entity instanceof Player player
-                    && FlightHandler.hasUsableRing(player)
-                    && context.isAbove(Shapes.block(), pos, false)
-                    && !context.isDescending()) {
+            boolean mayStand = entity instanceof Player player
+                    ? FlightHandler.hasUsableRing(player)
+                    // 非玩家生物：在云维度里一律可以站上去，免得它们陷进云里卡住
+                    : isCloudDimension(level);
+            if (mayStand && context.isAbove(Shapes.block(), pos, false) && !context.isDescending()) {
                 return super.getCollisionShape(state, level, pos, context);
             }
         }
@@ -74,10 +82,14 @@ public class CloudBlock extends Block {
         return neighbour.is(this) || super.skipRendering(state, neighbour, direction);
     }
 
+    private static boolean isCloudDimension(BlockGetter level) {
+        return level instanceof net.minecraft.world.level.Level world && world.dimension().equals(THE_CLOUD);
+    }
+
     /** Everyone else slowly sinks through, exactly like cobweb (which also resets the fall distance). */
     @Override
     protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
-        if (entity instanceof Player player && FlightHandler.hasUsableRing(player)) {
+        if (entity instanceof Player player ? FlightHandler.hasUsableRing(player) : isCloudDimension(level)) {
             return;
         }
         entity.makeStuckInBlock(state, SINK_SPEED);
