@@ -83,6 +83,12 @@ public class CloudChunkGenerator extends ChunkGenerator {
     private static final long SEED_PATCH = 0xB5C0FBCFL;
     private static final long SEED_PATCH_ALT = 0xE9B5DBA5L;
 
+    /**
+     * 调试开关：只生成厚云块（不铺云皮、不挖洞、不放云片）。
+     * 用来确认"侧壁戳出来的凸起"到底是密度场本身的形状，还是材质分配的问题。
+     */
+    public static final boolean DEBUG_THICK_ONLY = true;
+
     /** 邻域边长：16 区块 + 两侧各 2 格（云皮要往外看两格）。 */
     private static final int NEIGHBOURHOOD = 20;
 
@@ -195,8 +201,8 @@ public class CloudChunkGenerator extends ChunkGenerator {
                 }
             }
         }
-        // 挖洞：顶部两层不掏，保证地表完整
-        for (int ix = 0; ix < NEIGHBOURHOOD; ix++) {
+        // 挖洞：顶部两层不掏，保证地表完整（调试模式下整段跳过）
+        for (int ix = 0; !DEBUG_THICK_ONLY && ix < NEIGHBOURHOOD; ix++) {
             for (int iz = 0; iz < NEIGHBOURHOOD; iz++) {
                 int top = columnTop[ix][iz];
                 if (top == Integer.MIN_VALUE) {
@@ -229,13 +235,13 @@ public class CloudChunkGenerator extends ChunkGenerator {
                     }
                     int y = wy0 + iy;
                     boolean surface = y >= columnTop[ix][iz];
-                    boolean shell = !surface && exposed(solid, ix, iy, iz, height);
+                    boolean shell = !DEBUG_THICK_ONLY && !surface && exposed(solid, ix, iy, iz, height);
                     cursor.set(x, y, z);
                     chunk.setBlockState(cursor, shell ? cloudState : thickState, false);
                 }
 
                 // 高空薄云片
-                double strength = patchStrength(x, z);
+                double strength = DEBUG_THICK_ONLY ? 0.0 : patchStrength(x, z);
                 if (strength > 0.12) {
                     int patchTopY = patchTop(x, z);
                     int top = columnTop[ix][iz];
