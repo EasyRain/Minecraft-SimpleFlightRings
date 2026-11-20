@@ -67,7 +67,7 @@ public final class ModBlocks {
     /** 厚云砖块：建筑方块，也是云门的门框。 */
     public static final DeferredBlock<Block> THICK_CLOUD_BRICKS = BLOCKS.registerBlock(
             "thick_cloud_bricks",
-            Block::new,
+            ThickCloudBrickBlock::new,
             properties -> properties.strength(0.8F)
                     .sound(ModSounds.THICK_SOUND_TYPE));
 
