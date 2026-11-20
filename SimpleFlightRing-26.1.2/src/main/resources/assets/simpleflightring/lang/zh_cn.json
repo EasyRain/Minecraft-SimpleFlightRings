@@ -5,7 +5,7 @@
   "block.simpleflightring.cloud_block": "云块",
   "block.simpleflightring.thick_cloud_block": "厚云块",
   "block.simpleflightring.thick_cloud_bricks": "厚云砖块",
-  "block.simpleflightring.cloud_portal": "云层之上传送门",
+  "block.simpleflightring.cloud_portal": "云层传送门",
   "block.simpleflightring.thick_cloud_slab": "厚云台阶",
   "block.simpleflightring.thick_cloud_stairs": "厚云楼梯",
   "block.simpleflightring.thick_cloud_wall": "厚云墙",
@@ -350,5 +350,5 @@
   "subtitles.simpleflightring.thick_cloud_door.open": "厚云门：打开",
   "subtitles.simpleflightring.thick_cloud_door.close": "厚云门：关闭",
   "block.simpleflightring.thick_cloud_bed": "厚云床",
-  "dimension.simpleflightring.the_cloud": "云层之上"
+  "dimension.simpleflightring.the_cloud": "云层维度"
 }

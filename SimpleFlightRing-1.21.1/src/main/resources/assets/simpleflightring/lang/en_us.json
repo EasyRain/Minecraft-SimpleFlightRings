@@ -5,7 +5,7 @@
   "block.simpleflightring.cloud_block": "Cloud Block",
   "block.simpleflightring.thick_cloud_block": "Thick Cloud Block",
   "block.simpleflightring.thick_cloud_bricks": "Thick Cloud Bricks",
-  "block.simpleflightring.cloud_portal": "Above the Clouds Portal",
+  "block.simpleflightring.cloud_portal": "Cloud Portal",
   "block.simpleflightring.thick_cloud_slab": "Thick Cloud Slab",
   "block.simpleflightring.thick_cloud_stairs": "Thick Cloud Stairs",
   "block.simpleflightring.thick_cloud_wall": "Thick Cloud Wall",
@@ -350,5 +350,5 @@
   "subtitles.simpleflightring.thick_cloud_door.open": "Thick Cloud Door: Opens",
   "subtitles.simpleflightring.thick_cloud_door.close": "Thick Cloud Door: Closes",
   "block.simpleflightring.thick_cloud_bed": "Thick Cloud Bed",
-  "dimension.simpleflightring.the_cloud": "Above the Clouds"
+  "dimension.simpleflightring.the_cloud": "Cloud Dimension"
 }
