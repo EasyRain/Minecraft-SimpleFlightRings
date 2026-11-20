@@ -196,8 +196,12 @@ public final class BrokenPortalConversion {
                 continue;
             }
             if (BrokenPortalFrames.interiorFilled(level, rect)) {
-                // Already a finished portal - a lit one was handled by rewrite() above, and a broken one
-                // needs nothing.
+                // 已经是完整的门：不重复填充（也就不会重复播放激活音效）
+                return 0;
+            }
+            // 只在门洞全为空气时才填：measure 把空气也算作门内表面，
+            // 量出的矩形可能比实际门洞更大，不加这条会连点反复填、反复播声音。
+            if (!onlyAirInside(level, rect)) {
                 return 0;
             }
             // 厚云砖框 -> 云门；其它（黑曜石）-> 破碎门
@@ -205,6 +209,18 @@ public final class BrokenPortalConversion {
             return fillFrame(level, rect, cloud);
         }
         return 0;
+    }
+
+    /** 门洞是否全为空气（避免在已点亮或半成品上重复填充）。 */
+    private static boolean onlyAirInside(ServerLevel level, BrokenPortalFrames.Rect rect) {
+        for (int i = 0; i < rect.width(); i++) {
+            for (int j = 0; j < rect.height(); j++) {
+                if (!level.getBlockState(rect.min().relative(rect.axis(), i).above(j)).isAir()) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     /**
