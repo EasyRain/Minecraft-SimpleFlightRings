@@ -26,17 +26,20 @@ import net.minecraft.world.level.levelgen.structure.StructureSet;
 /**
  * 云层之上的地形生成器（M2）。
  * <p>
- * 参考《天境》那种"浮空群岛"的构图（只借结构思路，不复刻）：
- * <ul>
- *   <li><b>高度带</b>：每片云的整体高度由一张大尺度噪声决定（{@link #ALT_RANGE} 内起伏），
- *       所以有的云海在 220 附近、有的在 300 附近，不再是一整块平板；</li>
- *   <li><b>大陆</b>（几百格）+ <b>岛屿</b>（几十格）两层，岛屿只长在大陆之外的虚空里；</li>
- *   <li><b>悬垂</b>：厚的地方往下多长几格，做出"云团底部"的垂坠感；</li>
- *   <li><b>透光洞</b>：厚云核里用三维噪声掏掉一部分方块，抬头/低头能看到光穿过去；</li>
- *   <li><b>高空薄云片</b>：主层之上 50~100 格另有一层零星 1~3 格厚的云片（天境的"境云"那种）。</li>
- * </ul>
- * 结构上仍是"列式"生成（同一 (x,z) 只有一段云），所以 {@link #getBaseHeight} 与
- * {@link #getBaseColumn} 能和实际地形保持一致。
+ * 构图参考《天境》的**做法**（不是复刻）：它的 skylands 维度用原版噪声设置，把
+ * "三维基础噪声 × 一条竖直渐变"当密度 —— 于是浮岛天然被限制在一条高度带里，
+ * 带中间最厚、上下两端收成薄片，表面又由三维噪声揉出凹凸、悬垂和洞。
+ * 我们这里是自己写的噪声（{@link CloudNoise}），但用的是同一个思路：
+ *
+ * <pre>
+ *   band(y)  = 1 - ((y - 该片云的带中心) / BAND_HALF)²      // 中间 1、两端 0
+ *   solidity = 水平遮罩 × band × BAND_WEIGHT + 三维噪声 × DETAIL
+ *   实心 ⟺ solidity > SOLID_THRESHOLD；solidity > CORE_THRESHOLD 的地方是厚云核
+ * </pre>
+ *
+ * 这样做的效果：云岛是**透镜形**（中间厚、边缘薄）、表面不规则（有悬垂和洞）、
+ * 每片云的**带中心高低不同**（{@link #ALT_RANGE}），不会再是一整块平板。
+ * 主层之上另有一层 1~3 格厚的高空薄云片（天境"境云"那种）。
  */
 public class CloudChunkGenerator extends ChunkGenerator {
 
@@ -47,15 +50,23 @@ public class CloudChunkGenerator extends ChunkGenerator {
 
     /** 云海主层基准高度（y）：原版云在 192，我们整体抬到它之上。 */
     public static final int BASE_Y = 256;
-    /** 高度带：主层上下各起伏这么多格。 */
-    public static final int ALT_RANGE = 48;
-    /** 最厚处（再叠加 {@link #THICK_VARIATION} 的 0.6~1.0 系数和悬垂）。 */
-    public static final int MAX_THICKNESS = 36;
+    /** 每片云的高度带中心在这个范围内起伏（±）。 */
+    public static final int ALT_RANGE = 52;
+    /** 竖向半高：带中心到上下边缘的距离（决定最厚能到 ~2×BAND_HALF）。 */
+    public static final double BAND_HALF = 24.0;
+    /** 水平遮罩对实心度的贡献权重。 */
+    private static final double BAND_WEIGHT = 1.25;
+    /** 三维噪声对实心度的贡献（越大越碎、洞越多）。 */
+    private static final double DETAIL = 0.55;
+    /** 实心阈值。 */
+    private static final double SOLID_THRESHOLD = 0.52;
+    /** 超过它就是厚云核，否则只是云皮。 */
+    private static final double CORE_THRESHOLD = 0.78;
 
     private static final double CONTINENT_SCALE = 620.0;
     private static final double ISLAND_SCALE = 88.0;
     private static final double ALT_SCALE = 700.0;
-    private static final double THICK_SCALE = 210.0;
+    private static final double DETAIL_SCALE = 30.0;
     private static final double PATCH_SCALE = 44.0;
 
     private static final double CONTINENT_LO = 0.22;
@@ -68,11 +79,8 @@ public class CloudChunkGenerator extends ChunkGenerator {
     private static final long SEED_CONTINENT = 0x51A7C0DEL;
     private static final long SEED_ISLAND = 0x2B7E1516L;
     private static final long SEED_WARP = 0x6A09E667L;
-    private static final long SEED_HEIGHT = 0x3C6EF372L;
     private static final long SEED_ALT = 0x1F83D9ABL;
-    private static final long SEED_THICK = 0x5BE0CD19L;
-    private static final long SEED_HANG = 0x428A2F98L;
-    private static final long SEED_HOLE = 0x71374491L;
+    private static final long SEED_DETAIL = 0x71374491L;
     private static final long SEED_PATCH = 0xB5C0FBCFL;
     private static final long SEED_PATCH_ALT = 0xE9B5DBA5L;
 
@@ -85,58 +93,36 @@ public class CloudChunkGenerator extends ChunkGenerator {
         return CODEC;
     }
 
-    /** 一段云的竖直范围；没有云时返回 null。 */
-    private record CloudColumn(int top, int bottom) {
-    }
-
-    /** 该列的主云（大陆/岛屿）。 */
-    private static CloudColumn mainColumn(int x, int z) {
-        double wx = x + CloudNoise.fbm(x, z, 260.0, 2, SEED_WARP) * 48.0;
-        double wz = z + CloudNoise.fbm(x + 7919, z - 104729, 260.0, 2, SEED_WARP) * 48.0;
+    /** 水平遮罩：0 = 虚空，1 = 大陆内部；岛屿只长在大陆之外的虚空里。 */
+    private static double horizontalMask(int x, int z) {
+        double wx = x + CloudNoise.fbm(x, z, 260.0, 2, SEED_WARP) * 56.0;
+        double wz = z + CloudNoise.fbm(x + 7919, z - 104729, 260.0, 2, SEED_WARP) * 56.0;
 
         double continent = CloudNoise.smoothstep(CONTINENT_LO, CONTINENT_HI,
                 CloudNoise.fbm(wx, wz, CONTINENT_SCALE, 3, SEED_CONTINENT));
         double island = CloudNoise.smoothstep(ISLAND_LO, ISLAND_HI,
                 CloudNoise.fbm(wx, wz, ISLAND_SCALE, 2, SEED_ISLAND));
-        // 岛屿只长在大陆之外的虚空里
         double islandOnly = island * (1.0 - CloudNoise.smoothstep(0.0, 0.25, continent));
-        double density = Math.max(continent, islandOnly * 0.95);
-        if (density <= 0.02) {
-            return null;
-        }
-
-        // 高度带：每片云整体抬高/压低，别让所有云挤在一个高度
-        double altitude = BASE_Y + CloudNoise.fbm(x, z, ALT_SCALE, 3, SEED_ALT) * ALT_RANGE;
-        // 厚度再乘一个 0.6~1.0 的系数，让同一片云有厚有薄
-        double thickScale = 0.6 + 0.4 * (CloudNoise.fbm(x, z, THICK_SCALE, 2, SEED_THICK) * 0.5 + 0.5);
-        int thickness = Math.max(1, (int) Math.round(density * MAX_THICKNESS * thickScale));
-
-        // 悬垂：厚的地方往下多长 3~14 格
-        if (density > 0.45) {
-            double hang = CloudNoise.fbm(x, z, 90.0, 2, SEED_HANG);
-            if (hang > 0.15) {
-                thickness += (int) Math.round((hang - 0.15) / 0.85 * 14.0);
-            }
-        }
-
-        int top = (int) Math.round(altitude + CloudNoise.fbm(x, z, 300.0, 2, SEED_HEIGHT) * 6.0);
-        return new CloudColumn(top, top - thickness + 1);
+        return Math.max(continent, islandOnly * 0.92);
     }
 
-    /** 高空薄云片（1~3 格厚，只由云皮组成），和主云分开算。 */
-    private static CloudColumn patchColumn(int x, int z, int mainTop) {
-        double patch = CloudNoise.smoothstep(PATCH_LO, PATCH_HI,
-                CloudNoise.fbm(x, z, PATCH_SCALE, 2, SEED_PATCH));
-        if (patch <= 0.05) {
-            return null;
+    /** 该列的云带中心高度。 */
+    private static double bandCenter(int x, int z) {
+        return BASE_Y + CloudNoise.fbm(x, z, ALT_SCALE, 3, SEED_ALT) * ALT_RANGE;
+    }
+
+    /**
+     * 该体素的"实心度"。大于 {@link #SOLID_THRESHOLD} 就是云，越大越靠近核。
+     * 返回 {@link Double#NEGATIVE_INFINITY} 表示这一列根本没有云（省掉竖直循环）。
+     */
+    private static double solidity(int x, int y, int z, double mask, double center) {
+        double t = (y - center) / BAND_HALF;
+        if (t <= -1.0 || t >= 1.0) {
+            return Double.NEGATIVE_INFINITY;
         }
-        int offset = 55 + (int) Math.round(CloudNoise.fbm(x, z, 160.0, 2, SEED_PATCH_ALT) * 22.0);
-        int top = BASE_Y + offset;
-        if (Math.abs(top - mainTop) < 6) {
-            return null;   // 离主云太近就别贴上去
-        }
-        int thickness = Math.max(1, (int) Math.round(patch * 3.0));
-        return new CloudColumn(top, top - thickness + 1);
+        double band = 1.0 - t * t;
+        double detail = CloudNoise.value3(x, y * 1.6, z, DETAIL_SCALE, SEED_DETAIL);
+        return mask * band * BAND_WEIGHT + detail * DETAIL;
     }
 
     private BlockState cloud() {
@@ -147,12 +133,19 @@ public class CloudChunkGenerator extends ChunkGenerator {
         return ModBlocks.THICK_CLOUD_BLOCK.get().defaultBlockState();
     }
 
-    /** 厚云核里的透光洞：三维噪声掏掉一部分，但不碰外壳。 */
-    private static boolean isHole(int x, int y, int z, int thicknessFromTop) {
-        if (thicknessFromTop < 2) {
-            return false;   // 顶部两层永远是实的
+    /** 高空薄云片：主层之上 55~77 格，1~3 格厚，只由云皮组成。 */
+    private static int patchHeight(int x, int z, int mainTop) {
+        double patch = CloudNoise.smoothstep(PATCH_LO, PATCH_HI,
+                CloudNoise.fbm(x, z, PATCH_SCALE, 2, SEED_PATCH));
+        if (patch <= 0.05) {
+            return Integer.MIN_VALUE;
         }
-        return CloudNoise.value3(x, y, z, 13.0, SEED_HOLE) > 0.58;
+        int offset = 55 + (int) Math.round(CloudNoise.fbm(x, z, 160.0, 2, SEED_PATCH_ALT) * 22.0);
+        int top = BASE_Y + offset;
+        if (mainTop != Integer.MIN_VALUE && Math.abs(top - mainTop) < 8) {
+            return Integer.MIN_VALUE;
+        }
+        return top;
     }
 
     @Override
@@ -160,44 +153,48 @@ public class CloudChunkGenerator extends ChunkGenerator {
                                                         StructureManager structureManager, ChunkAccess chunk) {
         ChunkPos pos = chunk.getPos();
         int minY = this.getMinY();
-        int genDepth = this.getGenDepth();
+        int maxY = minY + this.getGenDepth();
         BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
 
         for (int dx = 0; dx < 16; dx++) {
             for (int dz = 0; dz < 16; dz++) {
                 int x = pos.getMinBlockX() + dx;
                 int z = pos.getMinBlockZ() + dz;
+                double mask = horizontalMask(x, z);
 
-                CloudColumn main = mainColumn(x, z);
-                if (main != null) {
-                    fillColumn(chunk, cursor, x, z, main, minY, genDepth, false);
+                int top = Integer.MIN_VALUE;
+                if (mask > 0.02) {
+                    double center = bandCenter(x, z);
+                    int from = Math.max(minY, (int) Math.floor(center - BAND_HALF));
+                    int to = Math.min(maxY - 1, (int) Math.ceil(center + BAND_HALF));
+                    for (int y = to; y >= from; y--) {
+                        double solidity = solidity(x, y, z, mask, center);
+                        if (solidity <= SOLID_THRESHOLD) {
+                            continue;
+                        }
+                        if (top == Integer.MIN_VALUE) {
+                            top = y;
+                        }
+                        cursor.set(x, y, z);
+                        chunk.setBlockState(cursor, solidity > CORE_THRESHOLD ? thick() : cloud(), 0);
+                    }
                 }
-                CloudColumn patch = patchColumn(x, z, main == null ? Integer.MIN_VALUE : main.top());
-                if (patch != null) {
-                    fillColumn(chunk, cursor, x, z, patch, minY, genDepth, true);
+
+                int patchTop = patchHeight(x, z, top);
+                if (patchTop != Integer.MIN_VALUE) {
+                    int thickness = 1 + Math.abs((x * 31 + z * 17) % 3);   // 1~3 层
+                    for (int i = 0; i < thickness; i++) {
+                        int y = patchTop - i;
+                        if (y < minY || y >= maxY) {
+                            continue;
+                        }
+                        cursor.set(x, y, z);
+                        chunk.setBlockState(cursor, cloud(), 0);
+                    }
                 }
             }
         }
         return CompletableFuture.completedFuture(chunk);
-    }
-
-    /** 填一列：顶部/底部各一层云皮，中间是厚云核（薄云片则整列都是云皮）。 */
-    private void fillColumn(ChunkAccess chunk, BlockPos.MutableBlockPos cursor, int x, int z,
-                            CloudColumn column, int minY, int genDepth, boolean patch) {
-        int thickness = column.top() - column.bottom() + 1;
-        int shell = thickness <= 3 ? 1 : 2;
-        for (int y = column.bottom(); y <= column.top(); y++) {
-            if (y < minY || y >= minY + genDepth) {
-                continue;
-            }
-            int fromTop = column.top() - y;
-            boolean skin = patch || fromTop < shell || fromTop >= thickness - 1;
-            if (!skin && isHole(x, y, z, fromTop)) {
-                continue;
-            }
-            cursor.set(x, y, z);
-            chunk.setBlockState(cursor, skin ? cloud() : thick(), 0);
-        }
     }
 
     @Override
@@ -209,7 +206,7 @@ public class CloudChunkGenerator extends ChunkGenerator {
     @Override
     public void applyCarvers(WorldGenRegion region, long seed, RandomState randomState, BiomeManager biomeManager,
                              StructureManager structureManager, ChunkAccess chunk) {
-        // 云不需要洞穴（洞是三维噪声掏出来的）
+        // 云不需要洞穴（洞由三维噪声直接掏出来）
     }
 
     @Override
@@ -234,37 +231,51 @@ public class CloudChunkGenerator extends ChunkGenerator {
 
     @Override
     public int getBaseHeight(int x, int z, Heightmap.Types type, LevelHeightAccessor level, RandomState randomState) {
-        CloudColumn main = mainColumn(x, z);
-        CloudColumn patch = patchColumn(x, z, main == null ? Integer.MIN_VALUE : main.top());
-        int top = Math.max(main == null ? Integer.MIN_VALUE : main.top(), patch == null ? Integer.MIN_VALUE : patch.top());
-        return top == Integer.MIN_VALUE ? this.getMinY() - 1 : top + 1;
+        int minY = this.getMinY();
+        int maxY = minY + this.getGenDepth();
+        int top = Integer.MIN_VALUE;
+        double mask = horizontalMask(x, z);
+        if (mask > 0.02) {
+            double center = bandCenter(x, z);
+            for (int y = Math.min(maxY - 1, (int) Math.ceil(center + BAND_HALF)); y >= minY; y--) {
+                if (solidity(x, y, z, mask, center) > SOLID_THRESHOLD) {
+                    top = y;
+                    break;
+                }
+            }
+        }
+        int patchTop = patchHeight(x, z, top);
+        if (patchTop != Integer.MIN_VALUE) {
+            top = Math.max(top, patchTop);
+        }
+        return top == Integer.MIN_VALUE ? minY - 1 : top + 1;
     }
 
     @Override
     public NoiseColumn getBaseColumn(int x, int z, LevelHeightAccessor level, RandomState randomState) {
         int minY = this.getMinY();
+        int maxY = minY + this.getGenDepth();
         BlockState[] states = new BlockState[this.getGenDepth()];
         java.util.Arrays.fill(states, Blocks.AIR.defaultBlockState());
 
-        CloudColumn main = mainColumn(x, z);
-        CloudColumn patch = patchColumn(x, z, main == null ? Integer.MIN_VALUE : main.top());
-        for (CloudColumn column : new CloudColumn[]{main, patch}) {
-            if (column == null) {
-                continue;
+        double mask = horizontalMask(x, z);
+        if (mask > 0.02) {
+            double center = bandCenter(x, z);
+            for (int y = minY; y < maxY; y++) {
+                double solidity = solidity(x, y, z, mask, center);
+                if (solidity > SOLID_THRESHOLD) {
+                    states[y - minY] = solidity > CORE_THRESHOLD ? thick() : cloud();
+                }
             }
-            int thickness = column.top() - column.bottom() + 1;
-            int shell = thickness <= 3 ? 1 : 2;
-            for (int y = column.bottom(); y <= column.top(); y++) {
-                int index = y - minY;
-                if (index < 0 || index >= states.length) {
-                    continue;
+        }
+        int patchTop = patchHeight(x, z, getBaseHeight(x, z, Heightmap.Types.WORLD_SURFACE, level, randomState) - 1);
+        if (patchTop != Integer.MIN_VALUE) {
+            int thickness = 1 + Math.abs((x * 31 + z * 17) % 3);
+            for (int i = 0; i < thickness; i++) {
+                int y = patchTop - i;
+                if (y >= minY && y < maxY) {
+                    states[y - minY] = cloud();
                 }
-                int fromTop = column.top() - y;
-                boolean skin = column == patch || fromTop < shell || fromTop >= thickness - 1;
-                if (!skin && isHole(x, y, z, fromTop)) {
-                    continue;
-                }
-                states[index] = skin ? cloud() : thick();
             }
         }
         return new NoiseColumn(minY, states);
@@ -272,11 +283,9 @@ public class CloudChunkGenerator extends ChunkGenerator {
 
     @Override
     public void addDebugScreenInfo(List<String> lines, RandomState randomState, BlockPos pos) {
-        CloudColumn main = mainColumn(pos.getX(), pos.getZ());
-        lines.add(main == null
-                ? "Cloud: none"
-                : "Cloud: " + main.bottom() + " .. " + main.top()
-                        + " (" + (main.top() - main.bottom() + 1) + " thick)");
+        double mask = horizontalMask(pos.getX(), pos.getZ());
+        lines.add("Cloud mask: " + String.format("%.2f", mask));
+        lines.add("Cloud band center: " + String.format("%.0f", bandCenter(pos.getX(), pos.getZ())));
     }
 
     @Override
