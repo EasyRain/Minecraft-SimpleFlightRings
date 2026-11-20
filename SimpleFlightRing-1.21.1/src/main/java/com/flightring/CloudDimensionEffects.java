@@ -15,16 +15,14 @@ import net.neoforged.neoforge.client.event.RegisterDimensionSpecialEffectsEvent;
  * 我们先前借用 {@code minecraft:overworld} 的特效，于是原版那层云（y=192）也跟进了云维度 ——
  * 而云维度的地形主层正好也在 192，会糊在一起。
  * <p>
- * 天空类型用 {@link SkyType#NONE}：**不画太阳、月亮、星星**。
+ * 天空类型用 {@link SkyType#NORMAL}：保留太阳、月亮、星星。
  * <p>
- * 为什么必须这样：NORMAL 天空类型会把太阳和月亮**永远画在天空球的两端**，而虚空维度没有地形遮挡，
- * 于是白天同时看到头顶太阳和脚下月亮（用户 2026-11-20 实测）。把原版云放到脚下（cloudLevel=64）
- * **挡不住** —— 天空球在云层后面，而且下半球的雾本来就是半透明的。
+ * 试过 {@link SkyType#NONE}（不画日月星辰、天空只剩雾色）—— 用户 2026-11-20 评价"太素了"，
+ * 宁可要带日月的天空，所以退回 NORMAL。副作用是虚空维度里白天能同时看到头顶的太阳和脚下的月亮；
+ * 这个现象要靠**自己接管 {@code renderSky}**（只画天空 + 太阳、不画月亮）才能消掉，
+ * 属于自己写整套天空渲染，等工作量允许再考虑。
  * <p>
- * NONE 的效果：天空 = 每帧用雾色清屏（我们群系的雾色是亮白偏蓝）⇒ 一片干净的高空亮雾，
- * 没有任何天体穿过画面。想要太阳/月亮，需要自己接管 {@code renderSky}（工作量大，暂不做）。
- * <p>
- * 云高保留 64：玩家在主层 192，脚下仍然有一整片原版云海，M2 铺上我们自己的云层后它就是"云海底部"。
+ * 云高设成 64：玩家在主层 192，脚下有一整片原版云海，M2 铺上我们自己的云层后它就是"云海底部"。
  */
 @EventBusSubscriber(modid = FlightRingMod.MODID, value = Dist.CLIENT)
 public final class CloudDimensionEffects extends DimensionSpecialEffects {
@@ -33,8 +31,8 @@ public final class CloudDimensionEffects extends DimensionSpecialEffects {
             ResourceLocation.fromNamespaceAndPath(FlightRingMod.MODID, "the_cloud");
 
     public CloudDimensionEffects() {
-        // cloudLevel = 64（原版云海在脚下）、hasGround = false、天空类型 NONE（不画日月星辰）、不强制亮色、非常亮环境光
-        super(64.0F, false, SkyType.NONE, false, false);
+        // cloudLevel = 64（原版云海在脚下）、hasGround = false、天空类型 NORMAL（保留日月星辰）、不强制亮色、非常亮环境光
+        super(64.0F, false, SkyType.NORMAL, false, false);
     }
 
     @Override
