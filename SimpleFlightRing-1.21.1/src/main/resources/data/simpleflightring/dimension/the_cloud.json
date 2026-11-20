@@ -1,0 +1,18 @@
+{
+  "type": "simpleflightring:the_cloud",
+  "generator": {
+    "type": "minecraft:flat",
+    "settings": {
+      "biome": "simpleflightring:cloud_sea",
+      "features": false,
+      "lakes": false,
+      "layers": [
+        {
+          "block": "minecraft:air",
+          "height": 1
+        }
+      ],
+      "structure_overrides": []
+    }
+  }
+}
