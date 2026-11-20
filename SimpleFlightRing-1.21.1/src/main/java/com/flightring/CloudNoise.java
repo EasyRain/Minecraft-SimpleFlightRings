@@ -63,6 +63,48 @@ public final class CloudNoise {
         return sum / norm;
     }
 
+
+    /** 三维值噪声：给厚云核挖洞、做悬垂用。 */
+    public static double value3(double x, double y, double z, double scale, long seed) {
+        double fx = x / scale;
+        double fy = y / scale;
+        double fz = z / scale;
+        int x0 = (int) Math.floor(fx);
+        int y0 = (int) Math.floor(fy);
+        int z0 = (int) Math.floor(fz);
+        double tx = smooth(fx - x0);
+        double ty = smooth(fy - y0);
+        double tz = smooth(fz - z0);
+
+        double n000 = hash3(x0, y0, z0, seed);
+        double n100 = hash3(x0 + 1, y0, z0, seed);
+        double n010 = hash3(x0, y0 + 1, z0, seed);
+        double n110 = hash3(x0 + 1, y0 + 1, z0, seed);
+        double n001 = hash3(x0, y0, z0 + 1, seed);
+        double n101 = hash3(x0 + 1, y0, z0 + 1, seed);
+        double n011 = hash3(x0, y0 + 1, z0 + 1, seed);
+        double n111 = hash3(x0 + 1, y0 + 1, z0 + 1, seed);
+
+        double x00 = n000 + (n100 - n000) * tx;
+        double x10 = n010 + (n110 - n010) * tx;
+        double x01 = n001 + (n101 - n001) * tx;
+        double x11 = n011 + (n111 - n011) * tx;
+        double y0i = x00 + (x10 - x00) * ty;
+        double y1i = x01 + (x11 - x01) * ty;
+        return y0i + (y1i - y0i) * tz;
+    }
+
+    private static double hash3(int x, int y, int z, long seed) {
+        long h = seed ^ ((long) y * 0x27D4EB2F165667C5L);
+        h = h * 6364136223846793005L + 1442695040888963407L;
+        h ^= (long) x * 0x9E3779B97F4A7C15L;
+        h = Long.rotateLeft(h, 31) * 0xBF58476D1CE4E5B9L;
+        h ^= (long) z * 0xC2B2AE3D27D4EB4FL;
+        h = Long.rotateLeft(h, 27) * 0x94D049BB133111EBL;
+        h ^= h >>> 33;
+        return ((h >>> 11) * 0x1.0p-53) * 2.0 - 1.0;
+    }
+
     /** 平滑阶梯：把 t 从 [lo, hi] 映射到 [0, 1]，两端各有平滑过渡。 */
     public static double smoothstep(double lo, double hi, double t) {
         double v = (t - lo) / (hi - lo);
