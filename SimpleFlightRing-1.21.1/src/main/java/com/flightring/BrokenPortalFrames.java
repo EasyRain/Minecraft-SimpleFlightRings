@@ -110,7 +110,10 @@ public final class BrokenPortalFrames {
         for (int i = 0; i < rect.width(); i++) {
             for (int j = 0; j < rect.height(); j++) {
                 BlockState state = level.getBlockState(rect.min().relative(rect.axis(), i).above(j));
-                if (!state.is(Blocks.NETHER_PORTAL) && !state.is(ModBlocks.BROKEN_PORTAL.get())) {
+                // 云门也算"门内表面"：否则云门的 isComplete 永远为假，
+                // 于是它旁边放/拆任何方块，邻居更新都会把云门清掉（用户 2026-11-20 实测）。
+                if (!state.is(Blocks.NETHER_PORTAL) && !state.is(ModBlocks.BROKEN_PORTAL.get())
+                        && !state.is(ModBlocks.CLOUD_PORTAL.get())) {
                     return false;
                 }
             }
