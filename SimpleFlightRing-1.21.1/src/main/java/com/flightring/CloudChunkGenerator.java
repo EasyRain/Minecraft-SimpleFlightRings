@@ -26,20 +26,18 @@ import net.minecraft.world.level.levelgen.structure.StructureSet;
 /**
  * 云层之上的地形生成器（M2）。
  * <p>
- * 构图参考《天境》的**做法**（不是复刻）：它的 skylands 维度用原版噪声设置，把
- * "三维基础噪声 × 一条竖直渐变"当密度 —— 于是浮岛天然被限制在一条高度带里，
- * 带中间最厚、上下两端收成薄片，表面又由三维噪声揉出凹凸、悬垂和洞。
- * 我们这里是自己写的噪声（{@link CloudNoise}），但用的是同一个思路：
- *
- * <pre>
- *   band(y)  = 1 - ((y - 该片云的带中心) / BAND_HALF)²      // 中间 1、两端 0
- *   solidity = 水平遮罩 × band × BAND_WEIGHT + 三维噪声 × DETAIL
- *   实心 ⟺ solidity > SOLID_THRESHOLD；solidity > CORE_THRESHOLD 的地方是厚云核
- * </pre>
- *
- * 这样做的效果：云岛是**透镜形**（中间厚、边缘薄）、表面不规则（有悬垂和洞）、
- * 每片云的**带中心高低不同**（{@link #ALT_RANGE}），不会再是一整块平板。
- * 主层之上另有一层 1~3 格厚的高空薄云片（天境"境云"那种）。
+ * 密度模型照《天境》的做法：**三维噪声 × 一条竖直渐变**（band），于是云岛被限制在一条高度带里、
+ * 中间厚两端薄、表面由三维噪声揉出凹凸。每片云的带中心高低不同（{@link #ALT_RANGE}）。
+ * <p>
+ * 方块的"材质"按**暴露面**而不是按密度决定（用户 2026-11-20 的三条意见）：
+ * <ul>
+ *   <li><b>顶面是厚云块</b>：站得住、能刷怪、能放地物和结构（不再被云皮盖住）；</li>
+ *   <li><b>侧面和底面是云块</b>：只有贴着空气的那一圈是软的，做出云岛的蓬松轮廓；</li>
+ *   <li><b>内部是厚云块</b>：实心核；</li>
+ *   <li><b>洞</b>：三维噪声在内部掏空，破到表面就形成一个开口（开口的内壁自动变成云皮）。</li>
+ * </ul>
+ * 主层之上另有一层薄云片：厚度由一张平滑的二维噪声连续变化（1~3 格），边缘会顺着噪声收薄，
+ * 不再是"每列随机取 1~3 格"那种锯齿。
  */
 public class CloudChunkGenerator extends ChunkGenerator {
 
@@ -52,37 +50,41 @@ public class CloudChunkGenerator extends ChunkGenerator {
     public static final int BASE_Y = 256;
     /** 每片云的高度带中心在这个范围内起伏（±）。 */
     public static final int ALT_RANGE = 52;
-    /** 竖向半高：带中心到上下边缘的距离（决定最厚能到 ~2×BAND_HALF）。 */
+    /** 竖向半高：带中心到上下边缘的距离（最厚约 2×BAND_HALF）。 */
     public static final double BAND_HALF = 24.0;
-    /** 水平遮罩对实心度的贡献权重。 */
+
     private static final double BAND_WEIGHT = 1.25;
-    /** 三维噪声对实心度的贡献（越大越碎、洞越多）。 */
     private static final double DETAIL = 0.55;
-    /** 实心阈值。 */
     private static final double SOLID_THRESHOLD = 0.52;
-    /** 超过它就是厚云核，否则只是云皮。 */
-    private static final double CORE_THRESHOLD = 0.78;
+
+    /** 洞里再掏空一层：只掏内部，不动顶面两层。 */
+    private static final double CAVE_THRESHOLD = 0.62;
 
     private static final double CONTINENT_SCALE = 620.0;
     private static final double ISLAND_SCALE = 88.0;
     private static final double ALT_SCALE = 700.0;
     private static final double DETAIL_SCALE = 30.0;
+    private static final double CAVE_SCALE = 26.0;
     private static final double PATCH_SCALE = 44.0;
 
     private static final double CONTINENT_LO = 0.22;
     private static final double CONTINENT_HI = 0.46;
     private static final double ISLAND_LO = 0.34;
     private static final double ISLAND_HI = 0.56;
-    private static final double PATCH_LO = 0.52;
-    private static final double PATCH_HI = 0.74;
+    private static final double PATCH_LO = 0.50;
+    private static final double PATCH_HI = 0.70;
 
     private static final long SEED_CONTINENT = 0x51A7C0DEL;
     private static final long SEED_ISLAND = 0x2B7E1516L;
     private static final long SEED_WARP = 0x6A09E667L;
     private static final long SEED_ALT = 0x1F83D9ABL;
     private static final long SEED_DETAIL = 0x71374491L;
+    private static final long SEED_CAVE = 0x428A2F98L;
     private static final long SEED_PATCH = 0xB5C0FBCFL;
     private static final long SEED_PATCH_ALT = 0xE9B5DBA5L;
+
+    /** 邻域边长（16 区块 + 两侧各 1 格），用来判断"侧面是否暴露"。 */
+    private static final int NEIGHBOURHOOD = 18;
 
     public CloudChunkGenerator(BiomeSource biomeSource) {
         super(biomeSource);
@@ -93,7 +95,6 @@ public class CloudChunkGenerator extends ChunkGenerator {
         return CODEC;
     }
 
-    /** 水平遮罩：0 = 虚空，1 = 大陆内部；岛屿只长在大陆之外的虚空里。 */
     private static double horizontalMask(int x, int z) {
         double wx = x + CloudNoise.fbm(x, z, 260.0, 2, SEED_WARP) * 56.0;
         double wz = z + CloudNoise.fbm(x + 7919, z - 104729, 260.0, 2, SEED_WARP) * 56.0;
@@ -106,15 +107,10 @@ public class CloudChunkGenerator extends ChunkGenerator {
         return Math.max(continent, islandOnly * 0.92);
     }
 
-    /** 该列的云带中心高度。 */
     private static double bandCenter(int x, int z) {
         return BASE_Y + CloudNoise.fbm(x, z, ALT_SCALE, 3, SEED_ALT) * ALT_RANGE;
     }
 
-    /**
-     * 该体素的"实心度"。大于 {@link #SOLID_THRESHOLD} 就是云，越大越靠近核。
-     * 返回 {@link Double#NEGATIVE_INFINITY} 表示这一列根本没有云（省掉竖直循环）。
-     */
     private static double solidity(int x, int y, int z, double mask, double center) {
         double t = (y - center) / BAND_HALF;
         if (t <= -1.0 || t >= 1.0) {
@@ -125,6 +121,28 @@ public class CloudChunkGenerator extends ChunkGenerator {
         return mask * band * BAND_WEIGHT + detail * DETAIL;
     }
 
+    /** 内部洞穴：三维噪声高于阈值的格子掏空（顶面两层不掏，保证地表完整）。 */
+    private static boolean isCave(int x, int y, int z) {
+        return CloudNoise.value3(x, y * 1.33, z, CAVE_SCALE, SEED_CAVE) > CAVE_THRESHOLD;
+    }
+
+    /** 该列实心段的最高点（没有就是 Integer.MIN_VALUE）。 */
+    private static int columnTop(int x, int z, int minY, int maxY) {
+        double mask = horizontalMask(x, z);
+        if (mask <= 0.02) {
+            return Integer.MIN_VALUE;
+        }
+        double center = bandCenter(x, z);
+        int from = Math.max(minY, (int) Math.floor(center - BAND_HALF));
+        int to = Math.min(maxY - 1, (int) Math.ceil(center + BAND_HALF));
+        for (int y = to; y >= from; y--) {
+            if (solidity(x, y, z, mask, center) > SOLID_THRESHOLD) {
+                return y;
+            }
+        }
+        return Integer.MIN_VALUE;
+    }
+
     private BlockState cloud() {
         return ModBlocks.CLOUD_BLOCK.get().defaultBlockState();
     }
@@ -133,19 +151,14 @@ public class CloudChunkGenerator extends ChunkGenerator {
         return ModBlocks.THICK_CLOUD_BLOCK.get().defaultBlockState();
     }
 
-    /** 高空薄云片：主层之上 55~77 格，1~3 格厚，只由云皮组成。 */
-    private static int patchHeight(int x, int z, int mainTop) {
-        double patch = CloudNoise.smoothstep(PATCH_LO, PATCH_HI,
-                CloudNoise.fbm(x, z, PATCH_SCALE, 2, SEED_PATCH));
-        if (patch <= 0.05) {
-            return Integer.MIN_VALUE;
-        }
+    /** 高空薄云片的高度；厚度由平滑噪声连续变化（1~3 格），边缘顺着噪声收薄。 */
+    private static double patchStrength(int x, int z) {
+        return CloudNoise.smoothstep(PATCH_LO, PATCH_HI, CloudNoise.fbm(x, z, PATCH_SCALE, 2, SEED_PATCH));
+    }
+
+    private static int patchTop(int x, int z) {
         int offset = 55 + (int) Math.round(CloudNoise.fbm(x, z, 160.0, 2, SEED_PATCH_ALT) * 22.0);
-        int top = BASE_Y + offset;
-        if (mainTop != Integer.MIN_VALUE && Math.abs(top - mainTop) < 8) {
-            return Integer.MIN_VALUE;
-        }
-        return top;
+        return BASE_Y + offset;
     }
 
     @Override
@@ -156,35 +169,63 @@ public class CloudChunkGenerator extends ChunkGenerator {
         int maxY = minY + this.getGenDepth();
         BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
 
+        // 先算好 18×18 邻域每列的顶面，用来判断"这一格是不是贴着空气的侧面"
+        int originX = pos.getMinBlockX() - 1;
+        int originZ = pos.getMinBlockZ() - 1;
+        int[] tops = new int[NEIGHBOURHOOD * NEIGHBOURHOOD];
+        for (int ix = 0; ix < NEIGHBOURHOOD; ix++) {
+            for (int iz = 0; iz < NEIGHBOURHOOD; iz++) {
+                tops[ix + iz * NEIGHBOURHOOD] = columnTop(originX + ix, originZ + iz, minY, maxY);
+            }
+        }
+
         for (int dx = 0; dx < 16; dx++) {
             for (int dz = 0; dz < 16; dz++) {
                 int x = pos.getMinBlockX() + dx;
                 int z = pos.getMinBlockZ() + dz;
-                double mask = horizontalMask(x, z);
-
-                int top = Integer.MIN_VALUE;
-                if (mask > 0.02) {
+                int top = tops[(dx + 1) + (dz + 1) * NEIGHBOURHOOD];
+                if (top != Integer.MIN_VALUE) {
+                    double mask = horizontalMask(x, z);
                     double center = bandCenter(x, z);
                     int from = Math.max(minY, (int) Math.floor(center - BAND_HALF));
-                    int to = Math.min(maxY - 1, (int) Math.ceil(center + BAND_HALF));
-                    for (int y = to; y >= from; y--) {
-                        double solidity = solidity(x, y, z, mask, center);
-                        if (solidity <= SOLID_THRESHOLD) {
-                            continue;
+                    int bottom = minY;
+                    for (int y = from; y <= top; y++) {
+                        if (solidity(x, y, z, mask, center) > SOLID_THRESHOLD) {
+                            bottom = y;
+                            break;
                         }
-                        if (top == Integer.MIN_VALUE) {
-                            top = y;
+                    }
+
+                    int up = tops[(dx + 1) + dz * NEIGHBOURHOOD];
+                    int down = tops[(dx + 1) + (dz + 2) * NEIGHBOURHOOD];
+                    int left = tops[dx + (dz + 1) * NEIGHBOURHOOD];
+                    int right = tops[(dx + 2) + (dz + 1) * NEIGHBOURHOOD];
+
+                    for (int y = bottom; y <= top; y++) {
+                        if (y < top - 1 && isCave(x, y, z)) {
+                            continue;   // 内部洞穴
                         }
+                        boolean exposedSide = y > up || y > down || y > left || y > right;
+                        boolean exposedBottom = y == bottom;
+                        boolean surface = y >= top - 1;
+                        // 顶面（以及贴顶的一层）用厚云块：站得住、能刷怪、能放结构；
+                        // 侧面/底面暴露的一圈用云块：蓬松轮廓；内部也是厚云块。
+                        BlockState state = (surface || (!exposedSide && !exposedBottom)) ? thick() : cloud();
                         cursor.set(x, y, z);
-                        chunk.setBlockState(cursor, solidity > CORE_THRESHOLD ? thick() : cloud(), false);
+                        chunk.setBlockState(cursor, state, false);
                     }
                 }
 
-                int patchTop = patchHeight(x, z, top);
-                if (patchTop != Integer.MIN_VALUE) {
-                    int thickness = 1 + Math.abs((x * 31 + z * 17) % 3);   // 1~3 层
+                // 高空薄云片：强度连续变化，厚度 = round(strength*3)，边缘自然收薄
+                double strength = patchStrength(x, z);
+                if (strength > 0.12) {
+                    int top2 = patchTop(x, z);
+                    if (top != Integer.MIN_VALUE && Math.abs(top2 - top) < 8) {
+                        continue;
+                    }
+                    int thickness = Math.max(1, (int) Math.round(strength * 3.0));
                     for (int i = 0; i < thickness; i++) {
-                        int y = patchTop - i;
+                        int y = top2 - i;
                         if (y < minY || y >= maxY) {
                             continue;
                         }
@@ -234,20 +275,13 @@ public class CloudChunkGenerator extends ChunkGenerator {
     public int getBaseHeight(int x, int z, Heightmap.Types type, LevelHeightAccessor level, RandomState randomState) {
         int minY = this.getMinY();
         int maxY = minY + this.getGenDepth();
-        int top = Integer.MIN_VALUE;
-        double mask = horizontalMask(x, z);
-        if (mask > 0.02) {
-            double center = bandCenter(x, z);
-            for (int y = Math.min(maxY - 1, (int) Math.ceil(center + BAND_HALF)); y >= minY; y--) {
-                if (solidity(x, y, z, mask, center) > SOLID_THRESHOLD) {
-                    top = y;
-                    break;
-                }
+        int top = columnTop(x, z, minY, maxY);
+        double strength = patchStrength(x, z);
+        if (strength > 0.12) {
+            int top2 = patchTop(x, z);
+            if (top == Integer.MIN_VALUE || Math.abs(top2 - top) >= 8) {
+                top = Math.max(top, top2);
             }
-        }
-        int patchTop = patchHeight(x, z, top);
-        if (patchTop != Integer.MIN_VALUE) {
-            top = Math.max(top, patchTop);
         }
         return top == Integer.MIN_VALUE ? minY - 1 : top + 1;
     }
@@ -259,23 +293,30 @@ public class CloudChunkGenerator extends ChunkGenerator {
         BlockState[] states = new BlockState[this.getGenDepth()];
         java.util.Arrays.fill(states, Blocks.AIR.defaultBlockState());
 
-        double mask = horizontalMask(x, z);
-        if (mask > 0.02) {
+        int top = columnTop(x, z, minY, maxY);
+        if (top != Integer.MIN_VALUE) {
+            double mask = horizontalMask(x, z);
             double center = bandCenter(x, z);
-            for (int y = minY; y < maxY; y++) {
-                double solidity = solidity(x, y, z, mask, center);
-                if (solidity > SOLID_THRESHOLD) {
-                    states[y - minY] = solidity > CORE_THRESHOLD ? thick() : cloud();
+            for (int y = minY; y <= top; y++) {
+                if (solidity(x, y, z, mask, center) <= SOLID_THRESHOLD) {
+                    continue;
                 }
+                if (y < top - 1 && isCave(x, y, z)) {
+                    continue;
+                }
+                states[y - minY] = thick();   // 高度图与结构只关心是否实心，统一给厚云块
             }
         }
-        int patchTop = patchHeight(x, z, getBaseHeight(x, z, Heightmap.Types.WORLD_SURFACE, level, randomState) - 1);
-        if (patchTop != Integer.MIN_VALUE) {
-            int thickness = 1 + Math.abs((x * 31 + z * 17) % 3);
-            for (int i = 0; i < thickness; i++) {
-                int y = patchTop - i;
-                if (y >= minY && y < maxY) {
-                    states[y - minY] = cloud();
+        double strength = patchStrength(x, z);
+        if (strength > 0.12) {
+            int top2 = patchTop(x, z);
+            if (top == Integer.MIN_VALUE || Math.abs(top2 - top) >= 8) {
+                int thickness = Math.max(1, (int) Math.round(strength * 3.0));
+                for (int i = 0; i < thickness; i++) {
+                    int y = top2 - i;
+                    if (y >= minY && y < maxY) {
+                        states[y - minY] = cloud();
+                    }
                 }
             }
         }
@@ -287,6 +328,7 @@ public class CloudChunkGenerator extends ChunkGenerator {
         double mask = horizontalMask(pos.getX(), pos.getZ());
         lines.add("Cloud mask: " + String.format("%.2f", mask));
         lines.add("Cloud band center: " + String.format("%.0f", bandCenter(pos.getX(), pos.getZ())));
+        lines.add("Patch strength: " + String.format("%.2f", patchStrength(pos.getX(), pos.getZ())));
     }
 
     @Override
