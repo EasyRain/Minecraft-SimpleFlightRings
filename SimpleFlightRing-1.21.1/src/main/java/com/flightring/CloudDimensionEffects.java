@@ -15,8 +15,13 @@ import net.neoforged.neoforge.client.event.RegisterDimensionSpecialEffectsEvent;
  * 我们先前借用 {@code minecraft:overworld} 的特效，于是原版那层云（y=192）也跟进了云维度 ——
  * 而云维度的地形主层正好也在 192，会糊在一起。
  * <p>
- * 这里返回 {@link Float#NaN}，客户端就不画原版云了 —— 云维度的"云"全部由我们自己的云块组成。
- * 想要原版云回来，把 dimension_type 的 {@code effects} 改回 {@code minecraft:overworld} 即可。
+ * 云高设成 **64**：玩家在云维度里（主层 192）始终**站在原版云层之上**，于是
+ * <ul>
+ *   <li>脚下是一整片原版云海，不会只看到空荡荡的虚空；</li>
+ *   <li>同时把"下半球"的夜空挡住 —— 之前设成 NaN（不画云）时，因为没有地形遮挡，
+ *       白天能同时看到头顶的太阳和脚下的月亮（用户 2026-11-20 实测）。</li>
+ * </ul>
+ * M2 会把我们自己的云层地形铺在 192，那时这片原版云海就变成"云海底部"的背景。
  */
 @EventBusSubscriber(modid = FlightRingMod.MODID, value = Dist.CLIENT)
 public final class CloudDimensionEffects extends DimensionSpecialEffects {
@@ -25,8 +30,8 @@ public final class CloudDimensionEffects extends DimensionSpecialEffects {
             ResourceLocation.fromNamespaceAndPath(FlightRingMod.MODID, "the_cloud");
 
     public CloudDimensionEffects() {
-        // cloudLevel = NaN（不画原版云）、hasGround = false、天空类型 NORMAL、不强制亮色、非常亮环境光
-        super(Float.NaN, false, SkyType.NORMAL, false, false);
+        // cloudLevel = 64（原版云海在脚下）、hasGround = false、天空类型 NORMAL、不强制亮色、非常亮环境光
+        super(64.0F, false, SkyType.NORMAL, false, false);
     }
 
     @Override
