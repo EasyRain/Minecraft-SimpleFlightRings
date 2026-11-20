@@ -28,8 +28,8 @@
     "water_creature": []
   },
   "attributes": {
-    "minecraft:visual/sky_color": "#7fa8e0",
-    "minecraft:visual/fog_color": "#dfe9ff"
+    "minecraft:visual/sky_color": "#ffb27a",
+    "minecraft:visual/fog_color": "#ffe0c0"
   },
   "effects": {
     "water_color": "#3f76e4"
