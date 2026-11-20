@@ -50,13 +50,18 @@ public final class ModBlocks {
                     .isViewBlocking((state, level, pos) -> false)
                     .isValidSpawn((state, level, pos, type) -> false));
 
-    /** 厚云块：实心内核，可站立、可刷怪。 */
+    /**
+     * 厚云块：实心内核，可站立、可刷怪。
+     * <p>
+     * ★ 这里**不能**用 {@code noOcclusion()}：它是实心不透明块，noOcclusion 会让网格器
+     * 认为"邻居挡不住视线"，于是**内部面全部照画** —— 旁观模式钻进地形只看到一堆内部面，
+     * 而且渲染量暴涨（用户 2026-11-20 实测）。
+     */
     public static final DeferredBlock<Block> THICK_CLOUD_BLOCK = BLOCKS.registerBlock(
             "thick_cloud_block",
             Block::new,
             BlockBehaviour.Properties.of().strength(0.6F)
                     .sound(ModSounds.THICK_SOUND_TYPE)
-                    .noOcclusion()
                     .isViewBlocking((state, level, pos) -> false));
 
     /** 厚云砖块：建筑方块，也是云门的门框。 */

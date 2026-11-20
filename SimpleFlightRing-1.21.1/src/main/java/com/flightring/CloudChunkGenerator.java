@@ -209,12 +209,19 @@ public class CloudChunkGenerator extends ChunkGenerator {
                     double mask = horizontalMask(x, z);
                     double center = bandCenter(x, z);
                     int from = Math.max(minY, (int) Math.floor(center - BAND_HALF));
-                    int bottom = minY;
+                    // ★ 兜底必须是 from，不能是 minY：万一这一列找不到实心点，
+                    // 用 minY 会从世界底部一路填到顶，生成一根"云柱"（用户 2026-11-20 截图里的竖条）。
+                    int bottom = from;
+                    boolean found = false;
                     for (int y = from; y <= top; y++) {
                         if (solidity(x, y, z, mask, center) > SOLID_THRESHOLD) {
                             bottom = y;
+                            found = true;
                             break;
                         }
+                    }
+                    if (!found) {
+                        bottom = top;
                     }
 
                     // dx/dz 是区块内坐标，邻域原点比区块左/后各偏 2 格
