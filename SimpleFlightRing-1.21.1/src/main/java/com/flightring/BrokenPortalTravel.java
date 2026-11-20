@@ -130,7 +130,27 @@ public final class BrokenPortalTravel {
             }
             return new BlockPos(x, CLOUD_FALLBACK_Y, z);
         }
+        // 先确保这一列所在区块已生成，否则高度图还是空的（会返回世界底部，
+        // 于是门被建到 y≈-55 的基岩层下面，用户 2026-11-20 实测）。
+        level.getChunkAt(new BlockPos(x, minY, z));
         int h = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
+        if (h > minY) {
+            return new BlockPos(x, h, z);
+        }
+        // 还是取不到（虚空 / 海洋中央之类）：和云维度一样螺旋找一列有地面的
+        for (int r = 0; r <= 96; r += 8) {
+            for (int dx = -r; dx <= r; dx += 4) {
+                for (int dz = -r; dz <= r; dz += 4) {
+                    if (Math.max(Math.abs(dx), Math.abs(dz)) != r) {
+                        continue;
+                    }
+                    int hh = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x + dx, z + dz);
+                    if (hh > minY) {
+                        return new BlockPos(x + dx, hh, z + dz);
+                    }
+                }
+            }
+        }
         return new BlockPos(x, Math.max(h, minY), z);
     }
 
@@ -269,7 +289,9 @@ public final class BrokenPortalTravel {
         int surface = findSurface(level, x0, z0, axis, y, w);
         boolean needsPad = surface < 0;
         if (!needsPad) {
-            y = surface;
+            // 门框底边**嵌进地面一格**，这样门洞的地板正好和周围地面齐平
+            //（用户 2026-11-20：之前底边浮在地面上，进门要先跳一格）。
+            y = surface - 1;
         }
         int perpFrom = needsPad ? -1 : 0;
         int perpTo = needsPad ? 1 : 0;
