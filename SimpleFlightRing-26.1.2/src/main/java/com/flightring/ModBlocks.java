@@ -85,6 +85,19 @@ public final class ModBlocks {
             properties -> properties.strength(0.8F)
                     .sound(ModSounds.THICK_SOUND_TYPE));
 
+    /** 云门：厚云砖框里点亮出来的传送门方块（无物品、无掉落）。 */
+    public static final DeferredBlock<Block> CLOUD_PORTAL = BLOCKS.registerBlock(
+            "cloud_portal",
+            CloudPortalBlock::new,
+            properties -> properties
+                    .noCollision()
+                    .randomTicks()
+                    .strength(-1.0F)
+                    .sound(SoundType.GLASS)
+                    .lightLevel(state -> 11)
+                    .noLootTable()
+                    .pushReaction(PushReaction.BLOCK));
+
     /** 厚云床：睡觉/重生点照原版，渲染器单独换成厚云贴图。 */
     public static final DeferredBlock<Block> THICK_CLOUD_BED = BLOCKS.registerBlock(
             "thick_cloud_bed",
