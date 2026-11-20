@@ -58,13 +58,13 @@ public class CloudChunkGenerator extends ChunkGenerator {
     private static final double SOLID_THRESHOLD = 0.52;
 
     /** 洞里再掏空一层：只掏内部，不动顶面两层。 */
-    private static final double CAVE_THRESHOLD = 0.62;
+    private static final double CAVE_THRESHOLD = 0.55;
 
     private static final double CONTINENT_SCALE = 620.0;
     private static final double ISLAND_SCALE = 88.0;
     private static final double ALT_SCALE = 700.0;
     private static final double DETAIL_SCALE = 30.0;
-    private static final double CAVE_SCALE = 26.0;
+    private static final double CAVE_SCALE = 32.0;
     private static final double PATCH_SCALE = 44.0;
 
     private static final double CONTINENT_LO = 0.22;
@@ -83,8 +83,10 @@ public class CloudChunkGenerator extends ChunkGenerator {
     private static final long SEED_PATCH = 0xB5C0FBCFL;
     private static final long SEED_PATCH_ALT = 0xE9B5DBA5L;
 
-    /** 邻域边长（16 区块 + 两侧各 1 格），用来判断"侧面是否暴露"。 */
-    private static final int NEIGHBOURHOOD = 18;
+    /** 邻域边长（16 区块 + 两侧各 2 格），用来判断"侧面是否暴露"——2 格才能算两层厚度。 */
+    private static final int NEIGHBOURHOOD = 20;
+    /** 侧面/底面的云皮厚度（格）。 */
+    private static final int SHELL = 2;
 
     public CloudChunkGenerator(BiomeSource biomeSource) {
         super(biomeSource);
@@ -143,6 +145,22 @@ public class CloudChunkGenerator extends ChunkGenerator {
         return Integer.MIN_VALUE;
     }
 
+    /** 该列实心段的最低点（没有就是 Integer.MAX_VALUE）。 */
+    private static int columnBottom(int x, int z, int minY, int maxY, int top) {
+        if (top == Integer.MIN_VALUE) {
+            return Integer.MAX_VALUE;
+        }
+        double mask = horizontalMask(x, z);
+        double center = bandCenter(x, z);
+        int from = Math.max(minY, (int) Math.floor(center - BAND_HALF));
+        for (int y = from; y <= top; y++) {
+            if (solidity(x, y, z, mask, center) > SOLID_THRESHOLD) {
+                return y;
+            }
+        }
+        return top;
+    }
+
     private BlockState cloud() {
         return ModBlocks.CLOUD_BLOCK.get().defaultBlockState();
     }
@@ -169,13 +187,16 @@ public class CloudChunkGenerator extends ChunkGenerator {
         int maxY = minY + this.getGenDepth();
         BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
 
-        // 先算好 18×18 邻域每列的顶面，用来判断"这一格是不是贴着空气的侧面"
-        int originX = pos.getMinBlockX() - 1;
-        int originZ = pos.getMinBlockZ() - 1;
+        // 先算好 20×20 邻域每列的实心范围，用来判断"这一格离侧面有几格"
+        int originX = pos.getMinBlockX() - 2;
+        int originZ = pos.getMinBlockZ() - 2;
         int[] tops = new int[NEIGHBOURHOOD * NEIGHBOURHOOD];
+        int[] bottoms = new int[NEIGHBOURHOOD * NEIGHBOURHOOD];
         for (int ix = 0; ix < NEIGHBOURHOOD; ix++) {
             for (int iz = 0; iz < NEIGHBOURHOOD; iz++) {
-                tops[ix + iz * NEIGHBOURHOOD] = columnTop(originX + ix, originZ + iz, minY, maxY);
+                int index = ix + iz * NEIGHBOURHOOD;
+                tops[index] = columnTop(originX + ix, originZ + iz, minY, maxY);
+                bottoms[index] = columnBottom(originX + ix, originZ + iz, minY, maxY, tops[index]);
             }
         }
 
@@ -196,20 +217,36 @@ public class CloudChunkGenerator extends ChunkGenerator {
                         }
                     }
 
-                    int up = tops[(dx + 1) + dz * NEIGHBOURHOOD];
-                    int down = tops[(dx + 1) + (dz + 2) * NEIGHBOURHOOD];
-                    int left = tops[dx + (dz + 1) * NEIGHBOURHOOD];
-                    int right = tops[(dx + 2) + (dz + 1) * NEIGHBOURHOOD];
+                    // dx/dz 是区块内坐标，邻域原点比区块左/后各偏 2 格
+                    // base = (dx+2) + (dz+2)*N
+                    int base = (dx + 2) + (dz + 2) * NEIGHBOURHOOD;
+                    int up1 = tops[base - NEIGHBOURHOOD];
+                    int down1 = tops[base + NEIGHBOURHOOD];
+                    int left1 = tops[base - 1];
+                    int right1 = tops[base + 1];
+                    int up2 = tops[base - 2 * NEIGHBOURHOOD];
+                    int down2 = tops[base + 2 * NEIGHBOURHOOD];
+                    int left2 = tops[base - 2];
+                    int right2 = tops[base + 2];
+                    int bUp1 = bottoms[base - NEIGHBOURHOOD];
+                    int bDown1 = bottoms[base + NEIGHBOURHOOD];
+                    int bLeft1 = bottoms[base - 1];
+                    int bRight1 = bottoms[base + 1];
 
                     for (int y = bottom; y <= top; y++) {
                         if (y < top - 1 && isCave(x, y, z)) {
                             continue;   // 内部洞穴
                         }
-                        boolean exposedSide = y > up || y > down || y > left || y > right;
-                        boolean exposedBottom = y == bottom;
+                        // 侧面：这一格在某个邻居列里是"空的"（高于它的顶 或 低于它的底）
+                        boolean side1 = y > up1 || y > down1 || y > left1 || y > right1
+                                || y < bUp1 || y < bDown1 || y < bLeft1 || y < bRight1;
+                        boolean side2 = y > up2 || y > down2 || y > left2 || y > right2;
+                        boolean exposedSide = side1 || side2;
+                        boolean exposedBottom = y < bottom + SHELL;
                         boolean surface = y >= top - 1;
-                        // 顶面（以及贴顶的一层）用厚云块：站得住、能刷怪、能放结构；
-                        // 侧面/底面暴露的一圈用云块：蓬松轮廓；内部也是厚云块。
+                        // 顶面（含贴顶一层）= 厚云块：站得住、能刷怪、能放地物/结构
+                        // 侧面/底面 SHELL 层 = 云块：蓬松轮廓
+                        // 其余内部 = 厚云块：实心核
                         BlockState state = (surface || (!exposedSide && !exposedBottom)) ? thick() : cloud();
                         cursor.set(x, y, z);
                         chunk.setBlockState(cursor, state, false);
