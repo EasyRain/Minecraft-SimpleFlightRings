@@ -22,7 +22,8 @@ import net.neoforged.neoforge.client.event.RegisterDimensionSpecialEffectsEvent;
  * 这个现象要靠**自己接管 {@code renderSky}**（只画天空 + 太阳、不画月亮）才能消掉，
  * 属于自己写整套天空渲染，等工作量允许再考虑。
  * <p>
- * 云高设成 64：玩家在主层 192，脚下有一整片原版云海，M2 铺上我们自己的云层后它就是"云海底部"。
+ * 云高设成 **NaN**：完全不画原版云。M2 已经有自己的云层地形（主层 192），
+ * 原版那层云跟它叠在同一高度会糊成一片（用户 2026-11-20 实测），所以关掉。
  */
 @EventBusSubscriber(modid = FlightRingMod.MODID, value = Dist.CLIENT)
 public final class CloudDimensionEffects extends DimensionSpecialEffects {
@@ -31,8 +32,8 @@ public final class CloudDimensionEffects extends DimensionSpecialEffects {
             ResourceLocation.fromNamespaceAndPath(FlightRingMod.MODID, "the_cloud");
 
     public CloudDimensionEffects() {
-        // cloudLevel = 64（原版云海在脚下）、hasGround = false、天空类型 NORMAL（保留日月星辰）、不强制亮色、非常亮环境光
-        super(64.0F, false, SkyType.NORMAL, false, false);
+        // cloudLevel = NaN（不画原版云，避免和云岛重叠）、hasGround = false、天空类型 NORMAL（保留日月星辰）
+        super(Float.NaN, false, SkyType.NORMAL, false, false);
     }
 
     @Override

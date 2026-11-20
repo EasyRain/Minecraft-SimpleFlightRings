@@ -46,18 +46,18 @@ public class CloudChunkGenerator extends ChunkGenerator {
 
     /** 云海主层高度（y）。 */
     public static final int BASE_Y = 192;
-    /** 最厚处：2 层云皮 + 5 层厚云核。 */
-    public static final int MAX_THICKNESS = 7;
+    /** 最厚处：2 层云皮 + 10 层厚云核（用户 2026-11-20：之前 7 层太薄）。 */
+    public static final int MAX_THICKNESS = 12;
     /** 大陆噪声尺度（越大越碎）。 */
     private static final double CONTINENT_SCALE = 620.0;
     /** 岛屿噪声尺度。 */
     private static final double ISLAND_SCALE = 88.0;
     /** 大陆边缘阈值：噪声高于它就成陆。 */
-    private static final double CONTINENT_LO = 0.18;
-    private static final double CONTINENT_HI = 0.42;
+    private static final double CONTINENT_LO = 0.22;
+    private static final double CONTINENT_HI = 0.46;
     /** 岛屿边缘阈值。 */
-    private static final double ISLAND_LO = 0.30;
-    private static final double ISLAND_HI = 0.52;
+    private static final double ISLAND_LO = 0.34;
+    private static final double ISLAND_HI = 0.56;
 
     private static final long SEED_CONTINENT = 0x51A7C0DEL;
     private static final long SEED_ISLAND = 0x2B7E1516L;
@@ -83,8 +83,10 @@ public class CloudChunkGenerator extends ChunkGenerator {
                 CloudNoise.fbm(wx, wz, CONTINENT_SCALE, 3, SEED_CONTINENT));
         double island = CloudNoise.smoothstep(ISLAND_LO, ISLAND_HI,
                 CloudNoise.fbm(wx, wz, ISLAND_SCALE, 2, SEED_ISLAND));
-        // 大陆优先；大陆边缘之外才由岛屿补上
-        return Math.max(continent, island * 0.92);
+        // 岛屿只长在大陆之外的虚空里：continent 一上来就把 island 压掉，
+        // 否则小岛会贴着大陆边缘长出来、糊成一团（用户 2026-11-20：大的和小的很容易撞到一起）
+        double islandOnly = island * (1.0 - CloudNoise.smoothstep(0.0, 0.25, continent));
+        return Math.max(continent, islandOnly * 0.95);
     }
 
     /** 该列云层的顶面高度。 */
@@ -119,7 +121,7 @@ public class CloudChunkGenerator extends ChunkGenerator {
                 int top = topY(x, z, density);
                 int thickness = Math.max(1, (int) Math.round(density * MAX_THICKNESS));
                 // 边缘（density 很小）只有 1 层云皮；厚起来以后上面 2 层云皮、下面全是厚云核
-                int shell = thickness <= 2 ? 1 : 2;
+                int shell = thickness <= 3 ? 1 : 2;
                 for (int i = 0; i < thickness; i++) {
                     int y = top - i;
                     if (y < minY || y >= minY + this.getGenDepth()) {
@@ -183,7 +185,7 @@ public class CloudChunkGenerator extends ChunkGenerator {
         double density = density(x, z);
         int top = density <= 0.02 ? minY - 1 : topY(x, z, density);
         int thickness = Math.max(1, (int) Math.round(density * MAX_THICKNESS));
-        int shell = thickness <= 2 ? 1 : 2;
+        int shell = thickness <= 3 ? 1 : 2;
         for (int i = 0; i < states.length; i++) {
             int y = minY + i;
             if (y > top) {
