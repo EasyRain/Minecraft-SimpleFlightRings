@@ -194,7 +194,9 @@ public final class BrokenPortalConversion {
                 // needs nothing.
                 return 0;
             }
-            return fillFrame(level, rect);
+            // 厚云砖框 -> 云门；其它（黑曜石）-> 破碎门
+            boolean cloud = level.getBlockState(rect.min().below()).is(ModBlocks.THICK_CLOUD_BRICKS.get());
+            return fillFrame(level, rect, cloud);
         }
         return 0;
     }
@@ -204,14 +206,15 @@ public final class BrokenPortalConversion {
      * the surface is still incomplete, and plays vanilla's portal-lighting sound. Nothing is shattered
      * here: the frame is being turned into a portal, it is the rewrite path that shatters a lit one.
      */
-    private static int fillFrame(ServerLevel level, BrokenPortalFrames.Rect rect) {
-        BlockState broken = ModBlocks.BROKEN_PORTAL.get().defaultBlockState()
-                .setValue(BrokenPortalBlock.AXIS, rect.axis());
+    private static int fillFrame(ServerLevel level, BrokenPortalFrames.Rect rect, boolean cloud) {
+        BlockState filled = (cloud
+                ? ModBlocks.CLOUD_PORTAL.get().defaultBlockState().setValue(CloudPortalBlock.AXIS, rect.axis())
+                : ModBlocks.BROKEN_PORTAL.get().defaultBlockState().setValue(BrokenPortalBlock.AXIS, rect.axis()));
         BrokenPortalFrames.beginBulkEdit();
         try {
             for (int i = 0; i < rect.width(); i++) {
                 for (int j = 0; j < rect.height(); j++) {
-                    level.setBlock(rect.min().relative(rect.axis(), i).above(j), broken, Block.UPDATE_ALL);
+                    level.setBlock(rect.min().relative(rect.axis(), i).above(j), filled, Block.UPDATE_ALL);
                 }
             }
         } finally {

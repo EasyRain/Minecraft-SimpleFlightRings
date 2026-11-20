@@ -68,7 +68,9 @@ public final class BrokenPortalTravel {
         // The only per player bit that is kept, and only because a nether portal in the nether can be
         // converted too: the way back has to know which dimension it came from.
         BrokenPortalData.setOriginDimension(entity, from.dimension().location());
-        BrokenPortalFrames.Rect rect = findOrBuild(target, portalPos, axisOf(from.getBlockState(portalPos)));
+        BrokenPortalFrames.Rect rect = findOrBuild(target, portalPos, axisOf(from.getBlockState(portalPos)),
+                Blocks.OBSIDIAN.defaultBlockState(),
+                ModBlocks.BROKEN_PORTAL.get().defaultBlockState().setValue(BrokenPortalBlock.AXIS, axisOf(from.getBlockState(portalPos))));
         return transition(target, rect, entity);
     }
 
@@ -85,7 +87,37 @@ public final class BrokenPortalTravel {
         if (target == null) {
             target = from.getServer().overworld();
         }
-        BrokenPortalFrames.Rect rect = findOrBuild(target, portalPos, axisOf(from.getBlockState(portalPos)));
+        BrokenPortalFrames.Rect rect = findOrBuild(target, portalPos, axisOf(from.getBlockState(portalPos)),
+                Blocks.OBSIDIAN.defaultBlockState(),
+                ModBlocks.BROKEN_PORTAL.get().defaultBlockState().setValue(BrokenPortalBlock.AXIS, axisOf(from.getBlockState(portalPos))));
+        return transition(target, rect, entity);
+    }
+
+    /** 云维度，见 {@code data/simpleflightring/dimension/the_cloud.json}。 */
+    public static final ResourceKey<Level> CLOUD_DIMENSION = ResourceKey.create(
+            Registries.DIMENSION,
+            ResourceLocation.fromNamespaceAndPath(FlightRingMod.MODID, "the_cloud"));
+
+    /** 主世界 / 其它维度 -> 云层：和破碎门同一套逻辑，只是目标维度与门框材质不同。 */
+    public static DimensionTransition toCloud(ServerLevel from, Entity entity, BlockPos portalPos) {
+        ServerLevel target = from.getServer().getLevel(CLOUD_DIMENSION);
+        if (target == null) {
+            return null;
+        }
+        Direction.Axis axis = axisOf(from.getBlockState(portalPos));
+        BrokenPortalFrames.Rect rect = findOrBuild(target, portalPos, axis,
+                ModBlocks.THICK_CLOUD_BRICKS.get().defaultBlockState(),
+                ModBlocks.CLOUD_PORTAL.get().defaultBlockState().setValue(CloudPortalBlock.AXIS, axis));
+        return transition(target, rect, entity);
+    }
+
+    /** 云层 -> 主世界：坐标 1:1，落点同样复用"找附近的云门，没有就建一座"。 */
+    public static DimensionTransition backFromCloud(ServerLevel from, Entity entity, BlockPos portalPos) {
+        ServerLevel target = from.getServer().overworld();
+        Direction.Axis axis = axisOf(from.getBlockState(portalPos));
+        BrokenPortalFrames.Rect rect = findOrBuild(target, portalPos, axis,
+                ModBlocks.THICK_CLOUD_BRICKS.get().defaultBlockState(),
+                ModBlocks.CLOUD_PORTAL.get().defaultBlockState().setValue(CloudPortalBlock.AXIS, axis));
         return transition(target, rect, entity);
     }
 
@@ -105,9 +137,10 @@ public final class BrokenPortalTravel {
 
     // ------------------------------------------------------------------ finding / building
 
-    private static BrokenPortalFrames.Rect findOrBuild(ServerLevel level, BlockPos wanted, Direction.Axis axis) {
-        BrokenPortalFrames.Rect existing = find(level, wanted);
-        return existing != null ? existing : build(level, wanted, axis);
+    private static BrokenPortalFrames.Rect findOrBuild(ServerLevel level, BlockPos wanted, Direction.Axis axis,
+                                                       BlockState frame, BlockState portal) {
+        BrokenPortalFrames.Rect existing = find(level, wanted, portal);
+        return existing != null ? existing : build(level, wanted, axis, frame, portal);
     }
 
     /**
@@ -120,17 +153,17 @@ public final class BrokenPortalTravel {
      * range is the fallback for when that portal is gone and another one nearby should be reused
      * instead of building a new one.
      */
-    private static BrokenPortalFrames.Rect find(ServerLevel level, BlockPos wanted) {
-        BrokenPortalFrames.Rect near = scanForPortal(level, wanted, CLOSE_SEARCH_RADIUS);
+    private static BrokenPortalFrames.Rect find(ServerLevel level, BlockPos wanted, BlockState portal) {
+        BrokenPortalFrames.Rect near = scanForPortal(level, wanted, CLOSE_SEARCH_RADIUS, portal);
         if (near != null) {
             return near;
         }
         // Same radius in every dimension: see CLOSE_SEARCH_RADIUS / WIDE_SEARCH_RADIUS.
-        return scanForPortal(level, wanted, WIDE_SEARCH_RADIUS);
+        return scanForPortal(level, wanted, WIDE_SEARCH_RADIUS, portal);
     }
 
     /** Closest rewritten portal (ties: lowest Y) in a square of the given radius, or {@code null}. */
-    private static BrokenPortalFrames.Rect scanForPortal(ServerLevel level, BlockPos wanted, int radius) {
+    private static BrokenPortalFrames.Rect scanForPortal(ServerLevel level, BlockPos wanted, int radius, BlockState portal) {
         for (int cx = (wanted.getX() - radius) >> 4; cx <= (wanted.getX() + radius) >> 4; cx++) {
             for (int cz = (wanted.getZ() - radius) >> 4; cz <= (wanted.getZ() + radius) >> 4; cz++) {
                 level.getChunk(cx, cz);
@@ -142,7 +175,7 @@ public final class BrokenPortalTravel {
         for (int cx = (wanted.getX() - radius) >> 4; cx <= (wanted.getX() + radius) >> 4; cx++) {
             for (int cz = (wanted.getZ() - radius) >> 4; cz <= (wanted.getZ() + radius) >> 4; cz++) {
                 level.getChunk(cx, cz).findBlocks(
-                        state -> state.is(ModBlocks.BROKEN_PORTAL.get()),
+                        state -> state.getBlock() == portal.getBlock(),
                         (pos, state) -> {
                             if (border.isWithinBounds(pos) && pos.distSqr(wanted) <= maxDistance) {
                                 found.add(pos.immutable());
@@ -174,7 +207,8 @@ public final class BrokenPortalTravel {
      * bottom row widened by one block to either side, i.e. a plain 4x3 obsidian pad with the portal
      * in the middle (user's request, 2026-10-09).
      */
-    private static BrokenPortalFrames.Rect build(ServerLevel level, BlockPos wanted, Direction.Axis axis) {
+    private static BrokenPortalFrames.Rect build(ServerLevel level, BlockPos wanted, Direction.Axis axis,
+                                                 BlockState frame, BlockState portal) {
         int y = Mth.clamp(wanted.getY(), level.getMinBuildHeight() + 8, level.getMaxBuildHeight() - 8);
         int x0 = wanted.getX();
         int z0 = wanted.getZ();
@@ -216,24 +250,23 @@ public final class BrokenPortalTravel {
             if (needsPad) {
                 for (int along = 0; along < w; along++) {
                     for (int perp = perpFrom; perp <= perpTo; perp++) {
-                        set(level, framePos(x0, z0, axis, along, y, perp), Blocks.OBSIDIAN.defaultBlockState());
+                        set(level, framePos(x0, z0, axis, along, y, perp), frame);
                     }
                 }
             }
 
-            // Obsidian frame: 4 wide (2x3 inner) x 5 tall, exactly like a minimal nether portal.
+            // 门框：4 宽（内 2×3）× 5 高，和最小的下界门一致；材质由调用方决定
+            //（破碎门用黑曜石，云门用厚云砖）。
             for (int i = 0; i < w; i++) {
-                set(level, framePos(x0, z0, axis, i, y, 0), Blocks.OBSIDIAN.defaultBlockState());
-                set(level, framePos(x0, z0, axis, i, y + h - 1, 0), Blocks.OBSIDIAN.defaultBlockState());
+                set(level, framePos(x0, z0, axis, i, y, 0), frame);
+                set(level, framePos(x0, z0, axis, i, y + h - 1, 0), frame);
             }
             for (int j = 0; j < h; j++) {
-                set(level, framePos(x0, z0, axis, 0, y + j, 0), Blocks.OBSIDIAN.defaultBlockState());
-                set(level, framePos(x0, z0, axis, w - 1, y + j, 0), Blocks.OBSIDIAN.defaultBlockState());
+                set(level, framePos(x0, z0, axis, 0, y + j, 0), frame);
+                set(level, framePos(x0, z0, axis, w - 1, y + j, 0), frame);
             }
 
             // The portal itself.
-            BlockState portal = ModBlocks.BROKEN_PORTAL.get().defaultBlockState()
-                    .setValue(BrokenPortalBlock.AXIS, axis);
             for (int i = 1; i <= INNER_WIDTH; i++) {
                 for (int j = 1; j <= INNER_HEIGHT; j++) {
                     set(level, framePos(x0, z0, axis, i, y + j, 0), portal);
