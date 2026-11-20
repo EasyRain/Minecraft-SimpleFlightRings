@@ -87,7 +87,7 @@ public class CloudChunkGenerator extends ChunkGenerator {
      * 调试开关：只生成厚云块（不铺云皮、不挖洞、不放云片）。
      * 用来确认"侧壁戳出来的凸起"到底是密度场本身的形状，还是材质分配的问题。
      */
-    public static final boolean DEBUG_THICK_ONLY = true;
+    public static final boolean DEBUG_THICK_ONLY = false;
 
     /** 邻域边长：16 区块 + 两侧各 2 格（云皮要往外看两格）。 */
     private static final int NEIGHBOURHOOD = 20;
@@ -234,8 +234,10 @@ public class CloudChunkGenerator extends ChunkGenerator {
                         continue;
                     }
                     int y = wy0 + iy;
-                    boolean surface = y >= columnTop[ix][iz];
-                    boolean shell = !DEBUG_THICK_ONLY && !surface && exposed(solid, ix, iy, iz, height);
+                    // 只按"有没有贴着空气"决定材质：侧面/底面暴露的一圈（含侧壁最顶那一格）都铺云皮。
+                    // 之前把"该列顶面"一律豁免成厚云块，导致每个侧壁最上面必有一块厚云块，
+                    // 云皮只能从它下面开始 —— 就是"云皮像嵌进厚云块里"的观感（用户 2026-11-20）。
+                    boolean shell = !DEBUG_THICK_ONLY && exposed(solid, ix, iy, iz, height);
                     cursor.set(x, y, z);
                     chunk.setBlockState(cursor, shell ? cloudState : thickState, 0);
                 }
@@ -262,7 +264,13 @@ public class CloudChunkGenerator extends ChunkGenerator {
         return CompletableFuture.completedFuture(chunk);
     }
 
-    /** 这一格在 SHELL 格以内是否贴着空气（只看侧面和底面，顶面另外处理）。 */
+    /**
+     * 这一格在 SHELL 格以内是否贴着**侧面或底面**的空气。
+     * <p>
+     * 只看侧面和底面，不看头顶：头顶贴着空气的格子是"可站立的地表"，要保持厚云块；
+     * 但如果它侧面也露着（岛的边缘），那它照样算壳、铺云皮 —— 否则每个侧壁最上面那一格
+     * 永远是厚云块，看起来像云皮从它下面才开始。
+     */
     private static boolean exposed(boolean[][][] solid, int ix, int iy, int iz, int height) {
         for (int d = 1; d <= SHELL; d++) {
             if (isAir(solid, ix - d, iy, iz, height) || isAir(solid, ix + d, iy, iz, height)
@@ -270,7 +278,6 @@ public class CloudChunkGenerator extends ChunkGenerator {
                 return true;
             }
         }
-        // 底面
         return isAir(solid, ix, iy - 1, iz, height) || isAir(solid, ix, iy - 2, iz, height);
     }
 
