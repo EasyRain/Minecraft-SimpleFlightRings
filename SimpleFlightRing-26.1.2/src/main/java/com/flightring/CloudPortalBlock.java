@@ -9,6 +9,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -55,6 +56,31 @@ public class CloudPortalBlock extends Block implements Portal {
     @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return state.getValue(AXIS) == Direction.Axis.X ? X_AXIS_AABB : Z_AXIS_AABB;
+    }
+
+    /**
+     * 拆掉门框或任意一格门，整座门就消失 —— 和原版下界门一致。
+     * <p>
+     * 判定复用 {@link BrokenPortalFrames}（厚云砖通过 {@code isPortalFrame} 被认成框架）：
+     * 量出门洞矩形后，只要框不完整或门洞没被填满，这一格就变回空气，其余格子会因为各自的
+     * 邻居更新跟着消失。
+     */
+    @Override
+    protected BlockState updateShape(BlockState state, net.minecraft.world.level.LevelReader level,
+                                     net.minecraft.world.level.ScheduledTickAccess ticks, BlockPos pos,
+                                     Direction direction, BlockPos neighbourPos, BlockState neighbourState,
+                                     net.minecraft.util.RandomSource random) {
+        if (BrokenPortalFrames.isBulkEditing()) {
+            return super.updateShape(state, level, ticks, pos, direction, neighbourPos, neighbourState, random);
+        }
+        BrokenPortalFrames.Rect rect = BrokenPortalFrames.measure(level, pos, state.getValue(AXIS));
+        if (rect == null) {
+            // 还在被点亮的过程中（还没量出完整门洞）：先留着
+            return super.updateShape(state, level, ticks, pos, direction, neighbourPos, neighbourState, random);
+        }
+        return BrokenPortalFrames.isComplete(level, rect)
+                ? super.updateShape(state, level, ticks, pos, direction, neighbourPos, neighbourState, random)
+                : Blocks.AIR.defaultBlockState();
     }
 
     @Override

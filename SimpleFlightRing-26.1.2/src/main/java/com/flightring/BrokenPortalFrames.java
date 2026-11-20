@@ -54,7 +54,8 @@ public final class BrokenPortalFrames {
         return state.isAir()
                 || state.is(BlockTags.FIRE)
                 || state.is(Blocks.NETHER_PORTAL)
-                || state.is(ModBlocks.BROKEN_PORTAL.get());
+                || state.is(ModBlocks.BROKEN_PORTAL.get())
+                || state.is(ModBlocks.CLOUD_PORTAL.get());
     }
 
     /**

@@ -92,29 +92,53 @@ public final class CloudPortalTravel {
     }
 
     /**
-     * 在落点放两格云门（必要时先铺一小块厚云平台），返回玩家脚下应该站的位置。
+     * 在落点建一座**完整的云门**：4 宽 × 5 高的厚云砖框 + 中间 2×3 的云门方块。
+     * <p>
+     * 用户 2026-11-20：之前只放两格门方块、没有框，看着不像门。现在照原版下界门的尺寸补齐框架，
+     * 落点也定在门洞底部中间（玩家一出来就站在门里，和原版一致）。
+     * <p>
+     * 框架用厚云砖是必须的：云门有自我校验，框不合法会立刻消失。
      */
     private static BlockPos placePortal(ServerLevel level, BlockPos target, Direction.Axis axis) {
+        BlockState brick = ModBlocks.THICK_CLOUD_BRICKS.get().defaultBlockState();
         BlockState portal = ModBlocks.CLOUD_PORTAL.get().defaultBlockState().setValue(CloudPortalBlock.AXIS, axis);
-        BlockState platform = ModBlocks.THICK_CLOUD_BLOCK.get().defaultBlockState();
+        BlockState air = Blocks.AIR.defaultBlockState();
 
         int y = target.getY();
-        level.getChunkAt(target);
+        // 门洞左下角 = 目标点；外框从它沿轴往后再退一格
+        BlockPos min = target;
+        BlockPos frameOrigin = min.relative(axis, -1);
 
-        // 地面：脚下这一格如果是空气就补一块厚云，避免直接掉下去
-        if (level.getBlockState(target.below()).isAir()) {
-            for (int dx = -1; dx <= 1; dx++) {
-                for (int dz = -1; dz <= 1; dz++) {
-                    level.setBlockAndUpdate(target.offset(dx, -1, dz), platform);
+        level.getChunkAt(min);
+
+        BrokenPortalFrames.beginBulkEdit();
+        try {
+            // 先把门的占地清空（含门上方一格），避免埋进地形
+            for (int i = -1; i <= 2; i++) {
+                for (int j = -1; j <= 4; j++) {
+                    level.setBlock(frameOrigin.relative(axis, i).above(j), air, 2);
                 }
             }
+            // 底边、顶边
+            for (int i = 0; i < 4; i++) {
+                level.setBlock(frameOrigin.relative(axis, i).below(), brick, 2);
+                level.setBlock(frameOrigin.relative(axis, i).above(4), brick, 2);
+            }
+            // 左右立柱
+            for (int j = 0; j < 4; j++) {
+                level.setBlock(frameOrigin.below().above(j), brick, 2);
+                level.setBlock(frameOrigin.relative(axis, 3).below().above(j), brick, 2);
+            }
+            // 门洞：2 宽 × 3 高
+            for (int i = 1; i <= 2; i++) {
+                for (int j = 0; j < 3; j++) {
+                    level.setBlock(min.relative(axis, i - 1).above(j), portal, 2);
+                }
+            }
+        } finally {
+            BrokenPortalFrames.endBulkEdit();
         }
-
-        // 两格高的门（沿传送轴的垂直面）
-        level.setBlockAndUpdate(target, portal);
-        level.setBlockAndUpdate(target.above(), portal);
-        level.setBlockAndUpdate(target.above(2), Blocks.AIR.defaultBlockState());
-        return target;
+        return min;
     }
 
     private static Direction.Axis axisOf(BlockState state) {
