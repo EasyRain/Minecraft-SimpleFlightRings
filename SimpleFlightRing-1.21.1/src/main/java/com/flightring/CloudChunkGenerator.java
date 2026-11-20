@@ -113,17 +113,34 @@ public class CloudChunkGenerator extends ChunkGenerator {
         return BASE_Y + CloudNoise.fbm(x, z, ALT_SCALE, 3, SEED_ALT) * ALT_RANGE;
     }
 
-    private static double solidity(int x, int y, int z, double mask, double center) {
+    /** 密度值（不含洞穴）；大于 {@link #SOLID_THRESHOLD} 才可能是实心。 */
+    private static double densityAt(int x, int y, int z, double mask, double center) {
         double t = (y - center) / BAND_HALF;
         if (t <= -1.0 || t >= 1.0) {
             return Double.NEGATIVE_INFINITY;
         }
         double band = 1.0 - t * t;
         double detail = CloudNoise.value3(x, y * 1.6, z, DETAIL_SCALE, SEED_DETAIL);
-        // 三维噪声只在岛屿内部起作用：边缘（mask 小）把它的权重压到 0，
-        // 否则"带 × 遮罩"本来就贴着阈值，噪声一冒头就单独成一根竖条 —— 也就是岛边那一溜溜"鳍"。
         double detailWeight = DETAIL * CloudNoise.smoothstep(0.02, 0.32, mask);
         return mask * band * BAND_WEIGHT + detail * detailWeight;
+    }
+
+    /**
+     * 该体素最终是否是实心（密度 + 洞穴）。
+     * <p>
+     * {@code top} 传该列的顶面高度：顶部两层不参与洞穴，保证地表完整。
+     * 材料（云皮/厚云核）不再靠"猜邻居列的高度范围"，而是**直接问邻居这一格是不是实心** ——
+     * 之前用列的 [bottom, top] 近似，洞穴挖空的位置会被误判成"被挡住"，于是厚云块从侧壁戳出来
+     * （用户 2026-11-20 截图里那一排排凸起）。
+     */
+    private static boolean solidAt(int x, int y, int z, double mask, double center, int top, int minY, int maxY) {
+        if (y < minY || y >= maxY || mask <= 0.02) {
+            return false;
+        }
+        if (densityAt(x, y, z, mask, center) <= SOLID_THRESHOLD) {
+            return false;
+        }
+        return y >= top - 1 || !isCave(x, y, z);
     }
 
     /** 内部洞穴：三维噪声高于阈值的格子掏空（顶面两层不掏，保证地表完整）。 */
@@ -141,7 +158,7 @@ public class CloudChunkGenerator extends ChunkGenerator {
         int from = Math.max(minY, (int) Math.floor(center - BAND_HALF));
         int to = Math.min(maxY - 1, (int) Math.ceil(center + BAND_HALF));
         for (int y = to; y >= from; y--) {
-            if (solidity(x, y, z, mask, center) > SOLID_THRESHOLD) {
+            if (densityAt(x, y, z, mask, center) > SOLID_THRESHOLD) {
                 return y;
             }
         }
@@ -157,7 +174,7 @@ public class CloudChunkGenerator extends ChunkGenerator {
         double center = bandCenter(x, z);
         int from = Math.max(minY, (int) Math.floor(center - BAND_HALF));
         for (int y = from; y <= top; y++) {
-            if (solidity(x, y, z, mask, center) > SOLID_THRESHOLD) {
+            if (densityAt(x, y, z, mask, center) > SOLID_THRESHOLD) {
                 return y;
             }
         }
@@ -190,94 +207,96 @@ public class CloudChunkGenerator extends ChunkGenerator {
         int maxY = minY + this.getGenDepth();
         BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
 
-        // 先算好 20×20 邻域每列的实心范围，用来判断"这一格离侧面有几格"
+        // 先算好 20×20 邻域每列的 mask / 带中心 / 顶面。
+        // 材料判定要"问邻居这一格是不是实心"，所以这些值必须按邻域缓存，避免重复算 fbm。
         int originX = pos.getMinBlockX() - 2;
         int originZ = pos.getMinBlockZ() - 2;
-        int[] tops = new int[NEIGHBOURHOOD * NEIGHBOURHOOD];
-        int[] bottoms = new int[NEIGHBOURHOOD * NEIGHBOURHOOD];
+        int size = NEIGHBOURHOOD * NEIGHBOURHOOD;
+        double[] masks = new double[size];
+        double[] centers = new double[size];
+        int[] tops = new int[size];
         for (int ix = 0; ix < NEIGHBOURHOOD; ix++) {
             for (int iz = 0; iz < NEIGHBOURHOOD; iz++) {
                 int index = ix + iz * NEIGHBOURHOOD;
-                tops[index] = columnTop(originX + ix, originZ + iz, minY, maxY);
-                bottoms[index] = columnBottom(originX + ix, originZ + iz, minY, maxY, tops[index]);
+                int wx = originX + ix;
+                int wz = originZ + iz;
+                masks[index] = horizontalMask(wx, wz);
+                centers[index] = bandCenter(wx, wz);
+                tops[index] = masks[index] <= 0.02 ? Integer.MIN_VALUE : columnTop(wx, wz, minY, maxY);
             }
         }
+        BlockState cloudState = cloud();
+        BlockState thickState = thick();
 
         for (int dx = 0; dx < 16; dx++) {
             for (int dz = 0; dz < 16; dz++) {
                 int x = pos.getMinBlockX() + dx;
                 int z = pos.getMinBlockZ() + dz;
-                int top = tops[(dx + 1) + (dz + 1) * NEIGHBOURHOOD];
-                if (top != Integer.MIN_VALUE) {
-                    double mask = horizontalMask(x, z);
-                    double center = bandCenter(x, z);
-                    int from = Math.max(minY, (int) Math.floor(center - BAND_HALF));
-                    // ★ 兜底必须是 from，不能是 minY：万一这一列找不到实心点，
-                    // 用 minY 会从世界底部一路填到顶，生成一根"云柱"（用户 2026-11-20 截图里的竖条）。
-                    int bottom = from;
-                    boolean found = false;
-                    for (int y = from; y <= top; y++) {
-                        if (solidity(x, y, z, mask, center) > SOLID_THRESHOLD) {
-                            bottom = y;
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found) {
-                        bottom = top;
-                    }
-
-                    // dx/dz 是区块内坐标，邻域原点比区块左/后各偏 2 格
-                    // base = (dx+2) + (dz+2)*N
-                    int base = (dx + 2) + (dz + 2) * NEIGHBOURHOOD;
-                    int up1 = tops[base - NEIGHBOURHOOD];
-                    int down1 = tops[base + NEIGHBOURHOOD];
-                    int left1 = tops[base - 1];
-                    int right1 = tops[base + 1];
-                    int up2 = tops[base - 2 * NEIGHBOURHOOD];
-                    int down2 = tops[base + 2 * NEIGHBOURHOOD];
-                    int left2 = tops[base - 2];
-                    int right2 = tops[base + 2];
-                    int bUp1 = bottoms[base - NEIGHBOURHOOD];
-                    int bDown1 = bottoms[base + NEIGHBOURHOOD];
-                    int bLeft1 = bottoms[base - 1];
-                    int bRight1 = bottoms[base + 1];
-
-                    for (int y = bottom; y <= top; y++) {
-                        if (y < top - 1 && isCave(x, y, z)) {
-                            continue;   // 内部洞穴
-                        }
-                        // 侧面：这一格在某个邻居列里是"空的"（高于它的顶 或 低于它的底）
-                        boolean side1 = y > up1 || y > down1 || y > left1 || y > right1
-                                || y < bUp1 || y < bDown1 || y < bLeft1 || y < bRight1;
-                        boolean side2 = y > up2 || y > down2 || y > left2 || y > right2;
-                        boolean exposedSide = side1 || side2;
-                        boolean exposedBottom = y < bottom + SHELL;
-                        boolean surface = y >= top - 1;
-                        // 顶面（含贴顶一层）= 厚云块：站得住、能刷怪、能放地物/结构
-                        // 侧面/底面 SHELL 层 = 云块：蓬松轮廓
-                        // 其余内部 = 厚云块：实心核
-                        BlockState state = (surface || (!exposedSide && !exposedBottom)) ? thick() : cloud();
-                        cursor.set(x, y, z);
-                        chunk.setBlockState(cursor, state, false);
+                int self = (dx + 2) + (dz + 2) * NEIGHBOURHOOD;
+                int top = tops[self];
+                if (top == Integer.MIN_VALUE) {
+                    continue;
+                }
+                double mask = masks[self];
+                double center = centers[self];
+                int from = Math.max(minY, (int) Math.floor(center - BAND_HALF));
+                int bottom = top;
+                for (int y = from; y <= top; y++) {
+                    if (solidAt(x, y, z, mask, center, top, minY, maxY)) {
+                        bottom = y;
+                        break;
                     }
                 }
 
-                // 高空薄云片：强度连续变化，厚度 = round(strength*3)，边缘自然收薄
-                double strength = patchStrength(x, z);
-                if (strength > 0.12) {
-                    int top2 = patchTop(x, z);
-                    if (top != Integer.MIN_VALUE && Math.abs(top2 - top) < 8) {
+                int nUp = self - NEIGHBOURHOOD;
+                int nDown = self + NEIGHBOURHOOD;
+                int nLeft = self - 1;
+                int nRight = self + 1;
+
+                for (int y = bottom; y <= top; y++) {
+                    if (!solidAt(x, y, z, mask, center, top, minY, maxY)) {
                         continue;
                     }
-                    int thickness = Math.max(1, (int) Math.round(strength * 3.0));
-                    for (int i = 0; i < thickness; i++) {
-                        int y = top2 - i;
-                        if (y < minY || y >= maxY) {
-                            continue;
+                    boolean surface = y >= top - 1;
+                    boolean shell;
+                    if (surface) {
+                        shell = false;   // 顶面 = 厚云块：站得住、能刷怪、能放地物/结构
+                    } else {
+                        // 只要六个方向（含上下）里有一格是空气，这一格就是"壳"，用云皮
+                        boolean airNeighbour =
+                                !solidAt(x, y - 1, z, mask, center, top, minY, maxY)
+                                || !solidAt(x, y + 1, z, mask, center, top, minY, maxY)
+                                || !solidAt(x - 1, y, z, masks[nLeft], centers[nLeft], tops[nLeft], minY, maxY)
+                                || !solidAt(x + 1, y, z, masks[nRight], centers[nRight], tops[nRight], minY, maxY)
+                                || !solidAt(x, y, z - 1, masks[nUp], centers[nUp], tops[nUp], minY, maxY)
+                                || !solidAt(x, y, z + 1, masks[nDown], centers[nDown], tops[nDown], minY, maxY);
+                        // 再看距离 2 的邻居，让云皮有两层厚
+                        boolean airNeighbour2 =
+                                !solidAt(x - 2, y, z, masks[nLeft - 1], centers[nLeft - 1], tops[nLeft - 1], minY, maxY)
+                                || !solidAt(x + 2, y, z, masks[nRight + 1], centers[nRight + 1], tops[nRight + 1], minY, maxY)
+                                || !solidAt(x, y, z - 2, masks[nUp - NEIGHBOURHOOD], centers[nUp - NEIGHBOURHOOD], tops[nUp - NEIGHBOURHOOD], minY, maxY)
+                                || !solidAt(x, y, z + 2, masks[nDown + NEIGHBOURHOOD], centers[nDown + NEIGHBOURHOOD], tops[nDown + NEIGHBOURHOOD], minY, maxY)
+                                || !solidAt(x, y - 2, z, mask, center, top, minY, maxY);
+                        shell = airNeighbour || airNeighbour2;
+                    }
+                    cursor.set(x, y, z);
+                    chunk.setBlockState(cursor, shell ? cloudState : thickState, false);
+                }
+
+                // 高空薄云片
+                double strength = patchStrength(x, z);
+                if (strength > 0.12) {
+                    int patchTopY = patchTop(x, z);
+                    if (Math.abs(patchTopY - top) >= 8) {
+                        int thickness = Math.max(1, (int) Math.round(strength * 3.0));
+                        for (int i = 0; i < thickness; i++) {
+                            int y = patchTopY - i;
+                            if (y < minY || y >= maxY) {
+                                continue;
+                            }
+                            cursor.set(x, y, z);
+                            chunk.setBlockState(cursor, cloudState, false);
                         }
-                        cursor.set(x, y, z);
-                        chunk.setBlockState(cursor, cloud(), false);
                     }
                 }
             }
@@ -345,10 +364,7 @@ public class CloudChunkGenerator extends ChunkGenerator {
             double mask = horizontalMask(x, z);
             double center = bandCenter(x, z);
             for (int y = minY; y <= top; y++) {
-                if (solidity(x, y, z, mask, center) <= SOLID_THRESHOLD) {
-                    continue;
-                }
-                if (y < top - 1 && isCave(x, y, z)) {
+                if (!solidAt(x, y, z, mask, center, top, minY, maxY)) {
                     continue;
                 }
                 states[y - minY] = thick();   // 高度图与结构只关心是否实心，统一给厚云块
