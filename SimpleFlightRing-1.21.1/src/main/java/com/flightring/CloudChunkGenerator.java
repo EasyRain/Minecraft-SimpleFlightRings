@@ -59,6 +59,8 @@ public class CloudChunkGenerator extends ChunkGenerator {
     private static final double DETAIL = 0.55;
     private static final double SOLID_THRESHOLD = 0.52;
     private static final double CAVE_THRESHOLD = 0.55;
+    /** 顶部两层允许被掏穿的阈值（更高 = 破口更少）。 */
+    private static final double CAVE_BREACH_THRESHOLD = 0.66;
 
     private static final double CONTINENT_SCALE = 620.0;
     private static final double ISLAND_SCALE = 88.0;
@@ -131,6 +133,17 @@ public class CloudChunkGenerator extends ChunkGenerator {
 
     private static boolean isCave(int x, int y, int z) {
         return CloudNoise.value3(x, y * 1.33, z, CAVE_SCALE, SEED_CAVE) > CAVE_THRESHOLD;
+    }
+
+    /**
+     * 顶部两层的洞穴判定：阈值抬高。
+     * <p>
+     * 之前顶部两层一律不掏，于是**挖到地表的洞穴会被两层实心块盖住**，看起来像给洞口盖了个盖子
+     * （用户 2026-11-20）。现在只有洞穴噪声特别强的地方才允许把地表掏穿 ——
+     * 大部分地表仍然完整，但偶尔会出现真正的洞口。
+     */
+    private static boolean isCaveBreach(int x, int y, int z) {
+        return CloudNoise.value3(x, y * 1.33, z, CAVE_SCALE, SEED_CAVE) > CAVE_BREACH_THRESHOLD;
     }
 
     private static double patchStrength(int x, int z) {
@@ -212,7 +225,11 @@ public class CloudChunkGenerator extends ChunkGenerator {
                 int z = originZ + iz;
                 for (int iy = 0; iy < height; iy++) {
                     int y = wy0 + iy;
-                    if (solid[ix][iy][iz] && y < top - 1 && isCave(x, y, z)) {
+                    if (!solid[ix][iy][iz]) {
+                        continue;
+                    }
+                    boolean cave = y < top - 1 ? isCave(x, y, z) : isCaveBreach(x, y, z);
+                    if (cave) {
                         solid[ix][iy][iz] = false;
                     }
                 }
@@ -272,13 +289,19 @@ public class CloudChunkGenerator extends ChunkGenerator {
      * 永远是厚云块，看起来像云皮从它下面才开始。
      */
     private static boolean exposed(boolean[][][] solid, int ix, int iy, int iz, int height) {
+        // 侧面只往外看 1 格：看 2 格会让平地的顶面在靠近悬崖处也变成云皮，
+        // 表现为"每一层顶面都往侧面延伸两格云块"（用户 2026-11-20）。
+        if (isAir(solid, ix - 1, iy, iz, height) || isAir(solid, ix + 1, iy, iz, height)
+                || isAir(solid, ix, iy, iz - 1, height) || isAir(solid, ix, iy, iz + 1, height)) {
+            return true;
+        }
+        // 底面保留 SHELL 层（云岛底部本来就该厚一点）
         for (int d = 1; d <= SHELL; d++) {
-            if (isAir(solid, ix - d, iy, iz, height) || isAir(solid, ix + d, iy, iz, height)
-                    || isAir(solid, ix, iy, iz - d, height) || isAir(solid, ix, iy, iz + d, height)) {
+            if (isAir(solid, ix, iy - d, iz, height)) {
                 return true;
             }
         }
-        return isAir(solid, ix, iy - 1, iz, height) || isAir(solid, ix, iy - 2, iz, height);
+        return false;
     }
 
     private static boolean isAir(boolean[][][] solid, int ix, int iy, int iz, int height) {
