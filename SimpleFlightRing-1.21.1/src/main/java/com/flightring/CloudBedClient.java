@@ -115,9 +115,15 @@ public final class CloudBedClient {
         }
     }
 
+    private static Material bedMaterial;
+
+    /** 惰性创建：静态字段里碰 Sheets 会触发 "loaded too early"（见 CloudChestClient 的注释）。 */
     private static Material material() {
-        return new Material(Sheets.BED_SHEET,
-                ResourceLocation.fromNamespaceAndPath(FlightRingMod.MODID, "entity/bed/cloud"));
+        if (bedMaterial == null) {
+            bedMaterial = new Material(Sheets.BED_SHEET,
+                    ResourceLocation.fromNamespaceAndPath(FlightRingMod.MODID, "entity/bed/cloud"));
+        }
+        return bedMaterial;
     }
 
     /** 物品：把物品画成一个真实的厚云床方块实体。 */

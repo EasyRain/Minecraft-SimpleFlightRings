@@ -24,9 +24,30 @@ import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 @EventBusSubscriber(modid = FlightRingMod.MODID, value = Dist.CLIENT)
 public final class CloudChestClient {
 
-    private static final SpriteId SINGLE = sprite("cloud");
-    private static final SpriteId LEFT = sprite("cloud_left");
-    private static final SpriteId RIGHT = sprite("cloud_right");
+    // 惰性创建：类初始化阶段就碰 Sheets 会触发 "Sheets loaded too early"（1.21.1 日志里踩过）
+    private static SpriteId single;
+    private static SpriteId left;
+    private static SpriteId right;
+
+    private static SpriteId spriteFor(ChestType type) {
+        switch (type) {
+            case LEFT:
+                if (left == null) {
+                    left = sprite("cloud_left");
+                }
+                return left;
+            case RIGHT:
+                if (right == null) {
+                    right = sprite("cloud_right");
+                }
+                return right;
+            default:
+                if (single == null) {
+                    single = sprite("cloud");
+                }
+                return single;
+        }
+    }
 
     private CloudChestClient() {
     }
@@ -50,11 +71,7 @@ public final class CloudChestClient {
 
         @Override
         protected SpriteId getCustomSprite(ChestBlockEntity blockEntity, ChestRenderState renderState) {
-            return switch (renderState.type) {
-                case LEFT -> LEFT;
-                case RIGHT -> RIGHT;
-                default -> SINGLE;
-            };
+            return spriteFor(renderState.type);
         }
     }
 }

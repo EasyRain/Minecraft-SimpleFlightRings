@@ -44,10 +44,15 @@ public class CloudChunkGenerator extends ChunkGenerator {
                     BiomeSource.CODEC.fieldOf("biome_source").forGetter(ChunkGenerator::getBiomeSource)
             ).apply(instance, CloudChunkGenerator::new));
 
-    /** 云海主层高度（y）。 */
-    public static final int BASE_Y = 192;
-    /** 最厚处：2 层云皮 + 10 层厚云核（用户 2026-11-20：之前 7 层太薄）。 */
-    public static final int MAX_THICKNESS = 12;
+    /**
+     * 云海主层高度（y）。
+     * <p>
+     * 抬到 256 是为了**避开原版云层**（原版云在 192，Sodium/Iris 环境下拿 DimensionSpecialEffects 的
+     * NaN 关不掉它）—— 于是原版云正好在脚下变成"云海"，我们自己的云岛在它上面 64 格。
+     */
+    public static final int BASE_Y = 256;
+    /** 最厚处：2 层云皮 + 34 层厚云核（用户 2026-11-20：想要 30~40 层的厚度）。 */
+    public static final int MAX_THICKNESS = 36;
     /** 大陆噪声尺度（越大越碎）。 */
     private static final double CONTINENT_SCALE = 620.0;
     /** 岛屿噪声尺度。 */

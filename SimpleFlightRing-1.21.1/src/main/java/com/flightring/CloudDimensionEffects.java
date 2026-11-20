@@ -22,8 +22,11 @@ import net.neoforged.neoforge.client.event.RegisterDimensionSpecialEffectsEvent;
  * 这个现象要靠**自己接管 {@code renderSky}**（只画天空 + 太阳、不画月亮）才能消掉，
  * 属于自己写整套天空渲染，等工作量允许再考虑。
  * <p>
- * 云高设成 **NaN**：完全不画原版云。M2 已经有自己的云层地形（主层 192），
- * 原版那层云跟它叠在同一高度会糊成一片（用户 2026-11-20 实测），所以关掉。
+ * 云高设成 **192**（原版默认）：我们的云岛主层在 **256**，于是原版云在脚下变成一片"云海"，
+ * 不会再和云岛叠在同一层。
+ * <p>
+ * 试过用 NaN 关掉原版云，但用户的客户端装了 Sodium/Iris：即使效果类生效，云也照样画出来，
+ * 所以改成"把它放到脚下"这种不依赖渲染管线行为的办法。
  */
 @EventBusSubscriber(modid = FlightRingMod.MODID, value = Dist.CLIENT)
 public final class CloudDimensionEffects extends DimensionSpecialEffects {
@@ -33,7 +36,7 @@ public final class CloudDimensionEffects extends DimensionSpecialEffects {
 
     public CloudDimensionEffects() {
         // cloudLevel = NaN（不画原版云，避免和云岛重叠）、hasGround = false、天空类型 NORMAL（保留日月星辰）
-        super(Float.NaN, false, SkyType.NORMAL, false, false);
+        super(192.0F, false, SkyType.NORMAL, false, false);
     }
 
     @Override

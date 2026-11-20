@@ -24,8 +24,16 @@ import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 @EventBusSubscriber(modid = FlightRingMod.MODID, value = Dist.CLIENT)
 public final class CloudBedClient {
 
-    private static final SpriteId CLOUD_SPRITE = new SpriteId(Sheets.BED_SHEET,
-            Identifier.fromNamespaceAndPath(FlightRingMod.MODID, "entity/bed/cloud"));
+    private static SpriteId cloudSprite;
+
+    /** 惰性创建，避免在类初始化阶段加载 Sheets（见 CloudChestClient 的注释）。 */
+    private static SpriteId cloudSprite() {
+        if (cloudSprite == null) {
+            cloudSprite = new SpriteId(Sheets.BED_SHEET,
+                    Identifier.fromNamespaceAndPath(FlightRingMod.MODID, "entity/bed/cloud"));
+        }
+        return cloudSprite;
+    }
 
     private CloudBedClient() {
     }
@@ -46,7 +54,7 @@ public final class CloudBedClient {
                            CameraRenderState camera) {
             poseStack.pushPose();
             poseStack.mulPose(modelTransform(state.facing));
-            this.submitPiece(state.part, CLOUD_SPRITE, poseStack, collector, state.lightCoords,
+            this.submitPiece(state.part, cloudSprite(), poseStack, collector, state.lightCoords,
                     net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY, state.breakProgress, 0);
             poseStack.popPose();
         }

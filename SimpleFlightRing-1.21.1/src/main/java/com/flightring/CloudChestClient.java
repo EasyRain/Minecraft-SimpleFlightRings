@@ -35,9 +35,32 @@ public final class CloudChestClient {
     private static final ResourceLocation LEFT_TEXTURE = id("entity/chest/cloud_left");
     private static final ResourceLocation RIGHT_TEXTURE = id("entity/chest/cloud_right");
 
-    private static final Material SINGLE = new Material(Sheets.CHEST_SHEET, SINGLE_TEXTURE);
-    private static final Material LEFT = new Material(Sheets.CHEST_SHEET, LEFT_TEXTURE);
-    private static final Material RIGHT = new Material(Sheets.CHEST_SHEET, RIGHT_TEXTURE);
+    // 注意：不能在静态字段里 new Material —— 那会在 mod 构造期就加载 Sheets，
+    // NeoForge 会报 "Sheets loaded too early, modded registry-based materials may not work correctly"
+    // （2026-11-20 日志里确实报了）。所以在第一次真正渲染时才创建，并缓存下来。
+    private static Material single;
+    private static Material left;
+    private static Material right;
+
+    private static Material materialFor(ChestType type) {
+        switch (type) {
+            case LEFT:
+                if (left == null) {
+                    left = new Material(Sheets.CHEST_SHEET, LEFT_TEXTURE);
+                }
+                return left;
+            case RIGHT:
+                if (right == null) {
+                    right = new Material(Sheets.CHEST_SHEET, RIGHT_TEXTURE);
+                }
+                return right;
+            default:
+                if (single == null) {
+                    single = new Material(Sheets.CHEST_SHEET, SINGLE_TEXTURE);
+                }
+                return single;
+        }
+    }
 
     private CloudChestClient() {
     }
@@ -100,11 +123,7 @@ public final class CloudChestClient {
 
         @Override
         protected Material getMaterial(ChestBlockEntity blockEntity, ChestType chestType) {
-            return switch (chestType) {
-                case LEFT -> LEFT;
-                case RIGHT -> RIGHT;
-                default -> SINGLE;
-            };
+            return materialFor(chestType);
         }
     }
 }
