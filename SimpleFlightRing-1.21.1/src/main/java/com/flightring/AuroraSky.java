@@ -80,7 +80,8 @@ public final class AuroraSky {
         if (!night || !auroraBiome) {
             return;
         }
-        drawRibbon(event.getPoseStack(), cameraPos, ticks + partialTick, 1.0F);
+        org.joml.Quaternionf cameraRotation = new org.joml.Quaternionf(camera.rotation());
+        drawRibbon(event.getPoseStack(), cameraPos, ticks + partialTick, 1.0F, cameraRotation);
     }
 
     private static boolean inAuroraBiome(Minecraft minecraft, Vec3 cameraPos) {
@@ -90,7 +91,8 @@ public final class AuroraSky {
     }
 
     /** 画两层错开的帘幕，越靠天顶越淡。 */
-    private static void drawRibbon(PoseStack poseStack, Vec3 cameraPos, float time, float darken) {
+    private static void drawRibbon(PoseStack poseStack, Vec3 cameraPos, float time, float darken,
+                                   org.joml.Quaternionf cameraRotation) {
         RenderSystem.enableBlend();
         RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
         RenderSystem.disableCull();
@@ -100,8 +102,9 @@ public final class AuroraSky {
         RenderSystem.setShaderTexture(0, TEXTURE);
 
         poseStack.pushPose();
-        // AFTER_SKY 阶段的 PoseStack 已经是相机相对坐标（原版天空就是在原点画的），
-        // 这里只需要抬高到头顶，不能再减 cameraPos —— 之前那样会把光带推到地平线以下，看不见。
+        // ★ AFTER_SKY 阶段的 PoseStack 仍带着相机的朝向（所以之前光带像一顶跟着视角转的帽子）。
+        // 先用逆相机旋转把坐标系摆回"世界朝向"，再抬高到头顶，光带才是固定在天上的。
+        poseStack.mulPose(new org.joml.Quaternionf(cameraRotation).conjugate());
         poseStack.translate(0.0F, HEIGHT, 0.0F);
 
         float alpha = 0.55F * darken;
