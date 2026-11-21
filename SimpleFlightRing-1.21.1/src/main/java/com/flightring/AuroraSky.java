@@ -108,8 +108,11 @@ public final class AuroraSky {
         poseStack.translate(0.0F, HEIGHT, 0.0F);
 
         float alpha = 0.55F * darken;
-        drawLayer(poseStack, time * 0.35F, 0.0F, RADIUS, alpha);
-        drawLayer(poseStack, -time * 0.22F, 40.0F, RADIUS * 0.82F, alpha * 0.65F);
+        // 时间单位是 tick：这里换算成"每秒只移动百分之几纹理"的极慢漂移，
+        // 之前直接 time*0.35 相当于每 tick 移动 0.35，看起来像射激光（用户 2026-11-21 反馈）。
+        float seconds = time / 20.0F;
+        drawLayer(poseStack, seconds * 0.06F, 0.0F, RADIUS, alpha);
+        drawLayer(poseStack, -seconds * 0.035F, 55.0F, RADIUS * 0.78F, alpha * 0.55F);
 
         poseStack.popPose();
 
@@ -126,17 +129,18 @@ public final class AuroraSky {
         float size = radius;
         int segments = 6;
         float step = (2 * size) / segments;
+        float repeat = 2.0F;
         for (int i = 0; i < segments; i++) {
             float z0 = -size + step * i;
             float z1 = z0 + step;
-            float v0 = (i / (float) segments) * 2.0F + offset;
-            float v1 = ((i + 1) / (float) segments) * 2.0F + offset;
+            float v0 = (i / (float) segments) * repeat + offset;
+            float v1 = ((i + 1) / (float) segments) * repeat + offset;
             buffer.addVertex(poseStack.last().pose(), -size, yShift, z0)
                     .setUv(0.0F, v0).setColor(1.0F, 1.0F, 1.0F, alpha);
             buffer.addVertex(poseStack.last().pose(), size, yShift, z0)
-                    .setUv(3.0F, v0).setColor(1.0F, 1.0F, 1.0F, alpha);
+                    .setUv(repeat, v0).setColor(1.0F, 1.0F, 1.0F, alpha);
             buffer.addVertex(poseStack.last().pose(), size, yShift, z1)
-                    .setUv(3.0F, v1).setColor(1.0F, 1.0F, 1.0F, alpha);
+                    .setUv(repeat, v1).setColor(1.0F, 1.0F, 1.0F, alpha);
             buffer.addVertex(poseStack.last().pose(), -size, yShift, z1)
                     .setUv(0.0F, v1).setColor(1.0F, 1.0F, 1.0F, alpha);
         }
