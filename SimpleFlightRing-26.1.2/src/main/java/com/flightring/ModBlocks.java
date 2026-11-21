@@ -109,7 +109,7 @@ public final class ModBlocks {
             "thick_cloud_bed",
             ThickCloudBedBlock::new,
             properties -> properties.strength(0.2F)
-                    .sound(ModSounds.CHEST_SOUND_TYPE)
+                    .sound(SoundType.WOOD)
                     .noOcclusion());
 
     /** 厚云箱子：单箱/大箱照原版逻辑，开关盖用我们自己的音效（26.x 由 ChestBlock 构造函数接收）。 */
@@ -117,7 +117,7 @@ public final class ModBlocks {
             "thick_cloud_chest",
             ThickCloudChestBlock::new,
             properties -> properties.strength(2.0F)
-                    .sound(ModSounds.CHEST_SOUND_TYPE)
+                    .sound(SoundType.WOOD)
                     .noOcclusion());
 
 

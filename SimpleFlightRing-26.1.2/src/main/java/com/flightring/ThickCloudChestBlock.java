@@ -14,7 +14,7 @@ public class ThickCloudChestBlock extends ChestBlock {
 
     public ThickCloudChestBlock(Properties properties) {
         super(() -> ModBlockEntities.THICK_CLOUD_CHEST.get(),
-                ModSounds.CHEST_OPEN, ModSounds.CHEST_CLOSE, properties);
+                net.minecraft.sounds.SoundEvents.CHEST_OPEN, net.minecraft.sounds.SoundEvents.CHEST_CLOSE, properties);
     }
 
     @Override

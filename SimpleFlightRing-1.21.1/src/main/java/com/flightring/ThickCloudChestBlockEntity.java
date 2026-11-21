@@ -32,12 +32,12 @@ public class ThickCloudChestBlockEntity extends ChestBlockEntity {
     private final ContainerOpenersCounter cloudOpeners = new ContainerOpenersCounter() {
         @Override
         protected void onOpen(Level level, BlockPos pos, BlockState state) {
-            playCloudSound(level, pos, state, ModSounds.CHEST_OPEN);
+            playCloudSound(level, pos, state, net.minecraft.sounds.SoundEvents.CHEST_OPEN);
         }
 
         @Override
         protected void onClose(Level level, BlockPos pos, BlockState state) {
-            playCloudSound(level, pos, state, ModSounds.CHEST_CLOSE);
+            playCloudSound(level, pos, state, net.minecraft.sounds.SoundEvents.CHEST_CLOSE);
         }
 
         @Override
