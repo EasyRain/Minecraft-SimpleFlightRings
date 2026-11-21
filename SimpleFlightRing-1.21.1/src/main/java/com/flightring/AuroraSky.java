@@ -137,8 +137,9 @@ public final class AuroraSky {
         }
 
         poseStack.pushPose();
-        // ★ 不要在这里乘逆相机旋转：AFTER_SKY 的 PoseStack 已经是世界朝向，
-        // 再转一次会让"方向"变成相机相关，噪声就跟着镜头走了（用户 2026-11-21 的观察）。
+        // ★ 实测（用户 2026-11-21 两轮）：AFTER_SKY 的 PoseStack **确实带着相机朝向** ——
+        // 去掉这一步以后，极光整条都"钉在相机上"了；所以必须乘一次逆相机旋转把它摆回世界朝向。
+        poseStack.mulPose(new org.joml.Quaternionf(cameraRotation).conjugate());
         poseStack.translate(0.0F, HEIGHT, 0.0F);
 
         float seconds = time / 20.0F;
