@@ -288,6 +288,10 @@ public final class BrokenPortalTravel {
         // portal that happens to open on one of those must not get a plank under it either.
         int surface = findSurface(level, x0, z0, axis, y, w);
         boolean needsPad = surface < 0;
+        // 诊断日志：建门时把"想要的高度 / 找到的地面 / 是否铺地台"记下来，
+        // 排查落点问题时直接看 latest.log 里这一行即可。
+        FlightRingMod.LOGGER.info("[CloudPortal] build dim={} wanted={} y={} surface={} pad={}",
+                level.dimension().location(), wanted, y, surface, needsPad);
         if (!needsPad) {
             // 门框底边**嵌进地面一格**，这样门洞的地板正好和周围地面齐平
             //（用户 2026-11-20：之前底边浮在地面上，进门要先跳一格）。
