@@ -20,7 +20,6 @@
     "ClientFireAnimationMixin",
     "ClientFireOverlayMixin",
     "ClientRebirthAnimationMixin",
-    "CloudSkyMixin",
     "ElderGuardianCurseMixin"
   ],
   "injectors": {

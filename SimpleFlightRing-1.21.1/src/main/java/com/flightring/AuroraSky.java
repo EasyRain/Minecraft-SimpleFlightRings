@@ -8,7 +8,6 @@ import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
-import com.mojang.blaze3d.vertex.VertexSorting;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
@@ -28,7 +27,7 @@ import org.joml.Matrix4fStack;
  * 沿视线方向对"极光平面"采样 25 层噪声，{@code 1-2|noise-0.5|} 的 16 次方只保留噪声值在
  * 0.5 附近的窄带 —— 丝缕感来自贴图本身（白噪声），而不是网格形状。
  * <p>
- * 因此几何只是个"方向画布"：单位球穹顶（-10°~90° 仰角），片元着色器拿世界朝向算一切。
+ * 因此几何只是个"方向画布"：球面穹顶（-10°~90° 仰角，半径 100），片元着色器拿世界朝向算一切。
  * <b>必须配白噪声贴图</b>（{@code textures/noise.png}，3 通道独立）—— 平滑 fBm 在
  * 16 次方下会全灭（离线仿真实测），而 {@code clamp}（CLAMP_TO_EDGE）会把公式必然超界的
  * 采样坐标全部捏到贴图边缘一列 texel 上，得到"一块一块正方形层叠"。
@@ -38,7 +37,7 @@ import org.joml.Matrix4fStack;
  * 钉在天空上，只随视角转动、不随平移移动（平移视差由 {@code CameraPos} 微量提供，
  * 与光影包一致）。
  * <p>
- * ★ 矩阵架构（2026-11-22 定案，三轮"帽子"翻车的最终结论）：
+ * ★ 矩阵架构（2026-11-22 定案，"帽子/拿在手里/夹层"四轮翻车的最终结论）：
  * <ul>
  *   <li>{@code AFTER_SKY} 事件的 PoseStack 是<b>恒等</b>（NeoForge 派发时 poseStack 传 null），
  *       视图旋转 V 在 {@code event.getModelViewMatrix()} —— 不要碰事件 PoseStack、
@@ -47,11 +46,15 @@ import org.joml.Matrix4fStack;
  *       一旦 CPU 乘过任何矩阵，图案输入就变成"视线空间坐标"，图案立刻锁死在屏幕上（帽子）；</li>
  *   <li>gl_Position 的视图旋转只能来自矩阵（vsh 的 ModelViewMat）。
  *       {@code BufferUploader.drawWithShader} 用<b>全局</b>{@code RenderSystem.getModelViewMatrix()}
- *       / {@code getProjectionMatrix()}，所以绘制前对两个全局量各做一次作用域内覆盖
- *       （MV→V；投影→干净投影），画完恢复 —— 不依赖调用方遗留的全局状态；</li>
- *   <li>投影用<b>干净重建</b>（{@code getProjectionMatrix(getFov(...))}）：原版把走路摇晃
- *       （view bob）、受击倾斜、反胃翻转全折进全局投影，原版日月星辰跟着抖；极光作为
- *       无限远天空体不该抖（真摇头时无穷远物角位置不动），所以甩掉摇晃成分、只保留 FOV/缩放。</li>
+ *       （此刻为恒等）—— 所以绘制前对全局栈做作用域内覆盖 push/identity/mul(V)/apply，
+ *       画完 pop 恢复；</li>
+ *   <li>投影<b>不碰</b>（全局投影 = 原版天空家族正在用的同一个，view bob/受击/反胃都折在里面）。
+ *       天空家族运动一致性靠两件事：<b>同一对矩阵</b>（全局投影 × V，与星星/月亮完全相同）
+ *       + <b>同一半径尺度</b>（100，与原版天穹盘/太阳/月亮同款）。晃动 = ±3° 旋转
+ *       + 平移成分按 1/半径衰减（半径 100 时 ~0.17°，与星星逐像素一致 = "轻微晃动、
+ *       与天空融为一体"，即光影包的观感；半径 1 会放大 100 倍 = "拿在手里"，旧版翻车根源）。
+ *       —— 曾用"干净投影"（AT 开放 getFov 重建无 bob 投影）做过一版：极光全静止，
+ *       与仍在晃的星星产生相对运动（"夹层"），且比光影的实况（天体轻微晃）更死，已回退。</li>
  * </ul>
  * <p>
  * 触发条件：{@code the_cloud} 维度、所在群系是 {@code simpleflightring:aurora}。
@@ -110,28 +113,17 @@ public final class AuroraSky {
         boolean auroraBiome = inAuroraBiome(minecraft, cameraPos);
         // 昼夜淡入淡出（替代光影的 sunVisibility；夜晚 SunFade≈0，白天≈1）
         float sunFade = sunVisibility(minecraft);
-        // ★ 极光是"无限远"的天空体：**不**跟着 view bob（走路摇晃）/受击倾斜/反胃翻转一起抖。
-        //   原版把这些摇晃全部折进全局投影矩阵（GameRenderer#renderLevel：
-        //   bobHurt+bobView mul 进 getProjectionMatrix 的结果后才 resetProjectionMatrix()），
-        //   原版日月星辰因此跟着抖 —— 对横贯天穹的极光带非常显眼，而且对"无限远"的东西物理上也不对
-        //   （真摇头时无穷远物的角位置本应不动）。这里用【干净投影】画：
-        //   getProjectionMatrix(getFov(...)) 重建，FOV/缩放与画面严格一致、只少摇晃成分
-        //   （getFov 是 private，经 META-INF/accesstransformer.cfg 开放）。
-        float partialTick = minecraft.getTimer().getGameTimeDeltaPartialTick(true);
-        double fov = minecraft.gameRenderer.getFov(camera, partialTick, true);
-        Matrix4f cleanProjection = minecraft.gameRenderer.getProjectionMatrix(fov);
-        // 诊断：当前帧投影里摇晃成分的大小（站立≈0，走路>0 —— 在线验证"极光已脱离摇晃"）
-        float bobDelta = maxAbsDiff(event.getProjectionMatrix(), cleanProjection);
         int ticks = minecraft.player == null ? 0 : minecraft.player.tickCount;
         if (ticks - lastLoggedTick > 200) {
             lastLoggedTick = ticks;
-            FlightRingMod.LOGGER.info("[Aurora] stage fired: dim={} auroraBiome={} sunFade={} bobDelta={}",
-                    minecraft.level.dimension().location(), auroraBiome, sunFade, fmt(bobDelta));
+            FlightRingMod.LOGGER.info("[Aurora] stage fired: dim={} auroraBiome={} sunFade={}",
+                    minecraft.level.dimension().location(), auroraBiome, sunFade);
         }
         if (!auroraBiome || sunFade >= 0.999F) {
             return;
         }
 
+        float partialTick = minecraft.getTimer().getGameTimeDeltaPartialTick(false);
         float time = (minecraft.level.getGameTime() + partialTick) / 20.0F; // 世界年龄秒（= 光影 syncedTime）
         float rainFactor = minecraft.level.getRainLevel(partialTick);
 
@@ -160,13 +152,19 @@ public final class AuroraSky {
             sunUniform.set(sunFade);
         }
 
-        // ★ 矩阵架构（2026-11-22 定案，详见 09-踩坑 §3.21）：
+        // ★ 矩阵架构（2026-11-22 定案，详见 09-踩坑 §3.21/§3.23）：
         //   - 事件 PoseStack 在 AFTER_SKY 是【恒等】（dispatchRenderStage 传 null -> new PoseStack()），
         //     视图旋转 V 在 event.getModelViewMatrix() 里；不要碰 camera.rotation() 的共轭，历史方案全错。
         //   - 顶点必须是【原始世界方向】，不做任何 CPU 变换 —— 片元着色器拿它当世界方向算图案。
         //   - gl_Position 的视图旋转只能来自矩阵：BufferUploader.drawWithShader 用的是全局
-        //     RenderSystem.getModelViewMatrix() / getProjectionMatrix()，所以这里对两个全局量
-        //     各做一次【作用域内覆盖】（MV -> V；投影 -> 干净投影），画完恢复 —— 不依赖调用方状态。
+        //     RenderSystem.getModelViewMatrix()（此刻为恒等），所以对全局栈做【作用域内覆盖】
+        //     push -> identity -> mul(V) -> apply，画完 pop 恢复。
+        //   - 投影【不碰】：全局投影（原版 renderLevel 已把 view bob/受击/反胃折进去）正是原版
+        //     天空家族（天穹盘/日出盘/太阳/月亮/星星）使用的同一个投影 —— 极光跟着星星月亮
+        //     以完全相同的量晃（±3° 旋转为主，平移成分在半径 100 处仅 ~0.17°），
+        //     天空家族融为一体，= 光影包的观感（"轻微晃动"）。穹顶半径取 100（= 原版天空
+        //     尺度）正是为此：晃动平移成分的角位移 = 平移量/半径，半径 1 会把它放大 100 倍
+        //     成"拿在手里"的大幅晃动（旧版翻车根源）。
         Matrix4f viewMatrix = event.getModelViewMatrix();
         if (!loggedFirstDraw) {
             loggedFirstDraw = true;
@@ -179,8 +177,6 @@ public final class AuroraSky {
                     fmt(globalBefore.m00()), fmt(globalBefore.m11()),
                     fmt(globalBefore.m22()), fmt(globalBefore.m33()));
         }
-        Matrix4f savedProjection = new Matrix4f(RenderSystem.getProjectionMatrix());
-        RenderSystem.setProjectionMatrix(cleanProjection, VertexSorting.DISTANCE_TO_ORIGIN);
         Matrix4fStack glStack = RenderSystem.getModelViewStack();
         glStack.pushMatrix();
         glStack.identity();
@@ -191,7 +187,6 @@ public final class AuroraSky {
         } finally {
             glStack.popMatrix();
             RenderSystem.applyModelViewMatrix();
-            RenderSystem.setProjectionMatrix(savedProjection, VertexSorting.DISTANCE_TO_ORIGIN);
         }
 
         RenderSystem.enableDepthTest();
@@ -237,25 +232,17 @@ public final class AuroraSky {
         return String.format(java.util.Locale.ROOT, "%.3f", v);
     }
 
-    /** 两矩阵 16 元素的最大绝对差（诊断用：>0 = 当前帧投影带有 view bob 等摇晃成分）。 */
-    private static float maxAbsDiff(Matrix4f a, Matrix4f b) {
-        float max = 0.0F;
-        for (int column = 0; column < 4; column++) {
-            for (int row = 0; row < 4; row++) {
-                float d = Math.abs(a.get(column, row) - b.get(column, row));
-                if (d > max) {
-                    max = d;
-                }
-            }
-        }
-        return max;
-    }
+    /** 穹顶半径：与原版天空家族（天穹盘/太阳/月亮/星星都在 ~100）同尺度。 */
+    private static final float DOME_RADIUS = 100.0F;
 
     /**
-     * 单位球穹顶（仰角 -10°~90°），顶点坐标 = **原始世界方向**（不做任何 CPU 变换），
+     * 球面穹顶（仰角 -10°~90°），顶点坐标 = **原始世界方向 × 100**（不做任何其他 CPU 变换），
      * 由 drawDome 外层把视图矩阵放进全局 ModelViewStack 上屏：
-     * 片元里 worldDir = 顶点属性 = 世界方向（图案世界锁定），
-     * gl_Position = P·V·v（网格像天体一样钉在世界里）。
+     * 片元里 worldDir = 顶点属性（归一化后）= 世界方向（图案世界锁定），
+     * gl_Position = P·V·v —— 与原版星星/月亮走**同一对矩阵**（全局投影 × V）。
+     * 半径取 100 正是关键：view bob 的平移成分的角位移 = 平移量/半径，
+     * 半径 100 时 ~0.17°（与星星一致 = "轻微晃动、融为一体"），半径 1 时放大 100 倍
+     * （"拿在手里"，旧版翻车根源）。
      * 仰角按 t² 分布：地平线附近（极光最亮、方向变化最快）密，天顶附近疏。
      */
     private static void drawDome() {
@@ -279,19 +266,19 @@ public final class AuroraSky {
             for (int s = 0; s < sectors; s++) {
                 double az0 = Math.PI * 2.0 * s / sectors;
                 double az1 = Math.PI * 2.0 * (s + 1) / sectors;
-                float x00 = (float) (Math.cos(az0) * cosE0);
-                float z00 = (float) (Math.sin(az0) * cosE0);
-                float x10 = (float) (Math.cos(az1) * cosE0);
-                float z10 = (float) (Math.sin(az1) * cosE0);
-                float x11 = (float) (Math.cos(az1) * cosE1);
-                float z11 = (float) (Math.sin(az1) * cosE1);
-                float x01 = (float) (Math.cos(az0) * cosE1);
-                float z01 = (float) (Math.sin(az0) * cosE1);
-                // ★ 原始坐标直传（不乘 pose）：Position 属性就是世界方向
-                buffer.addVertex(x00, (float) sinE0, z00).setColor(255, 255, 255, 255);
-                buffer.addVertex(x10, (float) sinE0, z10).setColor(255, 255, 255, 255);
-                buffer.addVertex(x11, (float) sinE1, z11).setColor(255, 255, 255, 255);
-                buffer.addVertex(x01, (float) sinE1, z01).setColor(255, 255, 255, 255);
+                float x00 = (float) (Math.cos(az0) * cosE0) * DOME_RADIUS;
+                float z00 = (float) (Math.sin(az0) * cosE0) * DOME_RADIUS;
+                float x10 = (float) (Math.cos(az1) * cosE0) * DOME_RADIUS;
+                float z10 = (float) (Math.sin(az1) * cosE0) * DOME_RADIUS;
+                float x11 = (float) (Math.cos(az1) * cosE1) * DOME_RADIUS;
+                float z11 = (float) (Math.sin(az1) * cosE1) * DOME_RADIUS;
+                float x01 = (float) (Math.cos(az0) * cosE1) * DOME_RADIUS;
+                float z01 = (float) (Math.sin(az0) * cosE1) * DOME_RADIUS;
+                // ★ 原始方向×半径直传（不乘 pose）：Position 归一化即世界方向
+                buffer.addVertex(x00, (float) sinE0 * DOME_RADIUS, z00).setColor(255, 255, 255, 255);
+                buffer.addVertex(x10, (float) sinE0 * DOME_RADIUS, z10).setColor(255, 255, 255, 255);
+                buffer.addVertex(x11, (float) sinE1 * DOME_RADIUS, z11).setColor(255, 255, 255, 255);
+                buffer.addVertex(x01, (float) sinE1 * DOME_RADIUS, z01).setColor(255, 255, 255, 255);
             }
         }
         com.mojang.blaze3d.vertex.BufferUploader.drawWithShader(buffer.buildOrThrow());
