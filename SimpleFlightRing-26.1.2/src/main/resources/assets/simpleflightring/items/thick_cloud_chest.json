@@ -1,6 +1,10 @@
 {
   "model": {
-    "type": "minecraft:model",
-    "model": "simpleflightring:item/thick_cloud_chest"
+    "type": "minecraft:special",
+    "base": "simpleflightring:item/thick_cloud_chest",
+    "model": {
+      "type": "minecraft:chest",
+      "texture": "simpleflightring:cloud"
+    }
   }
 }
