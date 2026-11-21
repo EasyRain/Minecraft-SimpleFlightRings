@@ -59,9 +59,12 @@ public final class AuroraSky {
             return;
         }
         float partialTick = minecraft.getTimer().getGameTimeDeltaPartialTick(false);
-        // 夜晚才出现：getSkyDarken 0~11，越大越黑
-        float darken = minecraft.level.getSkyDarken(partialTick) / 11.0F;
-        boolean night = darken >= 0.45F;
+        // 夜晚才出现：直接看 dayTime（0 = 日出，6000 = 正午，13000~23000 是夜）
+        long dayTime = minecraft.level.getDayTime() % 24000L;
+        if (dayTime < 0) {
+            dayTime += 24000L;
+        }
+        boolean night = dayTime >= 12500L && dayTime <= 23500L;
         Camera camera = event.getCamera();
         if (camera == null) {
             return;
@@ -71,13 +74,13 @@ public final class AuroraSky {
         int ticks = minecraft.player == null ? 0 : minecraft.player.tickCount;
         if (ticks - lastLoggedTick > 200) {
             lastLoggedTick = ticks;
-            FlightRingMod.LOGGER.info("[Aurora] stage fired: dim={} auroraBiome={} darken={} night={}",
-                    minecraft.level.dimension().location(), auroraBiome, darken, night);
+            FlightRingMod.LOGGER.info("[Aurora] stage fired: dim={} auroraBiome={} dayTime={} night={}",
+                    minecraft.level.dimension().location(), auroraBiome, dayTime, night);
         }
         if (!night || !auroraBiome) {
             return;
         }
-        drawRibbon(event.getPoseStack(), cameraPos, ticks + partialTick, darken);
+        drawRibbon(event.getPoseStack(), cameraPos, ticks + partialTick, 1.0F);
     }
 
     private static boolean inAuroraBiome(Minecraft minecraft, Vec3 cameraPos) {
