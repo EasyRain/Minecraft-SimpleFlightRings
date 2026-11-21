@@ -116,9 +116,10 @@ public final class AuroraSky {
         poseStack.translate(0.0F, HEIGHT, 0.0F);
 
         float seconds = time / 20.0F;
-        // 主带 + 更外圈一条更淡的宽带，制造层次
-        drawBand(poseStack, seconds, 300.0F, 0.0F, 1.0F);
-        drawBand(poseStack, seconds * 0.8F + 17.0F, 380.0F, 26.0F, 0.5F);
+        // ★ 只画一段弧（不是整圈）：整圈会在正上方围成一个"光环"（用户 2026-11-21 截图）。
+        double north = -Math.PI / 2.0;
+        drawBand(poseStack, seconds, north, 2.5, 330.0F, 0.0F, 1.0F);
+        drawBand(poseStack, seconds * 0.8F + 17.0F, north + 0.35, 2.0, 430.0F, 22.0F, 0.45F);
 
         poseStack.popPose();
 
@@ -129,18 +130,20 @@ public final class AuroraSky {
     }
 
     /** 一圈光带（横贯天空的弧），竖直方向用高斯剖面。 */
-    private static void drawBand(PoseStack poseStack, float time, float radius, float yShift, float strength) {
+    private static void drawBand(PoseStack poseStack, float time, double center, double width,
+                                 float radius, float yShift, float strength) {
         final int steps = 160;
         final int rows = 7;
-        final float bandBottom = 90.0F + yShift;
-        final float bandTop = 230.0F + yShift;
+        // 贴近地平线的一条带：半径 330 时，30~170 格大约对应 5°~27° 仰角
+        final float bandBottom = 30.0F + yShift;
+        final float bandTop = 170.0F + yShift;
 
         Tesselator tesselator = Tesselator.getInstance();
         BufferBuilder buffer = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
 
         for (int i = 0; i < steps; i++) {
-            double a0 = Math.PI * 2.0 * i / steps;
-            double a1 = Math.PI * 2.0 * (i + 1) / steps;
+            double a0 = center - width / 2.0 + width * i / steps;
+            double a1 = center - width / 2.0 + width * (i + 1) / steps;
             float w0 = arcIntensity(time, a0);
             float w1 = arcIntensity(time, a1);
             if (w0 + w1 < 0.03F) {
