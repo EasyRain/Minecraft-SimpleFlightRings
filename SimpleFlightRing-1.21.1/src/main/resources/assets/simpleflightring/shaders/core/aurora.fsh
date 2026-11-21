@@ -42,20 +42,21 @@ void main() {
     for (int i = 0; i < sampleCount; i++) {
         float current = pow((i + ditherM) / float(sampleCountP), 2.0);
         vec2 planePos = wposXZ * (AURORA_SIZE * 0.8 + current) * 11.0 * AURORA_NOISE_SCALE;
-        planePos *= 0.0007;
+        planePos *= 0.004;
 
-        float noise = texture(Sampler0, planePos * 0.05).r;
+        float noise = texture(Sampler0, planePos * 0.35).r;
         noise = pow(pow(pow(pow(1.0 - 2.0 * abs(noise - 0.5), 2.0), 2.0), 2.0), 2.0);
-        noise *= texture(Sampler0, planePos * 0.15 + Time * 0.02).b;
-        noise *= texture(Sampler0, planePos * 0.25 - Time * 0.015).b;
+        noise *= texture(Sampler0, planePos * 0.9 + Time * 0.02).b;
+        noise *= texture(Sampler0, planePos * 1.7 - Time * 0.015).b;
 
         float currentM = 1.0 - current;
         aurora += noise * currentM * mix(auroraUp, auroraDown, pow(currentM * currentM, 2.0));
     }
 
-    aurora *= 1.8;
+    aurora *= 6.0;
     aurora /= float(sampleCount);
 
     // 上下渐隐由几何自身的 alpha 提供
-    fragColor = vec4(aurora, vertexColor.a * clamp(dot(aurora, vec3(0.4)), 0.0, 1.0) * 3.0);
+    float lum = clamp(dot(aurora, vec3(0.4)), 0.0, 1.0);
+    fragColor = vec4(aurora * 1.5 + vec3(0.02, 0.08, 0.05), vertexColor.a * clamp(lum * 6.0, 0.0, 1.0));
 }
