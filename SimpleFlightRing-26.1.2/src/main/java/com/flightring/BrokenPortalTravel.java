@@ -110,7 +110,7 @@ public final class BrokenPortalTravel {
     private static BlockPos resolveTarget(ServerLevel level, BlockPos portalPos, boolean cloud) {
         int x = portalPos.getX();
         int z = portalPos.getZ();
-        int minY = level.getMinY() + 8;
+        int minY = level.getMinY() + 1;
         if (cloud) {
             level.getChunkAt(new BlockPos(x, minY, z));
             for (int r = 0; r <= 96; r += 8) {
@@ -264,7 +264,7 @@ public final class BrokenPortalTravel {
      */
     private static BrokenPortalFrames.Rect build(ServerLevel level, BlockPos wanted, Direction.Axis axis,
                                                  BlockState frame, BlockState portal) {
-        int y = Mth.clamp(wanted.getY(), level.getMinY() + 8, level.getMaxY() - 8);
+        int y = Mth.clamp(wanted.getY(), level.getMinY() + 1, level.getMaxY() - 8);
         int x0 = wanted.getX();
         int z0 = wanted.getZ();
 
@@ -342,7 +342,7 @@ public final class BrokenPortalTravel {
      * happened to be flying should still end up on the ground, not floating with a plank under it.
      */
     private static int findSurface(ServerLevel level, int x0, int z0, Direction.Axis axis, int y, int w) {
-        int lowest = level.getMinY() + 2;
+        int lowest = level.getMinY();
         for (int probe = y; probe > lowest; probe--) {
             if (hasGroundAt(level, x0, z0, axis, probe, w)) {
                 return probe;
