@@ -13,10 +13,17 @@ import net.minecraft.world.level.block.state.properties.WoodType;
 public final class CloudWoodTypes {
 
     /** 云母木的方块组：木制音效、可被活塞推动等默认行为。 */
-    public static final BlockSetType CLOUD_SET = new BlockSetType("simpleflightring:cloud");
+    public static final BlockSetType CLOUD_SET =
+            BlockSetType.register(new BlockSetType("simpleflightring:cloud"));
 
     /** 云母木的木头类型（栅栏门要用）。 */
-    public static final WoodType CLOUD_WOOD_TYPE = new WoodType("simpleflightring:cloud", CLOUD_SET);
+    /**
+     * ★ 必须 {@code register} 进静态表：原版的告示牌渲染器是按 {@code WoodType.values()} 预建模型表的，
+     * 不注册的话 {@code StandingSignRenderer#getSignModel} 会拿到 null → 放下告示牌直接 NPE 崩端
+     * （用户 2026-11-21 崩溃报告）。
+     */
+    public static final WoodType CLOUD_WOOD_TYPE =
+            WoodType.register(new WoodType("simpleflightring:cloud", CLOUD_SET));
 
     private CloudWoodTypes() {
     }
