@@ -90,7 +90,13 @@ public final class AuroraSky {
         return holder.unwrapKey().map(key -> key.location().equals(AURORA_BIOME)).orElse(false);
     }
 
-    /** 画两层错开的帘幕，越靠天顶越淡。 */
+    /**
+     * 画极光帘幕。
+     * <p>
+     * 参考 {@code Auroras} 模组的做法：**不用贴图**，而是用一圈竖直的三角形带
+     * （每段的角度决定强度、竖直方向决定颜色与透明度），顶点色 + 加法混合 ⇒
+     * 边缘是渐隐的，不会像贴片那样有硬边。
+     */
     private static void drawRibbon(PoseStack poseStack, Vec3 cameraPos, float time, float darken,
                                    org.joml.Quaternionf cameraRotation) {
         RenderSystem.enableBlend();
@@ -98,21 +104,16 @@ public final class AuroraSky {
         RenderSystem.disableCull();
         RenderSystem.depthMask(false);
         RenderSystem.disableDepthTest();
-        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
-        RenderSystem.setShaderTexture(0, TEXTURE);
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
 
         poseStack.pushPose();
-        // ★ AFTER_SKY 阶段的 PoseStack 仍带着相机的朝向（所以之前光带像一顶跟着视角转的帽子）。
-        // 先用逆相机旋转把坐标系摆回"世界朝向"，再抬高到头顶，光带才是固定在天上的。
         poseStack.mulPose(new org.joml.Quaternionf(cameraRotation).conjugate());
         poseStack.translate(0.0F, HEIGHT, 0.0F);
 
-        float alpha = 0.55F * darken;
-        // 时间单位是 tick：这里换算成"每秒只移动百分之几纹理"的极慢漂移，
-        // 之前直接 time*0.35 相当于每 tick 移动 0.35，看起来像射激光（用户 2026-11-21 反馈）。
         float seconds = time / 20.0F;
-        drawLayer(poseStack, seconds * 0.06F, 0.0F, RADIUS, alpha);
-        drawLayer(poseStack, -seconds * 0.035F, 55.0F, RADIUS * 0.78F, alpha * 0.55F);
+        // 两层帘幕：远的一层更淡、相位不同
+        drawCurtain(poseStack, seconds, RADIUS, 0.0F, 1.0F);
+        drawCurtain(poseStack, seconds * 0.7F + 13.0F, RADIUS * 0.78F, 18.0F, 0.55F);
 
         poseStack.popPose();
 
@@ -122,30 +123,78 @@ public final class AuroraSky {
         RenderSystem.disableBlend();
     }
 
-    private static void drawLayer(PoseStack poseStack, float offset, float yShift, float radius, float alpha) {
+    /** 一圈竖直帘幕：角度决定强度（wave），高度决定颜色与透明度。 */
+    private static void drawCurtain(PoseStack poseStack, float time, float radius, float yShift, float strength) {
+        final int steps = 128;
+        final int rows = 8;
+        final float bottomY = -30.0F + yShift;
+        final float topY = 90.0F + yShift;
+
         Tesselator tesselator = Tesselator.getInstance();
-        BufferBuilder buffer = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-        // 头顶的水平光带：贴在 y = 0 平面上（调用方已经把它抬到 HEIGHT），uv 横向滚动
-        float size = radius;
-        int segments = 6;
-        float step = (2 * size) / segments;
-        float repeat = 2.0F;
-        for (int i = 0; i < segments; i++) {
-            float z0 = -size + step * i;
-            float z1 = z0 + step;
-            float v0 = (i / (float) segments) * repeat + offset;
-            float v1 = ((i + 1) / (float) segments) * repeat + offset;
-            buffer.addVertex(poseStack.last().pose(), -size, yShift, z0)
-                    .setUv(0.0F, v0).setColor(1.0F, 1.0F, 1.0F, alpha);
-            buffer.addVertex(poseStack.last().pose(), size, yShift, z0)
-                    .setUv(repeat, v0).setColor(1.0F, 1.0F, 1.0F, alpha);
-            buffer.addVertex(poseStack.last().pose(), size, yShift, z1)
-                    .setUv(repeat, v1).setColor(1.0F, 1.0F, 1.0F, alpha);
-            buffer.addVertex(poseStack.last().pose(), -size, yShift, z1)
-                    .setUv(0.0F, v1).setColor(1.0F, 1.0F, 1.0F, alpha);
+        BufferBuilder buffer = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+
+        for (int i = 0; i < steps; i++) {
+            double a0 = Math.PI * 2.0 * i / steps;
+            double a1 = Math.PI * 2.0 * (i + 1) / steps;
+            float w0 = wave(time, a0);
+            float w1 = wave(time, a1);
+            if (w0 + w1 < 0.02F) {
+                continue;
+            }
+            float x0 = (float) Math.cos(a0) * radius;
+            float z0 = (float) Math.sin(a0) * radius;
+            float x1 = (float) Math.cos(a1) * radius;
+            float z1 = (float) Math.sin(a1) * radius;
+
+            for (int r = 0; r < rows; r++) {
+                float t0 = r / (float) rows;
+                float t1 = (r + 1) / (float) rows;
+                // 竖直剖面：中间偏下最亮，上下两端渐隐
+                float p0 = verticalProfile(t0);
+                float p1 = verticalProfile(t1);
+                float a0a = w0 * p0 * strength * 0.42F;
+                float a1a = w1 * p0 * strength * 0.42F;
+                float a2a = w1 * p1 * strength * 0.42F;
+                float a3a = w0 * p1 * strength * 0.42F;
+                if (a0a + a1a + a2a + a3a < 0.004F) {
+                    continue;
+                }
+                float y0 = bottomY + (topY - bottomY) * t0;
+                float y1 = bottomY + (topY - bottomY) * t1;
+                // 颜色：下缘偏青白、上缘偏绿
+                float g0 = 1.0F - 0.25F * t0;
+                float b0 = 0.95F - 0.45F * t0;
+                float g1 = 1.0F - 0.25F * t1;
+                float b1 = 0.95F - 0.45F * t1;
+
+                var pose = poseStack.last().pose();
+                buffer.addVertex(pose, x0, y0, z0).setColor(0.55F, g0, b0, a0a);
+                buffer.addVertex(pose, x1, y0, z1).setColor(0.55F, g0, b0, a1a);
+                buffer.addVertex(pose, x1, y1, z1).setColor(0.35F, g1, b1, a2a);
+                buffer.addVertex(pose, x0, y1, z0).setColor(0.35F, g1, b1, a3a);
+            }
         }
-        // 用显式 shader 直接上传（RenderType.translucent() 期望 BLOCK 顶点格式，与我们不符，会静默失败）
         com.mojang.blaze3d.vertex.BufferUploader.drawWithShader(buffer.buildOrThrow());
+    }
+
+    /** 某个角度上的帘幕强度：几层慢速正弦叠加，再乘一个"带状"窗函数，两端自然为 0。 */
+    private static float wave(float time, double angle) {
+        double a = angle;
+        double w = Math.sin(a * 3.0 + time * 0.05) * 0.45
+                + Math.sin(a * 7.0 - time * 0.03 + 1.7) * 0.30
+                + Math.sin(a * 2.0 + time * 0.017 + 4.1) * 0.25;
+        float v = (float) Math.max(0.0, (w + 0.55) / 1.15);
+        return v * v;
+    }
+
+    /** 竖直亮度剖面：中间偏下最亮，上下渐隐到 0。 */
+    private static float verticalProfile(float t) {
+        if (t <= 0.0F || t >= 1.0F) {
+            return 0.0F;
+        }
+        float peak = 0.62F;
+        float d = (t - peak) / (t < peak ? peak : 1.0F - peak);
+        return Math.max(0.0F, 1.0F - d * d);
     }
 
     /** 两端下垂的弧度。 */
