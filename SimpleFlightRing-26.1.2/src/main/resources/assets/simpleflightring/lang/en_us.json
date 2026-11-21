@@ -356,5 +356,7 @@
   "block.simpleflightring.stripped_cloud_log": "Stripped Cloud Log",
   "block.simpleflightring.stripped_cloud_wood": "Stripped Cloud Wood",
   "block.simpleflightring.cloud_sign": "Cloud Wood Sign",
-  "block.simpleflightring.cloud_wall_sign": "Cloud Wood Sign"
+  "block.simpleflightring.cloud_wall_sign": "Cloud Wood Sign",
+  "block.simpleflightring.cloud_hanging_sign": "Cloud Wood Hanging Sign",
+  "block.simpleflightring.cloud_wall_hanging_sign": "Cloud Wood Hanging Sign"
 }

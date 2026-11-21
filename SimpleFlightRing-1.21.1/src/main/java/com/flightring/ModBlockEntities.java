@@ -28,4 +28,9 @@ public final class ModBlockEntities {
                     CloudSignBlockEntity::new,
                     ModBlocks.CLOUD_SIGN.get(),
                     ModBlocks.CLOUD_WALL_SIGN.get()).build(null));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<CloudHangingSignBlockEntity>> CLOUD_HANGING_SIGN =
+            BLOCK_ENTITIES.register("cloud_hanging_sign", () -> BlockEntityType.Builder.of(
+                    CloudHangingSignBlockEntity::new,
+                    ModBlocks.CLOUD_HANGING_SIGN.get(),
+                    ModBlocks.CLOUD_WALL_HANGING_SIGN.get()).build(null));
 }

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "X X",
+    "###",
+    "###"
+  ],
+  "result": {
+    "count": 6,
+    "id": "simpleflightring:cloud_hanging_sign"
+  },
+  "key": {
+    "#": "simpleflightring:stripped_cloud_log",
+    "X": "minecraft:iron_chain"
+  }
+}

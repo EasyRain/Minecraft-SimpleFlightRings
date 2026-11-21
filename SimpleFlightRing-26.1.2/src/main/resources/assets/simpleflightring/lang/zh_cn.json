@@ -356,5 +356,7 @@
   "block.simpleflightring.stripped_cloud_log": "去皮云木原木",
   "block.simpleflightring.stripped_cloud_wood": "去皮云木",
   "block.simpleflightring.cloud_sign": "云木告示牌",
-  "block.simpleflightring.cloud_wall_sign": "云木告示牌"
+  "block.simpleflightring.cloud_wall_sign": "云木告示牌",
+  "block.simpleflightring.cloud_hanging_sign": "云木悬挂告示牌",
+  "block.simpleflightring.cloud_wall_hanging_sign": "云木悬挂告示牌"
 }

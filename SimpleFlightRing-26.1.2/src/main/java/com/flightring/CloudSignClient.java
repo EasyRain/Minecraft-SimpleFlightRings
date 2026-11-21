@@ -19,5 +19,6 @@ public final class CloudSignClient {
     @SubscribeEvent
     public static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerBlockEntityRenderer(ModBlockEntities.CLOUD_SIGN.get(), StandingSignRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntities.CLOUD_HANGING_SIGN.get(), net.minecraft.client.renderer.blockentity.HangingSignRenderer::new);
     }
 }

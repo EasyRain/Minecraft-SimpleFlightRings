@@ -223,6 +223,18 @@ public final class ModBlocks {
             properties -> new CloudWallSignBlock(CloudWoodTypes.CLOUD_WOOD_TYPE, properties),
             properties -> properties.strength(1.0F).sound(SoundType.WOOD).noCollision());
 
+    /** 云木悬挂告示牌（吊顶式）。 */
+    public static final DeferredBlock<Block> CLOUD_HANGING_SIGN = BLOCKS.registerBlock(
+            "cloud_hanging_sign",
+            properties -> new CloudHangingSignBlock(CloudWoodTypes.CLOUD_WOOD_TYPE, properties),
+            properties -> properties.strength(1.0F).sound(SoundType.WOOD).noCollision());
+
+    /** 云木悬挂告示牌（墙式）。 */
+    public static final DeferredBlock<Block> CLOUD_WALL_HANGING_SIGN = BLOCKS.registerBlock(
+            "cloud_wall_hanging_sign",
+            properties -> new CloudWallHangingSignBlock(CloudWoodTypes.CLOUD_WOOD_TYPE, properties),
+            properties -> properties.strength(1.0F).sound(SoundType.WOOD).noCollision());
+
     /** 云树苗：能种在土上，也能直接种在厚云块上。 */
     public static final DeferredBlock<Block> CLOUD_SAPLING = BLOCKS.registerBlock(
             "cloud_sapling",
