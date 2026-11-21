@@ -16,7 +16,12 @@
       "type": "minecraft:block_predicate_filter",
       "predicate": {
         "type": "minecraft:matching_blocks",
-        "blocks": "simpleflightring:thick_cloud_block"
+        "blocks": "simpleflightring:thick_cloud_block",
+        "offset": [
+          0,
+          -1,
+          0
+        ]
       }
     },
     {

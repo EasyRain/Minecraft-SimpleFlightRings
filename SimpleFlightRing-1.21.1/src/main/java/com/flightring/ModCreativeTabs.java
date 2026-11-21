@@ -28,6 +28,11 @@ public class ModCreativeTabs {
                         // step, so it only exists once a player has fed it a Warden's soul.
                         // 云层之上的方块（M1）
                         output.accept(new ItemStack(ModItems.CLOUD_BLOCK_ITEM.get()));
+                        // 云木（M5）
+                        output.accept(new ItemStack(ModItems.CLOUD_LOG_ITEM.get()));
+                        output.accept(new ItemStack(ModItems.CLOUD_WOOD_ITEM.get()));
+                        output.accept(new ItemStack(ModItems.CLOUD_PLANKS_ITEM.get()));
+                        output.accept(new ItemStack(ModItems.CLOUD_LEAVES_ITEM.get()));
                         output.accept(new ItemStack(ModItems.THICK_CLOUD_BLOCK_ITEM.get()));
                         output.accept(new ItemStack(ModItems.THICK_CLOUD_BRICKS_ITEM.get()));
                         output.accept(new ItemStack(ModItems.THICK_CLOUD_SLAB_ITEM.get()));
