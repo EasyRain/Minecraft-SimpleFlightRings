@@ -3,6 +3,14 @@
   "values": [
     "simpleflightring:cloud_log",
     "simpleflightring:cloud_wood",
-    "simpleflightring:cloud_planks"
+    "simpleflightring:cloud_planks",
+    "simpleflightring:cloud_stairs",
+    "simpleflightring:cloud_slab",
+    "simpleflightring:cloud_fence",
+    "simpleflightring:cloud_fence_gate",
+    "simpleflightring:cloud_door",
+    "simpleflightring:cloud_trapdoor",
+    "simpleflightring:cloud_button",
+    "simpleflightring:cloud_pressure_plate"
   ]
 }

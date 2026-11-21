@@ -355,5 +355,13 @@
   "block.simpleflightring.cloud_wood": "云木",
   "block.simpleflightring.cloud_planks": "云母木板",
   "block.simpleflightring.cloud_leaves": "云叶",
-  "block.simpleflightring.cloud_sapling": "云树苗"
+  "block.simpleflightring.cloud_sapling": "云树苗",
+  "block.simpleflightring.cloud_stairs": "云母木台阶",
+  "block.simpleflightring.cloud_slab": "云母木半砖",
+  "block.simpleflightring.cloud_fence": "云母木栅栏",
+  "block.simpleflightring.cloud_fence_gate": "云母木栅栏门",
+  "block.simpleflightring.cloud_door": "云母木门",
+  "block.simpleflightring.cloud_trapdoor": "云母木活板门",
+  "block.simpleflightring.cloud_button": "云母木按钮",
+  "block.simpleflightring.cloud_pressure_plate": "云母木压力板"
 }

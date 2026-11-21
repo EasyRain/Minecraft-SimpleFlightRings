@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    {
+      "item": "simpleflightring:cloud_planks"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "simpleflightring:cloud_button"
+  }
+}

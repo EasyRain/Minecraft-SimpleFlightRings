@@ -3,6 +3,11 @@ package com.flightring;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.RotatedPillarBlock;
+import net.minecraft.world.level.block.ButtonBlock;
+import net.minecraft.world.level.block.FenceBlock;
+import net.minecraft.world.level.block.FenceGateBlock;
+import net.minecraft.world.level.block.PressurePlateBlock;
+import net.minecraft.world.level.block.TrapDoorBlock;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.WallBlock;
@@ -152,6 +157,53 @@ public final class ModBlocks {
             "cloud_planks",
             Block::new,
             properties -> properties.strength(2.0F, 3.0F).sound(SoundType.WOOD));
+
+
+    // ---- 云母木变体（M5）：台阶 / 楼梯 / 栅栏 / 栅栏门 / 门 / 活板门 / 按钮 / 压力板 ----------
+    // 全部挂在 CloudWoodTypes.CLOUD_SET 上，音效直接复用原版木头。
+
+    public static final DeferredBlock<Block> CLOUD_STAIRS = BLOCKS.registerBlock(
+            "cloud_stairs",
+            properties -> new StairBlock(ModBlocks.CLOUD_PLANKS.get().defaultBlockState(), properties),
+            properties -> properties.strength(2.0F, 3.0F).sound(SoundType.WOOD));
+
+    public static final DeferredBlock<Block> CLOUD_SLAB = BLOCKS.registerBlock(
+            "cloud_slab",
+            SlabBlock::new,
+            properties -> properties.strength(2.0F, 3.0F).sound(SoundType.WOOD));
+
+    public static final DeferredBlock<Block> CLOUD_FENCE = BLOCKS.registerBlock(
+            "cloud_fence",
+            FenceBlock::new,
+            properties -> properties.strength(2.0F, 3.0F).sound(SoundType.WOOD));
+
+    public static final DeferredBlock<Block> CLOUD_FENCE_GATE = BLOCKS.registerBlock(
+            "cloud_fence_gate",
+            properties -> new FenceGateBlock(CloudWoodTypes.CLOUD_WOOD_TYPE, properties),
+            properties -> properties.strength(2.0F, 3.0F).sound(SoundType.WOOD));
+
+    public static final DeferredBlock<Block> CLOUD_DOOR = BLOCKS.registerBlock(
+            "cloud_door",
+            properties -> new DoorBlock(CloudWoodTypes.CLOUD_SET, properties),
+            properties -> properties.strength(3.0F).noOcclusion().sound(SoundType.WOOD));
+
+    public static final DeferredBlock<Block> CLOUD_TRAPDOOR = BLOCKS.registerBlock(
+            "cloud_trapdoor",
+            properties -> new TrapDoorBlock(CloudWoodTypes.CLOUD_SET, properties),
+            properties -> properties.strength(3.0F).noOcclusion()
+                    .isValidSpawn((state, level, pos, type) -> false).sound(SoundType.WOOD));
+
+    public static final DeferredBlock<Block> CLOUD_BUTTON = BLOCKS.registerBlock(
+            "cloud_button",
+            properties -> new ButtonBlock(CloudWoodTypes.CLOUD_SET, 30, properties),
+            properties -> properties.noCollision().strength(0.5F)
+                    .pushReaction(PushReaction.DESTROY).sound(SoundType.WOOD));
+
+    public static final DeferredBlock<Block> CLOUD_PRESSURE_PLATE = BLOCKS.registerBlock(
+            "cloud_pressure_plate",
+            properties -> new PressurePlateBlock(CloudWoodTypes.CLOUD_SET, properties),
+            properties -> properties.noCollision().strength(0.5F)
+                    .pushReaction(PushReaction.DESTROY).sound(SoundType.WOOD));
 
     /** 云树苗：能种在土上，也能直接种在厚云块上。 */
     public static final DeferredBlock<Block> CLOUD_SAPLING = BLOCKS.registerBlock(
