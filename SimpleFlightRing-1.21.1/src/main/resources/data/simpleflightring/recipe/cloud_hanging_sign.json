@@ -15,7 +15,8 @@
       "item": "simpleflightring:stripped_cloud_log"
     },
     "X": {
-      "item": "minecraft:iron_chain"
+      "item": "minecraft:chain"
     }
-  }
+  },
+  "group": "hanging_sign"
 }
