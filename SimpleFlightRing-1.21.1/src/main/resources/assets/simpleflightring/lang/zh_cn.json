@@ -360,5 +360,6 @@
   "block.simpleflightring.cloud_hanging_sign": "云木悬挂告示牌",
   "block.simpleflightring.cloud_wall_hanging_sign": "云木悬挂告示牌",
   "item.simpleflightring.cloud_sign": "云木告示牌",
-  "item.simpleflightring.cloud_hanging_sign": "云木悬挂告示牌"
+  "item.simpleflightring.cloud_hanging_sign": "云木悬挂告示牌",
+  "block.simpleflightring.thick_cloud_chest": "云木箱子"
 }

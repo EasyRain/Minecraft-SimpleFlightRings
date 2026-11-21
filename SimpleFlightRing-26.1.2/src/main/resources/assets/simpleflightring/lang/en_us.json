@@ -360,5 +360,6 @@
   "block.simpleflightring.cloud_hanging_sign": "Cloud Wood Hanging Sign",
   "block.simpleflightring.cloud_wall_hanging_sign": "Cloud Wood Hanging Sign",
   "item.simpleflightring.cloud_sign": "Cloud Wood Sign",
-  "item.simpleflightring.cloud_hanging_sign": "Cloud Wood Hanging Sign"
+  "item.simpleflightring.cloud_hanging_sign": "Cloud Wood Hanging Sign",
+  "block.simpleflightring.thick_cloud_chest": "Cloud Wood Chest"
 }
