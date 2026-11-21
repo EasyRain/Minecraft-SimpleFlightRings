@@ -28,7 +28,7 @@ import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
  * 画法：把一张"极光帘幕"贴图当成两个大面片（一前一后、慢速反向滚动），加法混合、关深度写入，
  * 这样它在星空之上、地形之下，看起来像横贯天穹的一条光带。
  */
-@EventBusSubscriber(modid = FlightRingMod.MODID, value = Dist.CLIENT)
+@EventBusSubscriber(modid = FlightRingMod.MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
 public final class AuroraSky {
 
     private static final ResourceLocation TEXTURE =
@@ -59,23 +59,23 @@ public final class AuroraSky {
             return;
         }
         float partialTick = minecraft.getTimer().getGameTimeDeltaPartialTick(false);
-        int ticks = minecraft.player == null ? 0 : minecraft.player.tickCount;
         // 夜晚才出现：getSkyDarken 0~11，越大越黑
         float darken = minecraft.level.getSkyDarken(partialTick) / 11.0F;
-        if (darken < 0.45F) {
-            return;
-        }
+        boolean night = darken >= 0.45F;
         Camera camera = event.getCamera();
         if (camera == null) {
             return;
         }
         Vec3 cameraPos = camera.getPosition();
-        if (!inAuroraBiome(minecraft, cameraPos)) {
-            return;
-        }
+        boolean auroraBiome = inAuroraBiome(minecraft, cameraPos);
+        int ticks = minecraft.player == null ? 0 : minecraft.player.tickCount;
         if (ticks - lastLoggedTick > 200) {
             lastLoggedTick = ticks;
-            FlightRingMod.LOGGER.info("[Aurora] drawing at camera={} darken={}", cameraPos, darken);
+            FlightRingMod.LOGGER.info("[Aurora] stage fired: dim={} auroraBiome={} darken={} night={}",
+                    minecraft.level.dimension().location(), auroraBiome, darken, night);
+        }
+        if (!night || !auroraBiome) {
+            return;
         }
         drawRibbon(event.getPoseStack(), cameraPos, ticks + partialTick, darken);
     }
