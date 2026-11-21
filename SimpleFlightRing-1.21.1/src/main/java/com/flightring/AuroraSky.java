@@ -116,10 +116,10 @@ public final class AuroraSky {
         poseStack.translate(0.0F, HEIGHT, 0.0F);
 
         float seconds = time / 20.0F;
-        // ★ 只画一段弧（不是整圈）：整圈会在正上方围成一个"光环"（用户 2026-11-21 截图）。
-        double north = -Math.PI / 2.0;
-        drawBand(poseStack, seconds, north, 2.5, 330.0F, 0.0F, 1.0F);
-        drawBand(poseStack, seconds * 0.8F + 17.0F, north + 0.35, 2.0, 430.0F, 22.0F, 0.45F);
+        // 一圈"幕布"，但压在靠近地平线的高度，并让上下边缘起伏 —— 既不是头顶光环，
+        // 也没有断口（用户 2026-11-21：整圈、地平线略高、带波浪）。
+        drawBand(poseStack, seconds, 300.0F, 0.0F, 1.0F, 1.0F);
+        drawBand(poseStack, seconds * 0.75F + 23.0F, 400.0F, 26.0F, 0.45F, 1.6F);
 
         poseStack.popPose();
 
@@ -130,20 +130,21 @@ public final class AuroraSky {
     }
 
     /** 一圈光带（横贯天空的弧），竖直方向用高斯剖面。 */
-    private static void drawBand(PoseStack poseStack, float time, double center, double width,
-                                 float radius, float yShift, float strength) {
+    private static void drawBand(PoseStack poseStack, float time, float radius, float yShift,
+                                 float strength, float waviness) {
         final int steps = 160;
         final int rows = 7;
-        // 贴近地平线的一条带：半径 330 时，30~170 格大约对应 5°~27° 仰角
-        final float bandBottom = 30.0F + yShift;
-        final float bandTop = 170.0F + yShift;
+        // 贴近地平线的一圈：半径 300 时，40~150 格大约 7°~26° 仰角
+        final float bandBottom = 40.0F + yShift;
+        final float bandTop = 150.0F + yShift;
 
         Tesselator tesselator = Tesselator.getInstance();
         BufferBuilder buffer = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
 
         for (int i = 0; i < steps; i++) {
-            double a0 = center - width / 2.0 + width * i / steps;
-            double a1 = center - width / 2.0 + width * (i + 1) / steps;
+            // 整圈
+            double a0 = Math.PI * 2.0 * i / steps;
+            double a1 = Math.PI * 2.0 * (i + 1) / steps;
             float w0 = arcIntensity(time, a0);
             float w1 = arcIntensity(time, a1);
             if (w0 + w1 < 0.03F) {
@@ -166,8 +167,10 @@ public final class AuroraSky {
                 if (a00 + a10 + a11 + a01 < 0.004F) {
                     continue;
                 }
-                float y0 = bandBottom + (bandTop - bandBottom) * t0;
-                float y1 = bandBottom + (bandTop - bandBottom) * t1;
+                float waveTop0 = edgeWave(time, a0, waviness);
+                float waveTop1 = edgeWave(time, a1, waviness);
+                float y0 = bandBottom + (bandTop - bandBottom + waveTop0) * t0;
+                float y1 = bandBottom + (bandTop - bandBottom + waveTop1) * t1;
                 // 亮芯偏绿、上下两侧偏青蓝
                 float core0 = coreWeight(t0);
                 float core1 = coreWeight(t1);
@@ -195,6 +198,18 @@ public final class AuroraSky {
                 + Math.sin(a * 5.0 - time * 0.02 + 1.3) * 0.25
                 + Math.sin(a * 13.0 + time * 0.05 + 2.7) * 0.12;
         return (float) (0.55 + 0.45 * w);
+    }
+
+    /**
+     * 边缘起伏：让幕布的上缘（以及整体高度）缓慢上下波动，
+     * 这样它看起来是一条起伏的云带，而不是一个规矩的圆环。
+     */
+    private static float edgeWave(float time, double angle, float amount) {
+        double a = angle;
+        double w = Math.sin(a * 3.0 + time * 0.08) * 0.5
+                + Math.sin(a * 7.0 - time * 0.05 + 1.9) * 0.3
+                + Math.sin(a * 11.0 + time * 0.03 + 3.3) * 0.2;
+        return (float) (w * 55.0 * amount);
     }
 
     /** 竖直方向的高斯剖面：中间最亮，上下柔和淡出。 */
