@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "simpleflightring:cloud_stairs",
+    "simpleflightring:cloud_block_stairs",
+    "simpleflightring:thick_cloud_stairs",
+    "simpleflightring:thick_cloud_bricks_stairs"
+  ]
+}
