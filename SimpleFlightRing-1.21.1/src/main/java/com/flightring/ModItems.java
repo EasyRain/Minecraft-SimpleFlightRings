@@ -78,11 +78,19 @@ public class ModItems {
     public static final DeferredItem<BlockItem> CLOUD_SAPLING_ITEM =
             ITEMS.registerSimpleBlockItem("cloud_sapling", () -> ModBlocks.CLOUD_SAPLING.get());
     public static final DeferredItem<BlockItem> CLOUD_HANGING_SIGN_ITEM =
-            ITEMS.registerSimpleBlockItem("cloud_hanging_sign", () -> ModBlocks.CLOUD_HANGING_SIGN.get());
+            ITEMS.registerItem("cloud_hanging_sign",
+                    properties -> new net.minecraft.world.item.SignItem(properties,
+                            ModBlocks.CLOUD_HANGING_SIGN.get(), ModBlocks.CLOUD_WALL_HANGING_SIGN.get()));
     public static final DeferredItem<BlockItem> CLOUD_WALL_HANGING_SIGN_ITEM =
             ITEMS.registerSimpleBlockItem("cloud_wall_hanging_sign", () -> ModBlocks.CLOUD_WALL_HANGING_SIGN.get());
+    /**
+     * 云木告示牌物品：必须用 {@link net.minecraft.world.item.SignItem}，
+     * 否则只能放地上（普通 BlockItem 不会转成墙式），而且放置后不会打开编辑框。
+     */
     public static final DeferredItem<BlockItem> CLOUD_SIGN_ITEM =
-            ITEMS.registerSimpleBlockItem("cloud_sign", () -> ModBlocks.CLOUD_SIGN.get());
+            ITEMS.registerItem("cloud_sign",
+                    properties -> new net.minecraft.world.item.SignItem(properties,
+                            ModBlocks.CLOUD_SIGN.get(), ModBlocks.CLOUD_WALL_SIGN.get()));
     public static final DeferredItem<BlockItem> CLOUD_WALL_SIGN_ITEM =
             ITEMS.registerSimpleBlockItem("cloud_wall_sign", () -> ModBlocks.CLOUD_WALL_SIGN.get());
     public static final DeferredItem<BlockItem> STRIPPED_CLOUD_LOG_ITEM =
