@@ -45,8 +45,7 @@ public final class CloudBlockColors {
             var key = minecraft.level.registryAccess().registryOrThrow(Registries.BIOME).getResourceKey(b).orElse(null);
             int color = CloudColors.of(key == null ? null : key.location());
             if (key != null) {
-                FlightRingMod.LOGGER.debug("[CloudTint] {} -> #{}{}{}", key.location(),
-                        String.format("%06X", color), "", "");
+                FlightRingMod.LOGGER.info("[CloudTint] biome {} -> #{}", key.location(), String.format("%06X", color));
             }
             return color;
         });
