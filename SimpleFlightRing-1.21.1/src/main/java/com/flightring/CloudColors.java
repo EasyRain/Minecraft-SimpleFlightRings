@@ -2,9 +2,6 @@ package com.flightring;
 
 import javax.annotation.Nullable;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.biome.Biome;
-import net.minecraft.core.Holder;
 
 /**
  * 云层的群系配色表。
@@ -23,29 +20,16 @@ public final class CloudColors {
 
     /** 按群系 id 取颜色（RGB，不含 alpha）。 */
     public static int of(@Nullable ResourceLocation biomeId) {
-        if (biomeId == null) {
-            return DEFAULT;
-        }
-        if (!FlightRingMod.MODID.equals(biomeId.getNamespace())) {
+        if (biomeId == null || !FlightRingMod.MODID.equals(biomeId.getNamespace())) {
             return DEFAULT;
         }
         return switch (biomeId.getPath()) {
-            case "cloud_sea" -> 0xDCEEFF;        // 云海：偏蓝的白
-            case "clear_sky" -> 0xF2FAFF;        // 晴空：最亮
-            case "thunderhead" -> 0xB2BECC;      // 雷云：压暗的灰蓝
-            case "aurora" -> 0xD9F6EC;           // 极光：淡淡的青绿
-            case "sunset_clouds" -> 0xFFDCC4;    // 晚霞：暖桃色
+            case "cloud_sea" -> 0xDCEEFF;
+            case "clear_sky" -> 0xF2FAFF;
+            case "thunderhead" -> 0xB2BECC;
+            case "aurora" -> 0xD9F6EC;
+            case "sunset_clouds" -> 0xFFDCC4;
             default -> DEFAULT;
         };
-    }
-
-    /** 按群系 Holder 取颜色。 */
-    public static int of(Holder<Biome> biome) {
-        return biome.unwrapKey().map(key -> of(key.location())).orElse(DEFAULT);
-    }
-
-    /** 按世界 + 坐标取颜色。 */
-    public static int of(LevelReader level, net.minecraft.core.BlockPos pos) {
-        return of(level.getBiome(pos));
     }
 }
