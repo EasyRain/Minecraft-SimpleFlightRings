@@ -27,7 +27,7 @@ public final class CloudColors {
             case "cloud_sea" -> 0xDCEEFF;
             case "clear_sky" -> 0xF2FAFF;
             case "thunderhead" -> 0xB2BECC;
-            case "aurora" -> 0xD9F6EC;
+            case "aurora" -> 0xFFFFFF;   // 极光群系不染色：绿色太诡异，保持纯白（天空另有极光渲染）
             case "sunset_clouds" -> 0xFFDCC4;
             default -> DEFAULT;
         };
