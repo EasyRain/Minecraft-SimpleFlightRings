@@ -8,6 +8,7 @@ import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
+import com.mojang.blaze3d.vertex.VertexSorting;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
@@ -46,8 +47,11 @@ import org.joml.Matrix4fStack;
  *       一旦 CPU 乘过任何矩阵，图案输入就变成"视线空间坐标"，图案立刻锁死在屏幕上（帽子）；</li>
  *   <li>gl_Position 的视图旋转只能来自矩阵（vsh 的 ModelViewMat）。
  *       {@code BufferUploader.drawWithShader} 用<b>全局</b>{@code RenderSystem.getModelViewMatrix()}
- *       （此刻为恒等），所以绘制前对全局栈做作用域内覆盖 push/identity/mul(V)/apply，
- *       画完 pop 恢复 —— 不依赖调用方遗留的全局状态。</li>
+ *       / {@code getProjectionMatrix()}，所以绘制前对两个全局量各做一次作用域内覆盖
+ *       （MV→V；投影→干净投影），画完恢复 —— 不依赖调用方遗留的全局状态；</li>
+ *   <li>投影用<b>干净重建</b>（{@code getProjectionMatrix(getFov(...))}）：原版把走路摇晃
+ *       （view bob）、受击倾斜、反胃翻转全折进全局投影，原版日月星辰跟着抖；极光作为
+ *       无限远天空体不该抖（真摇头时无穷远物角位置不动），所以甩掉摇晃成分、只保留 FOV/缩放。</li>
  * </ul>
  * <p>
  * 触发条件：{@code the_cloud} 维度、所在群系是 {@code simpleflightring:aurora}。
@@ -106,17 +110,28 @@ public final class AuroraSky {
         boolean auroraBiome = inAuroraBiome(minecraft, cameraPos);
         // 昼夜淡入淡出（替代光影的 sunVisibility；夜晚 SunFade≈0，白天≈1）
         float sunFade = sunVisibility(minecraft);
+        // ★ 极光是"无限远"的天空体：**不**跟着 view bob（走路摇晃）/受击倾斜/反胃翻转一起抖。
+        //   原版把这些摇晃全部折进全局投影矩阵（GameRenderer#renderLevel：
+        //   bobHurt+bobView mul 进 getProjectionMatrix 的结果后才 resetProjectionMatrix()），
+        //   原版日月星辰因此跟着抖 —— 对横贯天穹的极光带非常显眼，而且对"无限远"的东西物理上也不对
+        //   （真摇头时无穷远物的角位置本应不动）。这里用【干净投影】画：
+        //   getProjectionMatrix(getFov(...)) 重建，FOV/缩放与画面严格一致、只少摇晃成分
+        //   （getFov 是 private，经 META-INF/accesstransformer.cfg 开放）。
+        float partialTick = minecraft.getTimer().getGameTimeDeltaPartialTick(true);
+        double fov = minecraft.gameRenderer.getFov(camera, partialTick, true);
+        Matrix4f cleanProjection = minecraft.gameRenderer.getProjectionMatrix(fov);
+        // 诊断：当前帧投影里摇晃成分的大小（站立≈0，走路>0 —— 在线验证"极光已脱离摇晃"）
+        float bobDelta = maxAbsDiff(event.getProjectionMatrix(), cleanProjection);
         int ticks = minecraft.player == null ? 0 : minecraft.player.tickCount;
         if (ticks - lastLoggedTick > 200) {
             lastLoggedTick = ticks;
-            FlightRingMod.LOGGER.info("[Aurora] stage fired: dim={} auroraBiome={} sunFade={}",
-                    minecraft.level.dimension().location(), auroraBiome, sunFade);
+            FlightRingMod.LOGGER.info("[Aurora] stage fired: dim={} auroraBiome={} sunFade={} bobDelta={}",
+                    minecraft.level.dimension().location(), auroraBiome, sunFade, fmt(bobDelta));
         }
         if (!auroraBiome || sunFade >= 0.999F) {
             return;
         }
 
-        float partialTick = minecraft.getTimer().getGameTimeDeltaPartialTick(false);
         float time = (minecraft.level.getGameTime() + partialTick) / 20.0F; // 世界年龄秒（= 光影 syncedTime）
         float rainFactor = minecraft.level.getRainLevel(partialTick);
 
@@ -150,8 +165,8 @@ public final class AuroraSky {
         //     视图旋转 V 在 event.getModelViewMatrix() 里；不要碰 camera.rotation() 的共轭，历史方案全错。
         //   - 顶点必须是【原始世界方向】，不做任何 CPU 变换 —— 片元着色器拿它当世界方向算图案。
         //   - gl_Position 的视图旋转只能来自矩阵：BufferUploader.drawWithShader 用的是全局
-        //     RenderSystem.getModelViewMatrix()（此刻为恒等），所以这里对全局栈做一次【作用域内覆盖】
-        //     pushMatrix -> identity -> mul(V) -> apply，画完 pop 恢复 —— 不依赖调用方的全局状态。
+        //     RenderSystem.getModelViewMatrix() / getProjectionMatrix()，所以这里对两个全局量
+        //     各做一次【作用域内覆盖】（MV -> V；投影 -> 干净投影），画完恢复 —— 不依赖调用方状态。
         Matrix4f viewMatrix = event.getModelViewMatrix();
         if (!loggedFirstDraw) {
             loggedFirstDraw = true;
@@ -164,6 +179,8 @@ public final class AuroraSky {
                     fmt(globalBefore.m00()), fmt(globalBefore.m11()),
                     fmt(globalBefore.m22()), fmt(globalBefore.m33()));
         }
+        Matrix4f savedProjection = new Matrix4f(RenderSystem.getProjectionMatrix());
+        RenderSystem.setProjectionMatrix(cleanProjection, VertexSorting.DISTANCE_TO_ORIGIN);
         Matrix4fStack glStack = RenderSystem.getModelViewStack();
         glStack.pushMatrix();
         glStack.identity();
@@ -174,6 +191,7 @@ public final class AuroraSky {
         } finally {
             glStack.popMatrix();
             RenderSystem.applyModelViewMatrix();
+            RenderSystem.setProjectionMatrix(savedProjection, VertexSorting.DISTANCE_TO_ORIGIN);
         }
 
         RenderSystem.enableDepthTest();
@@ -217,6 +235,20 @@ public final class AuroraSky {
 
     private static String fmt(float v) {
         return String.format(java.util.Locale.ROOT, "%.3f", v);
+    }
+
+    /** 两矩阵 16 元素的最大绝对差（诊断用：>0 = 当前帧投影带有 view bob 等摇晃成分）。 */
+    private static float maxAbsDiff(Matrix4f a, Matrix4f b) {
+        float max = 0.0F;
+        for (int column = 0; column < 4; column++) {
+            for (int row = 0; row < 4; row++) {
+                float d = Math.abs(a.get(column, row) - b.get(column, row));
+                if (d > max) {
+                    max = d;
+                }
+            }
+        }
+        return max;
     }
 
     /**
