@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/leaves",
+  "textures": {
+    "all": "simpleflightring:block/cloud_leaves"
+  }
+}

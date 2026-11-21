@@ -2,6 +2,8 @@ package com.flightring;
 
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.LeavesBlock;
+import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.WallBlock;
@@ -131,4 +133,44 @@ public final class ModBlocks {
 
     private ModBlocks() {
     }
+
+    // ---- 云木（M5）：一套完整的木头材料 -------------------------------------------------
+    // 云树长在云岛上，给床 / 箱子 / 门提供"正经材料"，也让这些方块能用原版的木头音效。
+
+    /** 云木原木：云树的树干。 */
+    public static final DeferredBlock<Block> CLOUD_LOG = BLOCKS.registerBlock(
+            "cloud_log",
+            RotatedPillarBlock::new,
+            BlockBehaviour.Properties.of()
+                    .strength(2.0F)
+                    .sound(SoundType.WOOD));
+
+    /** 云木：六面都是树皮纹理（和原版 oak_wood 一样）。 */
+    public static final DeferredBlock<Block> CLOUD_WOOD = BLOCKS.registerBlock(
+            "cloud_wood",
+            RotatedPillarBlock::new,
+            BlockBehaviour.Properties.of()
+                    .strength(2.0F)
+                    .sound(SoundType.WOOD));
+
+    /** 云母木板：云木加工出来的建筑板材。 */
+    public static final DeferredBlock<Block> CLOUD_PLANKS = BLOCKS.registerBlock(
+            "cloud_planks",
+            Block::new,
+            BlockBehaviour.Properties.of()
+                    .strength(2.0F, 3.0F)
+                    .sound(SoundType.WOOD));
+
+    /** 云叶：云树的树冠。 */
+    public static final DeferredBlock<Block> CLOUD_LEAVES = BLOCKS.registerBlock(
+            "cloud_leaves",
+            LeavesBlock::new,
+            BlockBehaviour.Properties.of()
+                    .strength(0.2F)
+                    .randomTicks()
+                    .sound(SoundType.GRASS)
+                    .noOcclusion()
+                    .isValidSpawn((state, level, pos, type) -> false)
+                    .isSuffocating((state, level, pos) -> false)
+                    .isViewBlocking((state, level, pos) -> false));
 }

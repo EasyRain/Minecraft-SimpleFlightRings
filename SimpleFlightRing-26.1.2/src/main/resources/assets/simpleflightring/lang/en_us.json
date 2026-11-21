@@ -350,5 +350,9 @@
   "subtitles.simpleflightring.thick_cloud_door.open": "Thick Cloud Door: Opens",
   "subtitles.simpleflightring.thick_cloud_door.close": "Thick Cloud Door: Closes",
   "block.simpleflightring.thick_cloud_bed": "Thick Cloud Bed",
-  "dimension.simpleflightring.the_cloud": "Cloud Dimension"
+  "dimension.simpleflightring.the_cloud": "Cloud Dimension",
+  "block.simpleflightring.cloud_log": "Cloud Log",
+  "block.simpleflightring.cloud_wood": "Cloud Wood",
+  "block.simpleflightring.cloud_planks": "Cloud Planks",
+  "block.simpleflightring.cloud_leaves": "Cloud Leaves"
 }

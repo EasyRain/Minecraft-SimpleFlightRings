@@ -2,6 +2,7 @@ package com.flightring;
 
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.WallBlock;
@@ -131,4 +132,36 @@ public final class ModBlocks {
 
     private ModBlocks() {
     }
+
+    // ---- 云木（M5）：一套完整的木头材料 -------------------------------------------------
+
+    /** 云木原木：云树的树干。 */
+    public static final DeferredBlock<Block> CLOUD_LOG = BLOCKS.registerBlock(
+            "cloud_log",
+            RotatedPillarBlock::new,
+            properties -> properties.strength(2.0F).sound(SoundType.WOOD));
+
+    /** 云木：六面都是树皮纹理。 */
+    public static final DeferredBlock<Block> CLOUD_WOOD = BLOCKS.registerBlock(
+            "cloud_wood",
+            RotatedPillarBlock::new,
+            properties -> properties.strength(2.0F).sound(SoundType.WOOD));
+
+    /** 云母木板。 */
+    public static final DeferredBlock<Block> CLOUD_PLANKS = BLOCKS.registerBlock(
+            "cloud_planks",
+            Block::new,
+            properties -> properties.strength(2.0F, 3.0F).sound(SoundType.WOOD));
+
+    /** 云叶。 */
+    public static final DeferredBlock<Block> CLOUD_LEAVES = BLOCKS.registerBlock(
+            "cloud_leaves",
+            CloudLeavesBlock::new,
+            properties -> properties.strength(0.2F)
+                    .randomTicks()
+                    .sound(SoundType.GRASS)
+                    .noOcclusion()
+                    .isValidSpawn((state, level, pos, type) -> false)
+                    .isSuffocating((state, level, pos) -> false)
+                    .isViewBlocking((state, level, pos) -> false));
 }

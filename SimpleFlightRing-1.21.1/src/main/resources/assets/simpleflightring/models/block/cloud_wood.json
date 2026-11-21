@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "simpleflightring:block/cloud_log",
+    "side": "simpleflightring:block/cloud_log"
+  }
+}

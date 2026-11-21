@@ -1,0 +1,12 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": [
+    "simpleflightring:cloud_sea",
+    "simpleflightring:clear_sky",
+    "simpleflightring:thunderhead",
+    "simpleflightring:aurora",
+    "simpleflightring:sunset_clouds"
+  ],
+  "features": "simpleflightring:cloud_tree",
+  "step": "vegetal_decoration"
+}

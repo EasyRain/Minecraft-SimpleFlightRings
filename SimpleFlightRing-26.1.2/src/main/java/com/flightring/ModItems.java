@@ -48,6 +48,14 @@ public class ModItems {
     // ---- 云层之上的方块物品（M1）-----------------------------------------------------
     public static final DeferredItem<BlockItem> CLOUD_BLOCK_ITEM =
             ITEMS.registerSimpleBlockItem("cloud_block", () -> ModBlocks.CLOUD_BLOCK.get());
+    public static final DeferredItem<BlockItem> CLOUD_LOG_ITEM =
+            ITEMS.registerSimpleBlockItem("cloud_log", () -> ModBlocks.CLOUD_LOG.get());
+    public static final DeferredItem<BlockItem> CLOUD_WOOD_ITEM =
+            ITEMS.registerSimpleBlockItem("cloud_wood", () -> ModBlocks.CLOUD_WOOD.get());
+    public static final DeferredItem<BlockItem> CLOUD_PLANKS_ITEM =
+            ITEMS.registerSimpleBlockItem("cloud_planks", () -> ModBlocks.CLOUD_PLANKS.get());
+    public static final DeferredItem<BlockItem> CLOUD_LEAVES_ITEM =
+            ITEMS.registerSimpleBlockItem("cloud_leaves", () -> ModBlocks.CLOUD_LEAVES.get());
     public static final DeferredItem<BlockItem> THICK_CLOUD_BLOCK_ITEM =
             ITEMS.registerSimpleBlockItem("thick_cloud_block", () -> ModBlocks.THICK_CLOUD_BLOCK.get());
     public static final DeferredItem<BlockItem> THICK_CLOUD_BRICKS_ITEM =

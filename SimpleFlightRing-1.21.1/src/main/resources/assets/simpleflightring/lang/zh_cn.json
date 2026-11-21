@@ -350,5 +350,9 @@
   "subtitles.simpleflightring.thick_cloud_door.open": "厚云门：打开",
   "subtitles.simpleflightring.thick_cloud_door.close": "厚云门：关闭",
   "block.simpleflightring.thick_cloud_bed": "厚云床",
-  "dimension.simpleflightring.the_cloud": "云层维度"
+  "dimension.simpleflightring.the_cloud": "云层维度",
+  "block.simpleflightring.cloud_log": "云木原木",
+  "block.simpleflightring.cloud_wood": "云木",
+  "block.simpleflightring.cloud_planks": "云母木板",
+  "block.simpleflightring.cloud_leaves": "云叶"
 }
