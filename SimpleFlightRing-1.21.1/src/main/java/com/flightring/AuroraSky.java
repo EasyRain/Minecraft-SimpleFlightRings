@@ -4,7 +4,6 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.Camera;
@@ -16,6 +15,8 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RegisterShadersEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
+import org.joml.Matrix4f;
+import org.joml.Matrix4fStack;
 
 /**
  * 极光群系的夜空极光（1.21.1）。
@@ -36,6 +37,19 @@ import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
  * 钉在天空上，只随视角转动、不随平移移动（平移视差由 {@code CameraPos} 微量提供，
  * 与光影包一致）。
  * <p>
+ * ★ 矩阵架构（2026-11-22 定案，三轮"帽子"翻车的最终结论）：
+ * <ul>
+ *   <li>{@code AFTER_SKY} 事件的 PoseStack 是<b>恒等</b>（NeoForge 派发时 poseStack 传 null），
+ *       视图旋转 V 在 {@code event.getModelViewMatrix()} —— 不要碰事件 PoseStack、
+ *       不要自己算 camera.rotation() 的共轭，历史两版方案都因此翻车；</li>
+ *   <li>顶点属性 = <b>原始世界方向</b>（不做 CPU 变换）：片元着色器拿它当世界方向算图案。
+ *       一旦 CPU 乘过任何矩阵，图案输入就变成"视线空间坐标"，图案立刻锁死在屏幕上（帽子）；</li>
+ *   <li>gl_Position 的视图旋转只能来自矩阵（vsh 的 ModelViewMat）。
+ *       {@code BufferUploader.drawWithShader} 用<b>全局</b>{@code RenderSystem.getModelViewMatrix()}
+ *       （此刻为恒等），所以绘制前对全局栈做作用域内覆盖 push/identity/mul(V)/apply，
+ *       画完 pop 恢复 —— 不依赖调用方遗留的全局状态。</li>
+ * </ul>
+ * <p>
  * 触发条件：{@code the_cloud} 维度、所在群系是 {@code simpleflightring:aurora}。
  */
 @EventBusSubscriber(modid = FlightRingMod.MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
@@ -50,6 +64,9 @@ public final class AuroraSky {
 
     /** 自定义 core shader（片元里跑移植后的 GetAuroraBorealis）。 */
     private static net.minecraft.client.renderer.ShaderInstance SHADER;
+
+    /** 首帧矩阵诊断（只打一次，验证矩阵架构）。 */
+    private static boolean loggedFirstDraw = false;
 
     /** 日志限流用（每 10 秒最多打一行）。 */
     private static int lastLoggedTick = -1000;
@@ -128,13 +145,36 @@ public final class AuroraSky {
             sunUniform.set(sunFade);
         }
 
-        PoseStack poseStack = event.getPoseStack();
-        poseStack.pushPose();
-        // ★ AFTER_SKY 的 PoseStack 带相机旋转（2026-11-21 实证）：乘一次逆旋转，
-        // 让穹顶顶点坐标处于"世界朝向"坐标系 —— 片元拿到的 worldDir 才是真正的世界方向。
-        poseStack.mulPose(new org.joml.Quaternionf(camera.rotation()).conjugate());
-        drawDome(poseStack);
-        poseStack.popPose();
+        // ★ 矩阵架构（2026-11-22 定案，详见 09-踩坑 §3.21）：
+        //   - 事件 PoseStack 在 AFTER_SKY 是【恒等】（dispatchRenderStage 传 null -> new PoseStack()），
+        //     视图旋转 V 在 event.getModelViewMatrix() 里；不要碰 camera.rotation() 的共轭，历史方案全错。
+        //   - 顶点必须是【原始世界方向】，不做任何 CPU 变换 —— 片元着色器拿它当世界方向算图案。
+        //   - gl_Position 的视图旋转只能来自矩阵：BufferUploader.drawWithShader 用的是全局
+        //     RenderSystem.getModelViewMatrix()（此刻为恒等），所以这里对全局栈做一次【作用域内覆盖】
+        //     pushMatrix -> identity -> mul(V) -> apply，画完 pop 恢复 —— 不依赖调用方的全局状态。
+        Matrix4f viewMatrix = event.getModelViewMatrix();
+        if (!loggedFirstDraw) {
+            loggedFirstDraw = true;
+            Matrix4f globalBefore = new Matrix4f(RenderSystem.getModelViewMatrix());
+            FlightRingMod.LOGGER.info(
+                    "[Aurora] first draw: view(row-major m00..m22)=[{},{},{},{},{},{},{},{},{}], globalMV-before=[{},{},{},{}]",
+                    fmt(viewMatrix.m00()), fmt(viewMatrix.m01()), fmt(viewMatrix.m02()),
+                    fmt(viewMatrix.m10()), fmt(viewMatrix.m11()), fmt(viewMatrix.m12()),
+                    fmt(viewMatrix.m20()), fmt(viewMatrix.m21()), fmt(viewMatrix.m22()),
+                    fmt(globalBefore.m00()), fmt(globalBefore.m11()),
+                    fmt(globalBefore.m22()), fmt(globalBefore.m33()));
+        }
+        Matrix4fStack glStack = RenderSystem.getModelViewStack();
+        glStack.pushMatrix();
+        glStack.identity();
+        glStack.mul(viewMatrix);
+        RenderSystem.applyModelViewMatrix();
+        try {
+            drawDome();
+        } finally {
+            glStack.popMatrix();
+            RenderSystem.applyModelViewMatrix();
+        }
 
         RenderSystem.enableDepthTest();
         RenderSystem.depthMask(true);
@@ -175,11 +215,18 @@ public final class AuroraSky {
         return c * c * (3.0F - 2.0F * c);
     }
 
+    private static String fmt(float v) {
+        return String.format(java.util.Locale.ROOT, "%.3f", v);
+    }
+
     /**
-     * 单位球穹顶（仰角 -10°~90°），顶点坐标即世界方向，片元着色器负责全部观感。
+     * 单位球穹顶（仰角 -10°~90°），顶点坐标 = **原始世界方向**（不做任何 CPU 变换），
+     * 由 drawDome 外层把视图矩阵放进全局 ModelViewStack 上屏：
+     * 片元里 worldDir = 顶点属性 = 世界方向（图案世界锁定），
+     * gl_Position = P·V·v（网格像天体一样钉在世界里）。
      * 仰角按 t² 分布：地平线附近（极光最亮、方向变化最快）密，天顶附近疏。
      */
-    private static void drawDome(PoseStack poseStack) {
+    private static void drawDome() {
         final int sectors = 48;
         final int rings = 24;
         final double elevMin = Math.toRadians(-10.0);
@@ -187,7 +234,6 @@ public final class AuroraSky {
 
         Tesselator tesselator = Tesselator.getInstance();
         BufferBuilder buffer = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-        var pose = poseStack.last().pose();
 
         for (int r = 0; r < rings; r++) {
             double t0 = (double) r / rings;
@@ -209,10 +255,11 @@ public final class AuroraSky {
                 float z11 = (float) (Math.sin(az1) * cosE1);
                 float x01 = (float) (Math.cos(az0) * cosE1);
                 float z01 = (float) (Math.sin(az0) * cosE1);
-                buffer.addVertex(pose, x00, (float) sinE0, z00).setColor(255, 255, 255, 255);
-                buffer.addVertex(pose, x10, (float) sinE0, z10).setColor(255, 255, 255, 255);
-                buffer.addVertex(pose, x11, (float) sinE1, z11).setColor(255, 255, 255, 255);
-                buffer.addVertex(pose, x01, (float) sinE1, z01).setColor(255, 255, 255, 255);
+                // ★ 原始坐标直传（不乘 pose）：Position 属性就是世界方向
+                buffer.addVertex(x00, (float) sinE0, z00).setColor(255, 255, 255, 255);
+                buffer.addVertex(x10, (float) sinE0, z10).setColor(255, 255, 255, 255);
+                buffer.addVertex(x11, (float) sinE1, z11).setColor(255, 255, 255, 255);
+                buffer.addVertex(x01, (float) sinE1, z01).setColor(255, 255, 255, 255);
             }
         }
         com.mojang.blaze3d.vertex.BufferUploader.drawWithShader(buffer.buildOrThrow());
