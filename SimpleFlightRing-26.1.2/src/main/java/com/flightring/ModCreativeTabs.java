@@ -50,13 +50,12 @@ public class ModCreativeTabs {
                         output.accept(new ItemStack(ModItems.THICK_CLOUD_SLAB_ITEM.get()));
                         output.accept(new ItemStack(ModItems.THICK_CLOUD_STAIRS_ITEM.get()));
                         output.accept(new ItemStack(ModItems.THICK_CLOUD_WALL_ITEM.get()));
-                        output.accept(new ItemStack(ModItems.THICK_CLOUD_DOOR_ITEM.get()));
                         output.accept(new ItemStack(ModItems.THICK_CLOUD_CHEST_ITEM.get()));
                         output.accept(new ItemStack(ModItems.THICK_CLOUD_BED_ITEM.get()));
                         output.accept(new ItemStack(ModItems.INDESTRUCTIBLE_CORE.get()));
                         output.accept(new ItemStack(ModItems.REFORGE_STONE.get()));
                         // The directed stone is one item whose name follows its mode, so show both kinds here.
-                        for (ReforgeMode mode : new ReforgeMode[]{ReforgeMode.PREFIX, ReforgeMode.RARITY}) {
+                                                for (ReforgeMode mode : new ReforgeMode[]{ReforgeMode.PREFIX, ReforgeMode.RARITY}) {
                             ItemStack directed = new ItemStack(ModItems.REFORGE_STONE_DIRECTED.get());
                             directed.set(ModDataComponents.REFORGE_MODE.get(), mode);
                             output.accept(directed);

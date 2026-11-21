@@ -121,14 +121,6 @@ public final class ModBlocks {
                     .sound(ModSounds.CHEST_SOUND_TYPE)
                     .noOcclusion());
 
-    /** 厚云门：云房子的门（BlockSetType 决定音效与开关行为）。 */
-    public static final DeferredBlock<Block> THICK_CLOUD_DOOR = BLOCKS.registerBlock(
-            "thick_cloud_door",
-            properties -> new DoorBlock(ModBlockSetTypes.CLOUD, properties),
-            BlockBehaviour.Properties.of().strength(0.8F)
-                    .sound(ModSounds.THICK_SOUND_TYPE)
-                    .noOcclusion()
-                    .pushReaction(PushReaction.DESTROY));
 
     public static final DeferredBlock<Block> THICK_CLOUD_WALL = BLOCKS.registerBlock(
             "thick_cloud_wall",

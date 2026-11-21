@@ -1,7 +1,0 @@
-{
-  "parent": "minecraft:block/door_top_right_open",
-  "textures": {
-    "bottom": "simpleflightring:block/thick_cloud_door_bottom",
-    "top": "simpleflightring:block/thick_cloud_door_top"
-  }
-}
