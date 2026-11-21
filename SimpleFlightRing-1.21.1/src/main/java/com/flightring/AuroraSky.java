@@ -124,6 +124,9 @@ public final class AuroraSky {
         RenderSystem.disableCull();
         RenderSystem.depthMask(false);
         RenderSystem.disableDepthTest();
+        if (SHADER == null) {
+            return;   // 着色器没加载成功：直接跳过，不要让 drawWithShader 空指针崩端
+        }
         RenderSystem.setShader(() -> SHADER);
 
         if (SHADER != null) {
