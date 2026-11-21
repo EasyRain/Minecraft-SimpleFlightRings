@@ -132,11 +132,12 @@ public final class AuroraSky {
     /** 一圈光带（横贯天空的弧），竖直方向用高斯剖面。 */
     private static void drawBand(PoseStack poseStack, float time, float radius, float yShift,
                                  float strength, float waviness) {
-        final int steps = 160;
-        final int rows = 7;
-        // 贴近地平线的一圈：半径 300 时，40~150 格大约 7°~26° 仰角
-        final float bandBottom = 40.0F + yShift;
-        final float bandTop = 150.0F + yShift;
+        // 段数/行数要够密，否则每格之间的透明度差会看成一格一格的方块（用户 2026-11-21）
+        final int steps = 288;
+        final int rows = 20;
+        // 垂到相机高度以下：半径 300 时，-140~110 格约对应 -25°~+20° 仰角
+        final float bandBottom = -140.0F + yShift;
+        final float bandTop = 110.0F + yShift;
 
         Tesselator tesselator = Tesselator.getInstance();
         BufferBuilder buffer = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
