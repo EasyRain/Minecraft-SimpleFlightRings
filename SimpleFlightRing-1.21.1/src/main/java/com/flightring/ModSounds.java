@@ -38,22 +38,8 @@ public final class ModSounds {
     public static final SoundEvent THICK_HIT = register("block.thick_cloud.hit");
     public static final SoundEvent THICK_FALL = register("block.thick_cloud.fall");
 
-    /** 厚云箱子：破坏/放置/踩/敲/落地 —— 与厚云同色系（雪），但字幕点名"厚云箱子"。 */
-    public static final SoundEvent CHEST_BREAK = register("block.thick_cloud_chest.break");
-    public static final SoundEvent CHEST_STEP = register("block.thick_cloud_chest.step");
-    public static final SoundEvent CHEST_PLACE = register("block.thick_cloud_chest.place");
-    public static final SoundEvent CHEST_HIT = register("block.thick_cloud_chest.hit");
-    public static final SoundEvent CHEST_FALL = register("block.thick_cloud_chest.fall");
-    /** 开关盖（由 ThickCloudChestBlockEntity 播放，不经过原版的 CHEST_OPEN/CLOSE）。 */
-    public static final SoundEvent CHEST_OPEN = register("block.thick_cloud_chest.open");
-    public static final SoundEvent CHEST_CLOSE = register("block.thick_cloud_chest.close");
 
-    public static final SoundType CHEST_SOUND_TYPE =
-            new SoundType(1.0F, 1.0F, CHEST_BREAK, CHEST_STEP, CHEST_PLACE, CHEST_HIT, CHEST_FALL);
 
-    /** 厚云门：羊毛的放置/破坏音色（用户 2026-11-19：木门声太硬）。 */
-    public static final SoundEvent DOOR_OPEN = register("block.thick_cloud_door.open");
-    public static final SoundEvent DOOR_CLOSE = register("block.thick_cloud_door.close");
 
     public static final SoundType CLOUD_SOUND_TYPE =
             new SoundType(1.0F, 1.0F, CLOUD_BREAK, CLOUD_STEP, CLOUD_PLACE, CLOUD_HIT, CLOUD_FALL);
