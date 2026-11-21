@@ -287,7 +287,7 @@ public final class BrokenPortalTravel {
         // dimension: the broken dimension is empty today, but it will have sky islands later, and a
         // portal that happens to open on one of those must not get a plank under it either.
         int surface = findSurface(level, x0, z0, axis, y, w);
-        boolean needsPad = surface < 0;
+        boolean needsPad = surface == Integer.MIN_VALUE;
         // 诊断日志：建门时把"想要的高度 / 找到的地面 / 是否铺地台"记下来，
         // 排查落点问题时直接看 latest.log 里这一行即可。
         FlightRingMod.LOGGER.info("[CloudPortal] build dim={} wanted={} y={} surface={} pad={}",
@@ -360,7 +360,9 @@ public final class BrokenPortalTravel {
                 return probe;
             }
         }
-        return -1;
+        // ★ 必须用 MIN_VALUE 当哨兵：超平坦的地面是负数（约 -60），
+        // 以前返回 -1 会被 needsPad 误判成"没有地面"（用户 2026-11-21 实测）。
+        return Integer.MIN_VALUE;
     }
 
     /** True when every position under the frame's bottom row is solid, non-liquid ground. */
