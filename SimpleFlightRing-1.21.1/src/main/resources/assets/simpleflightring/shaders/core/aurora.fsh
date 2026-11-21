@@ -1,5 +1,11 @@
 #version 150
 
+// 直接把 Complementary Unbound 的极光算法搬过来做对照实验：
+//   shaders/lib/atmospherics/auroraBorealis.glsl -> GetAuroraBorealis()
+// 差异只有：gbufferModelViewInverse*viewPos -> rawDir（我们自己的世界方向），
+//           noisetex -> Sampler0（随机噪声贴图），cameraPosition/frameTimeCounter -> 0/Time。
+
+uniform sampler2D Sampler0;
 uniform float Time;
 
 in vec4 vertexColor;
@@ -7,48 +13,49 @@ in vec3 rawDir;
 
 out vec4 fragColor;
 
-float hash(vec2 p) {
-    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
-}
+const int sampleCount = 12;
+const int sampleCountP = sampleCount + 5;
+const float AURORA_SIZE = 1.0;
+const float AURORA_NOISE_SCALE = 1.0;
 
-float noise(vec2 p) {
-    vec2 i = floor(p);
-    vec2 f = fract(p);
-    vec2 u = f * f * (3.0 - 2.0 * f);
-    return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x),
-               mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x), u.y);
-}
-
-float fbm(vec2 p) {
-    float v = 0.0;
-    float a = 0.5;
-    for (int i = 0; i < 4; i++) {
-        v += a * noise(p);
-        p *= 2.0;
-        a *= 0.5;
-    }
-    return v;
+float hash12(vec2 p) {
+    vec3 p3 = fract(vec3(p.xyx) * 0.1031);
+    p3 += dot(p3, p3.yzx + 33.33);
+    return fract((p3.x + p3.y) * p3.z);
 }
 
 void main() {
-    // ★ 在片元里归一化，方向才在整个天空连续（否则四边形边界会露出来）
     vec3 dir = normalize(rawDir);
 
-    float ang = atan(dir.z, dir.x);
-    float h = dir.y;
+    // 光影里是 wpos.xz /= wpos.y（只在看天时有效）；这里把 y 夹到一个正数下限，
+    // 这样"地平线附近"也能算，不会除零炸掉。
+    float y = max(dir.y, 0.06);
+    vec2 wposXZ = dir.xz / y;
 
-    // 以"高度"为纵向坐标，做上下渐隐的带
-    float band = exp(-pow((h - 0.22) / 0.30, 2.0));
+    float dither = hash12(gl_FragCoord.xy);
+    float ditherM = dither * 5.0;
 
-    // 帘褶：不同尺度的噪声叠加，横向拉伸、纵向压缩
-    vec2 p = vec2(ang * 2.2 + Time * 0.03, h * 5.0 - Time * 0.02);
-    float n1 = fbm(p * vec2(2.0, 0.8));
-    float n2 = fbm(p * vec2(6.0, 2.2) + 11.3);
-    float curtain = smoothstep(0.30, 0.80, n1 * 0.6 + n2 * 0.4);
+    vec3 aurora = vec3(0.0);
+    vec3 auroraUp = vec3(112.0, 36.0, 192.0) / 255.0;   // [1] Complementary
+    vec3 auroraDown = vec3(96.0, 255.0, 192.0) / 255.0;
 
-    float a = vertexColor.a * curtain * band;
-    if (a < 0.004) {
-        discard;
+    for (int i = 0; i < sampleCount; i++) {
+        float current = pow((i + ditherM) / float(sampleCountP), 2.0);
+        vec2 planePos = wposXZ * (AURORA_SIZE * 0.8 + current) * 11.0 * AURORA_NOISE_SCALE;
+        planePos *= 0.0007;
+
+        float noise = texture(Sampler0, planePos * 0.05).r;
+        noise = pow(pow(pow(pow(1.0 - 2.0 * abs(noise - 0.5), 2.0), 2.0), 2.0), 2.0);
+        noise *= texture(Sampler0, planePos * 0.15 + Time * 0.02).b;
+        noise *= texture(Sampler0, planePos * 0.25 - Time * 0.015).b;
+
+        float currentM = 1.0 - current;
+        aurora += noise * currentM * mix(auroraUp, auroraDown, pow(currentM * currentM, 2.0));
     }
-    fragColor = vec4(vertexColor.rgb, a);
+
+    aurora *= 1.8;
+    aurora /= float(sampleCount);
+
+    // 上下渐隐由几何自身的 alpha 提供
+    fragColor = vec4(aurora, vertexColor.a * clamp(dot(aurora, vec3(0.4)), 0.0, 1.0) * 3.0);
 }

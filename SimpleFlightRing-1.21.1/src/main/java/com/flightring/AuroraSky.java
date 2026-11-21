@@ -36,6 +36,10 @@ public final class AuroraSky {
     /** 自定义 core shader：片元着色器里直接算噪声，避免顶点色面片的块状感。 */
     private static net.minecraft.client.renderer.ShaderInstance SHADER;
 
+    /** 随机噪声贴图（给片元着色器采样）。 */
+    private static final ResourceLocation NOISE_TEXTURE =
+            ResourceLocation.fromNamespaceAndPath(FlightRingMod.MODID, "textures/noise.png");
+
     private static final ResourceLocation AURORA_BIOME =
             ResourceLocation.fromNamespaceAndPath(FlightRingMod.MODID, "aurora");
 
@@ -130,6 +134,7 @@ public final class AuroraSky {
         RenderSystem.setShader(() -> SHADER);
 
         if (SHADER != null) {
+            RenderSystem.setShaderTexture(0, NOISE_TEXTURE);
             var timeUniform = SHADER.safeGetUniform("Time");
             if (timeUniform != null) {
                 timeUniform.set(time / 20.0F);
