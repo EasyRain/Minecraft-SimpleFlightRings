@@ -363,5 +363,7 @@
   "block.simpleflightring.cloud_door": "Cloud Door",
   "block.simpleflightring.cloud_trapdoor": "Cloud Trapdoor",
   "block.simpleflightring.cloud_button": "Cloud Button",
-  "block.simpleflightring.cloud_pressure_plate": "Cloud Pressure Plate"
+  "block.simpleflightring.cloud_pressure_plate": "Cloud Pressure Plate",
+  "block.simpleflightring.stripped_cloud_log": "Stripped Cloud Log",
+  "block.simpleflightring.stripped_cloud_wood": "Stripped Cloud Wood"
 }

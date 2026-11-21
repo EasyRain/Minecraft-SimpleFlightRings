@@ -152,6 +152,19 @@ public final class ModBlocks {
             RotatedPillarBlock::new,
             properties -> properties.strength(2.0F).sound(SoundType.WOOD));
 
+
+    /** 去皮云木原木：用斧头给云木原木去皮得到。 */
+    public static final DeferredBlock<Block> STRIPPED_CLOUD_LOG = BLOCKS.registerBlock(
+            "stripped_cloud_log",
+            RotatedPillarBlock::new,
+            properties -> properties.strength(2.0F).sound(SoundType.WOOD));
+
+    /** 去皮云木。 */
+    public static final DeferredBlock<Block> STRIPPED_CLOUD_WOOD = BLOCKS.registerBlock(
+            "stripped_cloud_wood",
+            RotatedPillarBlock::new,
+            properties -> properties.strength(2.0F).sound(SoundType.WOOD));
+
     /** 云母木板。 */
     public static final DeferredBlock<Block> CLOUD_PLANKS = BLOCKS.registerBlock(
             "cloud_planks",

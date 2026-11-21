@@ -33,6 +33,8 @@ public class ModCreativeTabs {
                         output.accept(new ItemStack(ModItems.CLOUD_WOOD_ITEM.get()));
                         output.accept(new ItemStack(ModItems.CLOUD_PLANKS_ITEM.get()));
                         output.accept(new ItemStack(ModItems.CLOUD_LEAVES_ITEM.get()));
+                        output.accept(new ItemStack(ModItems.STRIPPED_CLOUD_LOG_ITEM.get()));
+                        output.accept(new ItemStack(ModItems.STRIPPED_CLOUD_WOOD_ITEM.get()));
                         output.accept(new ItemStack(ModItems.CLOUD_SAPLING_ITEM.get()));
                         // 云母木变体（M5）
                         output.accept(new ItemStack(ModItems.CLOUD_STAIRS_ITEM.get()));

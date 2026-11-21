@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=y": {
+      "model": "simpleflightring:block/stripped_cloud_wood"
+    },
+    "axis=z": {
+      "model": "simpleflightring:block/stripped_cloud_wood_horizontal",
+      "x": 90
+    },
+    "axis=x": {
+      "model": "simpleflightring:block/stripped_cloud_wood_horizontal",
+      "x": 90,
+      "y": 90
+    }
+  }
+}

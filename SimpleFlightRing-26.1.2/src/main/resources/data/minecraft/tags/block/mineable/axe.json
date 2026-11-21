@@ -11,6 +11,8 @@
     "simpleflightring:cloud_door",
     "simpleflightring:cloud_trapdoor",
     "simpleflightring:cloud_button",
-    "simpleflightring:cloud_pressure_plate"
+    "simpleflightring:cloud_pressure_plate",
+    "simpleflightring:stripped_cloud_log",
+    "simpleflightring:stripped_cloud_wood"
   ]
 }
