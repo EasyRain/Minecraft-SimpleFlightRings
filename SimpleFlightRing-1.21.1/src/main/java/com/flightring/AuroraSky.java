@@ -33,6 +33,9 @@ public final class AuroraSky {
 
     private static final ResourceLocation TEXTURE =
             ResourceLocation.fromNamespaceAndPath(FlightRingMod.MODID, "textures/environment/aurora.png");
+    /** 自定义 core shader：片元着色器里直接算噪声，避免顶点色面片的块状感。 */
+    private static net.minecraft.client.renderer.ShaderInstance SHADER;
+
     private static final ResourceLocation AURORA_BIOME =
             ResourceLocation.fromNamespaceAndPath(FlightRingMod.MODID, "aurora");
 
@@ -44,6 +47,18 @@ public final class AuroraSky {
     private static int lastLoggedTick = -1000;
 
     private AuroraSky() {
+    }
+
+    @SubscribeEvent
+    public static void onRegisterShaders(net.neoforged.neoforge.client.event.RegisterShadersEvent event) {
+        try {
+            event.registerShader(new net.minecraft.client.renderer.ShaderInstance(
+                    event.getResourceProvider(), "simpleflightring:aurora",
+                    com.mojang.blaze3d.vertex.DefaultVertexFormat.POSITION_COLOR),
+                    shader -> SHADER = shader);
+        } catch (java.io.IOException e) {
+            FlightRingMod.LOGGER.error("[Aurora] failed to load shader", e);
+        }
     }
 
     @SubscribeEvent
@@ -109,7 +124,14 @@ public final class AuroraSky {
         RenderSystem.disableCull();
         RenderSystem.depthMask(false);
         RenderSystem.disableDepthTest();
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        RenderSystem.setShader(() -> SHADER);
+
+        if (SHADER != null) {
+            var timeUniform = SHADER.safeGetUniform("Time");
+            if (timeUniform != null) {
+                timeUniform.set(time / 20.0F);
+            }
+        }
 
         poseStack.pushPose();
         poseStack.mulPose(new org.joml.Quaternionf(cameraRotation).conjugate());
@@ -133,8 +155,8 @@ public final class AuroraSky {
     private static void drawBand(PoseStack poseStack, float time, float radius, float yShift,
                                  float strength, float waviness) {
         // 段数/行数要够密，否则每格之间的透明度差会看成一格一格的方块（用户 2026-11-21）
-        final int steps = 288;
-        final int rows = 20;
+        final int steps = 96;
+        final int rows = 8;
         // 垂到相机高度以下：半径 300 时，-140~110 格约对应 -25°~+20° 仰角
         final float bandBottom = -140.0F + yShift;
         final float bandTop = 110.0F + yShift;
@@ -161,10 +183,10 @@ public final class AuroraSky {
                 float t1 = (r + 1) / (float) rows;
                 float p0 = gaussianProfile(t0);
                 float p1 = gaussianProfile(t1);
-                float a00 = w0 * p0 * strength * 0.55F;
-                float a10 = w1 * p0 * strength * 0.55F;
-                float a11 = w1 * p1 * strength * 0.55F;
-                float a01 = w0 * p1 * strength * 0.55F;
+                float a00 = strength;
+                float a10 = strength;
+                float a11 = strength;
+                float a01 = strength;
                 if (a00 + a10 + a11 + a01 < 0.004F) {
                     continue;
                 }
