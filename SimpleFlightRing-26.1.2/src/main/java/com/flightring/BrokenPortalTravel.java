@@ -287,7 +287,8 @@ public final class BrokenPortalTravel {
         if (!needsPad) {
             // 门框底边**嵌进地面一格**，这样门洞的地板正好和周围地面齐平
             //（用户 2026-11-20：之前底边浮在地面上，进门要先跳一格）。
-            y = surface - 1;
+            // 但不许替换世界最底层：单层基岩的世界里这样会打穿底部（用户 2026-11-21）。
+            y = Math.max(surface - 1, level.getMinY() + 1);
         }
         int perpFrom = needsPad ? -1 : 0;
         int perpTo = needsPad ? 1 : 0;
