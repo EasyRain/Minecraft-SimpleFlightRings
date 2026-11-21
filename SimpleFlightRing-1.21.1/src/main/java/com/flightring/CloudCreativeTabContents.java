@@ -44,6 +44,7 @@ public final class CloudCreativeTabContents {
         accept(event, ModItems.CLOUD_TRAPDOOR_ITEM.get());
         accept(event, ModItems.CLOUD_BUTTON_ITEM.get());
         accept(event, ModItems.CLOUD_PRESSURE_PLATE_ITEM.get());
+        accept(event, ModItems.CLOUD_SIGN_ITEM.get());
         // 厚云材料（M1/M2）
         accept(event, ModItems.THICK_CLOUD_BLOCK_ITEM.get());
         accept(event, ModItems.THICK_CLOUD_BRICKS_ITEM.get());

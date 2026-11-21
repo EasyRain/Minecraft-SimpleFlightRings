@@ -354,5 +354,7 @@
   "block.simpleflightring.cloud_button": "Cloud Wood Button",
   "block.simpleflightring.cloud_pressure_plate": "Cloud Wood Pressure Plate",
   "block.simpleflightring.stripped_cloud_log": "Stripped Cloud Log",
-  "block.simpleflightring.stripped_cloud_wood": "Stripped Cloud Wood"
+  "block.simpleflightring.stripped_cloud_wood": "Stripped Cloud Wood",
+  "block.simpleflightring.cloud_sign": "Cloud Wood Sign",
+  "block.simpleflightring.cloud_wall_sign": "Cloud Wood Sign"
 }

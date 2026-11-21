@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "###",
+    "###",
+    " X "
+  ],
+  "key": {
+    "#": "simpleflightring:cloud_planks",
+    "X": "minecraft:stick"
+  },
+  "result": {
+    "count": 3,
+    "id": "simpleflightring:cloud_sign"
+  }
+}

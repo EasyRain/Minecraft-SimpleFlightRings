@@ -218,6 +218,19 @@ public final class ModBlocks {
             BlockBehaviour.Properties.of().noCollission().strength(0.5F)
                     .pushReaction(PushReaction.DESTROY).sound(SoundType.WOOD));
 
+
+    /** 云木告示牌（立式）。 */
+    public static final DeferredBlock<Block> CLOUD_SIGN = BLOCKS.registerBlock(
+            "cloud_sign",
+            properties -> new net.minecraft.world.level.block.StandingSignBlock(CloudWoodTypes.CLOUD_WOOD_TYPE, properties),
+            BlockBehaviour.Properties.of().strength(1.0F).sound(SoundType.WOOD).noCollission());
+
+    /** 云木告示牌（墙式）。 */
+    public static final DeferredBlock<Block> CLOUD_WALL_SIGN = BLOCKS.registerBlock(
+            "cloud_wall_sign",
+            properties -> new net.minecraft.world.level.block.WallSignBlock(CloudWoodTypes.CLOUD_WOOD_TYPE, properties),
+            BlockBehaviour.Properties.of().strength(1.0F).sound(SoundType.WOOD).noCollission());
+
     /** 云树苗：能种在土上，也能直接种在厚云块上。 */
     public static final DeferredBlock<Block> CLOUD_SAPLING = BLOCKS.registerBlock(
             "cloud_sapling",

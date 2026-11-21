@@ -354,5 +354,7 @@
   "block.simpleflightring.cloud_button": "云木按钮",
   "block.simpleflightring.cloud_pressure_plate": "云木压力板",
   "block.simpleflightring.stripped_cloud_log": "去皮云木原木",
-  "block.simpleflightring.stripped_cloud_wood": "去皮云木"
+  "block.simpleflightring.stripped_cloud_wood": "去皮云木",
+  "block.simpleflightring.cloud_sign": "云木告示牌",
+  "block.simpleflightring.cloud_wall_sign": "云木告示牌"
 }

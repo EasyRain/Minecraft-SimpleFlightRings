@@ -13,6 +13,8 @@
     "simpleflightring:cloud_button",
     "simpleflightring:cloud_pressure_plate",
     "simpleflightring:stripped_cloud_log",
-    "simpleflightring:stripped_cloud_wood"
+    "simpleflightring:stripped_cloud_wood",
+    "simpleflightring:cloud_sign",
+    "simpleflightring:cloud_wall_sign"
   ]
 }

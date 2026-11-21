@@ -38,6 +38,25 @@ public class CloudPortalBlock extends BrokenPortalBlock {
         return true;
     }
 
+    /**
+     * 云门的粒子：淡蓝色的云屑 + 偶尔的白色光点，比下界门的紫色安静一些。
+     */
+    @Override
+    public void animateTick(BlockState state, Level level, BlockPos pos, net.minecraft.util.RandomSource random) {
+        int count = random.nextInt(3);
+        for (int i = 0; i < count; i++) {
+            double x = pos.getX() + random.nextDouble();
+            double y = pos.getY() + random.nextDouble();
+            double z = pos.getZ() + random.nextDouble();
+            level.addParticle(net.minecraft.core.particles.ParticleTypes.CLOUD, x, y, z,
+                    (random.nextDouble() - 0.5) * 0.05, 0.02, (random.nextDouble() - 0.5) * 0.05);
+            if (random.nextInt(4) == 0) {
+                level.addParticle(net.minecraft.core.particles.ParticleTypes.END_ROD, x, y, z,
+                        (random.nextDouble() - 0.5) * 0.02, 0.04, (random.nextDouble() - 0.5) * 0.02);
+            }
+        }
+    }
+
     @Nullable
     @Override
     public TeleportTransition getPortalDestination(ServerLevel level, Entity entity, BlockPos pos) {
