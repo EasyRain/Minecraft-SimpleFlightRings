@@ -77,6 +77,22 @@ public class ModItems {
             ITEMS.registerSimpleBlockItem("cloud_leaves", () -> ModBlocks.CLOUD_LEAVES.get());
     public static final DeferredItem<BlockItem> CLOUD_SAPLING_ITEM =
             ITEMS.registerSimpleBlockItem("cloud_sapling", () -> ModBlocks.CLOUD_SAPLING.get());
+    public static final DeferredItem<BlockItem> CLOUD_STAIRS_ITEM =
+            ITEMS.registerSimpleBlockItem("cloud_stairs", () -> ModBlocks.CLOUD_STAIRS.get());
+    public static final DeferredItem<BlockItem> CLOUD_SLAB_ITEM =
+            ITEMS.registerSimpleBlockItem("cloud_slab", () -> ModBlocks.CLOUD_SLAB.get());
+    public static final DeferredItem<BlockItem> CLOUD_FENCE_ITEM =
+            ITEMS.registerSimpleBlockItem("cloud_fence", () -> ModBlocks.CLOUD_FENCE.get());
+    public static final DeferredItem<BlockItem> CLOUD_FENCE_GATE_ITEM =
+            ITEMS.registerSimpleBlockItem("cloud_fence_gate", () -> ModBlocks.CLOUD_FENCE_GATE.get());
+    public static final DeferredItem<BlockItem> CLOUD_DOOR_ITEM =
+            ITEMS.registerSimpleBlockItem("cloud_door", () -> ModBlocks.CLOUD_DOOR.get());
+    public static final DeferredItem<BlockItem> CLOUD_TRAPDOOR_ITEM =
+            ITEMS.registerSimpleBlockItem("cloud_trapdoor", () -> ModBlocks.CLOUD_TRAPDOOR.get());
+    public static final DeferredItem<BlockItem> CLOUD_BUTTON_ITEM =
+            ITEMS.registerSimpleBlockItem("cloud_button", () -> ModBlocks.CLOUD_BUTTON.get());
+    public static final DeferredItem<BlockItem> CLOUD_PRESSURE_PLATE_ITEM =
+            ITEMS.registerSimpleBlockItem("cloud_pressure_plate", () -> ModBlocks.CLOUD_PRESSURE_PLATE.get());
     public static final DeferredItem<BlockItem> THICK_CLOUD_BLOCK_ITEM =
             ITEMS.registerSimpleBlockItem("thick_cloud_block", () -> ModBlocks.THICK_CLOUD_BLOCK.get());
     public static final DeferredItem<BlockItem> THICK_CLOUD_BRICKS_ITEM =

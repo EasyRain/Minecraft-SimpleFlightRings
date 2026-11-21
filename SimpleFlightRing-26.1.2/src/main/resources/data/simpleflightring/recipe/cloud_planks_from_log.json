@@ -2,9 +2,7 @@
   "type": "minecraft:crafting_shapeless",
   "category": "building",
   "ingredients": [
-    {
-      "item": "simpleflightring:cloud_log"
-    }
+    "simpleflightring:cloud_log"
   ],
   "result": {
     "count": 4,

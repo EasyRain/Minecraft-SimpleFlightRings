@@ -6,12 +6,8 @@
     "#/#"
   ],
   "key": {
-    "#": {
-      "item": "simpleflightring:cloud_planks"
-    },
-    "/": {
-      "item": "minecraft:stick"
-    }
+    "#": "simpleflightring:cloud_planks",
+    "/": "minecraft:stick"
   },
   "result": {
     "count": 1,

@@ -6,9 +6,7 @@
     "##"
   ],
   "key": {
-    "#": {
-      "item": "simpleflightring:cloud_log"
-    }
+    "#": "simpleflightring:cloud_log"
   },
   "result": {
     "count": 3,
