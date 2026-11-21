@@ -2,11 +2,11 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "#": {
-      "item": "simpleflightring:thick_cloud_bricks"
-    },
     "X": {
-      "item": "simpleflightring:thick_cloud_block"
+      "item": "simpleflightring:cloud_block"
+    },
+    "#": {
+      "item": "simpleflightring:cloud_planks"
     }
   },
   "pattern": [

@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "#": "simpleflightring:thick_cloud_block"
+    "#": "simpleflightring:cloud_planks"
   },
   "pattern": [
     "###",
