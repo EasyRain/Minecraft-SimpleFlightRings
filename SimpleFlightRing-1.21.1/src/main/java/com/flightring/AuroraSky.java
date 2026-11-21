@@ -40,6 +40,9 @@ public final class AuroraSky {
     private static final float HEIGHT = 120.0F;
     private static final float RADIUS = 260.0F;
 
+    /** 日志限流用（每 10 秒最多打一行）。 */
+    private static int lastLoggedTick = -1000;
+
     private AuroraSky() {
     }
 
@@ -70,6 +73,10 @@ public final class AuroraSky {
         if (!inAuroraBiome(minecraft, cameraPos)) {
             return;
         }
+        if (ticks - lastLoggedTick > 200) {
+            lastLoggedTick = ticks;
+            FlightRingMod.LOGGER.info("[Aurora] drawing at camera={} darken={}", cameraPos, darken);
+        }
         drawRibbon(event.getPoseStack(), cameraPos, ticks + partialTick, darken);
     }
 
@@ -90,7 +97,9 @@ public final class AuroraSky {
         RenderSystem.setShaderTexture(0, TEXTURE);
 
         poseStack.pushPose();
-        poseStack.translate(-cameraPos.x, HEIGHT - cameraPos.y, -cameraPos.z);
+        // AFTER_SKY 阶段的 PoseStack 已经是相机相对坐标（原版天空就是在原点画的），
+        // 这里只需要抬高到头顶，不能再减 cameraPos —— 之前那样会把光带推到地平线以下，看不见。
+        poseStack.translate(0.0F, HEIGHT, 0.0F);
 
         float alpha = 0.55F * darken;
         drawLayer(poseStack, time * 0.35F, 0.0F, RADIUS, alpha);
