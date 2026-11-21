@@ -3,7 +3,7 @@
 uniform float Time;
 
 in vec4 vertexColor;
-in vec3 worldDir;
+in vec3 rawDir;
 
 out vec4 fragColor;
 
@@ -31,19 +31,20 @@ float fbm(vec2 p) {
 }
 
 void main() {
-    // 把方向投影到"天空平面"上做噪声：水平角 + 高度，纹理就自然随视角连续
-    float ang = atan(worldDir.z, worldDir.x);
-    float h = clamp(worldDir.y * 2.0 + 0.5, 0.0, 1.0);
+    // ★ 在片元里归一化，方向才在整个天空连续（否则四边形边界会露出来）
+    vec3 dir = normalize(rawDir);
 
-    vec2 p = vec2(ang * 1.6 + Time * 0.02, h * 2.4 + Time * 0.01);
+    float ang = atan(dir.z, dir.x);
+    float h = dir.y;
 
-    // 竖向条纹：在不同尺度上取噪声，做出"帘褶"
-    float n1 = fbm(p * vec2(3.0, 1.2));
-    float n2 = fbm(p * vec2(9.0, 3.0) + 13.7);
-    float curtain = smoothstep(0.35, 0.85, n1 * 0.65 + n2 * 0.35);
+    // 以"高度"为纵向坐标，做上下渐隐的带
+    float band = exp(-pow((h - 0.22) / 0.30, 2.0));
 
-    // 上下柔和淡出（高斯）
-    float band = exp(-pow((h - 0.45) / 0.30, 2.0));
+    // 帘褶：不同尺度的噪声叠加，横向拉伸、纵向压缩
+    vec2 p = vec2(ang * 2.2 + Time * 0.03, h * 5.0 - Time * 0.02);
+    float n1 = fbm(p * vec2(2.0, 0.8));
+    float n2 = fbm(p * vec2(6.0, 2.2) + 11.3);
+    float curtain = smoothstep(0.30, 0.80, n1 * 0.6 + n2 * 0.4);
 
     float a = vertexColor.a * curtain * band;
     if (a < 0.004) {
