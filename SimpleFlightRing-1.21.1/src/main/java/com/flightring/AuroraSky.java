@@ -93,13 +93,14 @@ public final class AuroraSky {
     /**
      * 画极光。
      * <p>
-     * 关键经验（用户 2026-11-21 两轮反馈）：
+     * 参考 {@code Auroras} 的预览图：它是一条**横贯天空的彩色光带** —— 中间一条亮芯，
+     * 上下柔和地淡出，而不是竖直帘幕或头顶光斑。所以这里：
      * <ul>
-     *   <li>整圈画在头顶 ⇒ 从下面看就是一个"镜片光斑"，不像极光；</li>
-     *   <li>所以要画**一段远处的巨大竖幕**（像真实极光那样挂在一侧天空），
-     *       高度远大于宽度、下缘接近地平线、上缘很高。</li>
+     *   <li>画一段**很宽**的圆弧（≈240°）当作"带子"；</li>
+     *   <li>竖直方向只占 90~220 格，亮度用**高斯**剖面，中间最亮、上下渐隐；</li>
+     *   <li>沿弧的强度用几层低频正弦做明暗起伏，边缘平滑、不断开；</li>
+     *   <li>颜色：亮芯偏绿、两侧偏青蓝。</li>
      * </ul>
-     * 参考 {@code Auroras} 的做法：不用贴图，顶点色 + 加法混合，强度和颜色都由方程算。
      */
     private static void drawRibbon(PoseStack poseStack, Vec3 cameraPos, float time, float darken,
                                    org.joml.Quaternionf cameraRotation) {
@@ -115,9 +116,9 @@ public final class AuroraSky {
         poseStack.translate(0.0F, HEIGHT, 0.0F);
 
         float seconds = time / 20.0F;
-        // 北边一段主幕 + 稍偏东一段更淡的副幕（副幕更远、更淡，制造层次）
-        drawCurtain(poseStack, seconds, -Math.PI / 2.0, 2.6, 340.0F, 1.0F);
-        drawCurtain(poseStack, seconds * 0.75F + 21.0F, -Math.PI / 2.0 + 0.55, 2.1, 430.0F, 0.55F);
+        // 主带 + 更外圈一条更淡的宽带，制造层次
+        drawBand(poseStack, seconds, 300.0F, 0.0F, 1.0F);
+        drawBand(poseStack, seconds * 0.8F + 17.0F, 380.0F, 26.0F, 0.5F);
 
         poseStack.popPose();
 
@@ -127,34 +128,24 @@ public final class AuroraSky {
         RenderSystem.disableBlend();
     }
 
-    /**
-     * 一段弧形竖幕：{@code center} 是弧的中心方位角，{@code width} 是跨度（弧度）。
-     * 竖直方向从地平线下方一直拉到很高，形成"挂在天边"的帘子。
-     */
-    private static void drawCurtain(PoseStack poseStack, float time, double center, double width,
-                                    float radius, float strength) {
-        final int steps = 96;
-        final int rows = 10;
-        final float bottomY = -90.0F;
-        final float topY = 260.0F;
+    /** 一圈光带（横贯天空的弧），竖直方向用高斯剖面。 */
+    private static void drawBand(PoseStack poseStack, float time, float radius, float yShift, float strength) {
+        final int steps = 160;
+        final int rows = 7;
+        final float bandBottom = 90.0F + yShift;
+        final float bandTop = 230.0F + yShift;
 
         Tesselator tesselator = Tesselator.getInstance();
         BufferBuilder buffer = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
 
         for (int i = 0; i < steps; i++) {
-            double a0 = center - width / 2.0 + width * i / steps;
-            double a1 = center - width / 2.0 + width * (i + 1) / steps;
-            float w0 = wave(time, a0);
-            float w1 = wave(time, a1);
-            if (w0 + w1 < 0.02F) {
+            double a0 = Math.PI * 2.0 * i / steps;
+            double a1 = Math.PI * 2.0 * (i + 1) / steps;
+            float w0 = arcIntensity(time, a0);
+            float w1 = arcIntensity(time, a1);
+            if (w0 + w1 < 0.03F) {
                 continue;
             }
-            // 弧的两端自然收薄
-            float edge0 = (float) Math.sin(Math.PI * (i + 0.5) / steps);
-            float edge1 = (float) Math.sin(Math.PI * (i + 1.5) / steps);
-            w0 *= edge0;
-            w1 *= edge1;
-
             float x0 = (float) Math.cos(a0) * radius;
             float z0 = (float) Math.sin(a0) * radius;
             float x1 = (float) Math.cos(a1) * radius;
@@ -163,24 +154,26 @@ public final class AuroraSky {
             for (int r = 0; r < rows; r++) {
                 float t0 = r / (float) rows;
                 float t1 = (r + 1) / (float) rows;
-                float p0 = verticalProfile(t0);
-                float p1 = verticalProfile(t1);
-                float a00 = w0 * p0 * strength * 0.30F;
-                float a10 = w1 * p0 * strength * 0.30F;
-                float a11 = w1 * p1 * strength * 0.30F;
-                float a01 = w0 * p1 * strength * 0.30F;
+                float p0 = gaussianProfile(t0);
+                float p1 = gaussianProfile(t1);
+                float a00 = w0 * p0 * strength * 0.55F;
+                float a10 = w1 * p0 * strength * 0.55F;
+                float a11 = w1 * p1 * strength * 0.55F;
+                float a01 = w0 * p1 * strength * 0.55F;
                 if (a00 + a10 + a11 + a01 < 0.004F) {
                     continue;
                 }
-                float y0 = bottomY + (topY - bottomY) * t0;
-                float y1 = bottomY + (topY - bottomY) * t1;
-                // 下缘偏青白、上缘偏绿（真实极光下缘更亮更白）
-                float r0 = 0.55F - 0.25F * t0;
-                float g0 = 1.0F - 0.15F * t0;
-                float b0 = 0.95F - 0.45F * t0;
-                float r1 = 0.55F - 0.25F * t1;
-                float g1 = 1.0F - 0.15F * t1;
-                float b1 = 0.95F - 0.45F * t1;
+                float y0 = bandBottom + (bandTop - bandBottom) * t0;
+                float y1 = bandBottom + (bandTop - bandBottom) * t1;
+                // 亮芯偏绿、上下两侧偏青蓝
+                float core0 = coreWeight(t0);
+                float core1 = coreWeight(t1);
+                float r0 = 0.30F - 0.12F * core0;
+                float g0 = 0.65F + 0.35F * core0;
+                float b0 = 0.85F - 0.35F * core0;
+                float r1 = 0.30F - 0.12F * core1;
+                float g1 = 0.65F + 0.35F * core1;
+                float b1 = 0.85F - 0.35F * core1;
 
                 var pose = poseStack.last().pose();
                 buffer.addVertex(pose, x0, y0, z0).setColor(r0, g0, b0, a00);
@@ -192,27 +185,25 @@ public final class AuroraSky {
         com.mojang.blaze3d.vertex.BufferUploader.drawWithShader(buffer.buildOrThrow());
     }
 
-    /** 某个角度上的帘幕强度：几层慢速正弦叠加，再乘一个"带状"窗函数，两端自然为 0。 */
-    private static float wave(float time, double angle) {
+    /** 光带沿弧的强度：几层低频正弦，保持连续（不断开），只做明暗起伏。 */
+    private static float arcIntensity(float time, double angle) {
         double a = angle;
-        double w = Math.sin(a * 3.0 + time * 0.05) * 0.30
-                + Math.sin(a * 11.0 - time * 0.03 + 1.7) * 0.35
-                + Math.sin(a * 23.0 + time * 0.02 + 4.1) * 0.20
-                + Math.sin(a * 2.0 + time * 0.017) * 0.15;
-        float v = (float) Math.max(0.0, (w + 0.55) / 1.15);
-        return v * v;
+        double w = Math.sin(a * 2.0 + time * 0.03) * 0.35
+                + Math.sin(a * 5.0 - time * 0.02 + 1.3) * 0.25
+                + Math.sin(a * 13.0 + time * 0.05 + 2.7) * 0.12;
+        return (float) (0.55 + 0.45 * w);
     }
 
-    /**
-     * 竖直亮度剖面：**下缘最亮，向上迅速变淡**，顶部完全消失（真实极光的样子）。
-     */
-    private static float verticalProfile(float t) {
-        if (t <= 0.0F || t >= 1.0F) {
-            return 0.0F;
-        }
-        float fadeUp = (float) Math.pow(1.0F - t, 2.2);
-        float fadeBottom = Math.min(1.0F, t / 0.10F);
-        return fadeUp * fadeBottom;
+    /** 竖直方向的高斯剖面：中间最亮，上下柔和淡出。 */
+    private static float gaussianProfile(float t) {
+        float d = (t - 0.5F) / 0.34F;
+        return (float) Math.exp(-d * d);
+    }
+
+    /** 越靠近亮芯越绿，两侧偏青。 */
+    private static float coreWeight(float t) {
+        float d = (t - 0.5F) / 0.26F;
+        return (float) Math.exp(-d * d);
     }
 
     /** 两端下垂的弧度。 */
