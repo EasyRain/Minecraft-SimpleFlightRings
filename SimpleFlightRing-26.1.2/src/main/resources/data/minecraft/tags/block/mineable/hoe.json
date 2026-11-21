@@ -1,9 +1,6 @@
 {
   "replace": false,
   "values": [
-    "simpleflightring:cloud_leaves",
-    "simpleflightring:cloud_block_slab",
-    "simpleflightring:cloud_block_stairs",
-    "simpleflightring:cloud_block_wall"
+    "simpleflightring:cloud_leaves"
   ]
 }

@@ -1,0 +1,13 @@
+{
+  "replace": false,
+  "values": [
+    "simpleflightring:cloud_block",
+    "simpleflightring:cloud_block_slab",
+    "simpleflightring:cloud_block_stairs",
+    "simpleflightring:cloud_block_wall",
+    "simpleflightring:thick_cloud_block",
+    "simpleflightring:thick_cloud_slab",
+    "simpleflightring:thick_cloud_stairs",
+    "simpleflightring:thick_cloud_wall"
+  ]
+}

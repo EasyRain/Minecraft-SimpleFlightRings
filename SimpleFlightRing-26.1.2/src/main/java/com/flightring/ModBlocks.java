@@ -49,7 +49,7 @@ public final class ModBlocks {
     public static final DeferredBlock<Block> CLOUD_BLOCK = BLOCKS.registerBlock(
             "cloud_block",
             CloudBlock::new,
-            properties -> properties.strength(0.2F)
+            properties -> properties.strength(0.5F)
                     .sound(ModSounds.CLOUD_SOUND_TYPE)
                     .noOcclusion()
                     .isSuffocating((state, level, pos) -> false)
@@ -66,7 +66,7 @@ public final class ModBlocks {
     public static final DeferredBlock<Block> THICK_CLOUD_BLOCK = BLOCKS.registerBlock(
             "thick_cloud_block",
             ThickCloudBlock::new,
-            properties -> properties.strength(0.6F)
+            properties -> properties.strength(2.0F)
                     .sound(ModSounds.THICK_SOUND_TYPE)
                     .isViewBlocking((state, level, pos) -> false));
 
@@ -240,7 +240,7 @@ public final class ModBlocks {
     public static final DeferredBlock<Block> CLOUD_BLOCK_SLAB = BLOCKS.registerBlock(
             "cloud_block_slab",
             CloudSlabBlock::new,
-            properties -> properties.strength(0.2F)
+            properties -> properties.strength(0.5F)
                     .sound(ModSounds.CLOUD_SOUND_TYPE)
                     .noOcclusion()
                     .isSuffocating((state, level, pos) -> false)
@@ -250,7 +250,7 @@ public final class ModBlocks {
     public static final DeferredBlock<Block> CLOUD_BLOCK_STAIRS = BLOCKS.registerBlock(
             "cloud_block_stairs",
             properties -> new CloudStairBlock(ModBlocks.CLOUD_BLOCK.get().defaultBlockState(), properties),
-            properties -> properties.strength(0.2F)
+            properties -> properties.strength(0.5F)
                     .sound(ModSounds.CLOUD_SOUND_TYPE)
                     .noOcclusion()
                     .isSuffocating((state, level, pos) -> false)
@@ -260,7 +260,7 @@ public final class ModBlocks {
     public static final DeferredBlock<Block> CLOUD_BLOCK_WALL = BLOCKS.registerBlock(
             "cloud_block_wall",
             CloudWallBlock::new,
-            properties -> properties.strength(0.2F)
+            properties -> properties.strength(0.5F)
                     .sound(ModSounds.CLOUD_SOUND_TYPE)
                     .noOcclusion()
                     .isSuffocating((state, level, pos) -> false)

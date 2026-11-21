@@ -50,7 +50,7 @@ public final class ModBlocks {
     public static final DeferredBlock<Block> CLOUD_BLOCK = BLOCKS.registerBlock(
             "cloud_block",
             CloudBlock::new,
-            BlockBehaviour.Properties.of().strength(0.2F)
+            BlockBehaviour.Properties.of().strength(0.5F)
                     .sound(ModSounds.CLOUD_SOUND_TYPE)
                     .noOcclusion()
                     .isSuffocating((state, level, pos) -> false)
@@ -67,7 +67,7 @@ public final class ModBlocks {
     public static final DeferredBlock<Block> THICK_CLOUD_BLOCK = BLOCKS.registerBlock(
             "thick_cloud_block",
             ThickCloudBlock::new,
-            BlockBehaviour.Properties.of().strength(0.6F)
+            BlockBehaviour.Properties.of().strength(2.0F)
                     .sound(ModSounds.THICK_SOUND_TYPE)
                     .isViewBlocking((state, level, pos) -> false));
 
@@ -248,7 +248,7 @@ public final class ModBlocks {
     public static final DeferredBlock<Block> CLOUD_BLOCK_SLAB = BLOCKS.registerBlock(
             "cloud_block_slab",
             CloudSlabBlock::new,
-            BlockBehaviour.Properties.of().strength(0.2F)
+            BlockBehaviour.Properties.of().strength(0.5F)
                     .sound(ModSounds.CLOUD_SOUND_TYPE)
                     .noOcclusion()
                     .isSuffocating((state, level, pos) -> false)
@@ -258,7 +258,7 @@ public final class ModBlocks {
     public static final DeferredBlock<Block> CLOUD_BLOCK_STAIRS = BLOCKS.registerBlock(
             "cloud_block_stairs",
             properties -> new CloudStairBlock(ModBlocks.CLOUD_BLOCK.get().defaultBlockState(), properties),
-            BlockBehaviour.Properties.of().strength(0.2F)
+            BlockBehaviour.Properties.of().strength(0.5F)
                     .sound(ModSounds.CLOUD_SOUND_TYPE)
                     .noOcclusion()
                     .isSuffocating((state, level, pos) -> false)
@@ -268,7 +268,7 @@ public final class ModBlocks {
     public static final DeferredBlock<Block> CLOUD_BLOCK_WALL = BLOCKS.registerBlock(
             "cloud_block_wall",
             CloudWallBlock::new,
-            BlockBehaviour.Properties.of().strength(0.2F)
+            BlockBehaviour.Properties.of().strength(0.5F)
                     .sound(ModSounds.CLOUD_SOUND_TYPE)
                     .noOcclusion()
                     .isSuffocating((state, level, pos) -> false)
