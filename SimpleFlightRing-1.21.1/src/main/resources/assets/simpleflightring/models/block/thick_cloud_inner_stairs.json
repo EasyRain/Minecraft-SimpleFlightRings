@@ -1,0 +1,8 @@
+{
+  "parent": "simpleflightring:block/tinted_inner_stairs",
+  "textures": {
+    "bottom": "simpleflightring:block/thick_cloud_block",
+    "top": "simpleflightring:block/thick_cloud_block",
+    "side": "simpleflightring:block/thick_cloud_block"
+  }
+}

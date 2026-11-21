@@ -1,5 +1,5 @@
 {
-  "parent": "minecraft:block/template_wall_post",
+  "parent": "simpleflightring:block/tinted_wall_post",
   "textures": {
     "wall": "simpleflightring:block/thick_cloud_block"
   }

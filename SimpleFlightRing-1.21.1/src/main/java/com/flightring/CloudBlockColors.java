@@ -68,6 +68,10 @@ public final class CloudBlockColors {
                 ModBlocks.CLOUD_BLOCK.get(),
                 ModBlocks.CLOUD_BLOCK_SLAB.get(),
                 ModBlocks.CLOUD_BLOCK_STAIRS.get(),
-                ModBlocks.CLOUD_BLOCK_WALL.get());
+                ModBlocks.CLOUD_BLOCK_WALL.get(),
+                ModBlocks.THICK_CLOUD_BLOCK.get(),
+                ModBlocks.THICK_CLOUD_SLAB.get(),
+                ModBlocks.THICK_CLOUD_STAIRS.get(),
+                ModBlocks.THICK_CLOUD_WALL.get());
     }
 }
