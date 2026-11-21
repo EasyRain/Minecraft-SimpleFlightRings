@@ -1,5 +1,5 @@
 {
-  "parent": "minecraft:block/slab_top",
+  "parent": "simpleflightring:block/tinted_slab_top",
   "textures": {
     "bottom": "simpleflightring:block/cloud_block",
     "top": "simpleflightring:block/cloud_block",

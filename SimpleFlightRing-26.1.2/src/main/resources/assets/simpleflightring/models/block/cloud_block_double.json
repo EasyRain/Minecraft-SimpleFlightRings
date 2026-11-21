@@ -1,5 +1,5 @@
 {
-  "parent": "minecraft:block/cube_all",
+  "parent": "simpleflightring:block/tinted_cube_all",
   "textures": {
     "all": "simpleflightring:block/cloud_block"
   },

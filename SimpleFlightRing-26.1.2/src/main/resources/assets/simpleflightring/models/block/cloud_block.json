@@ -1,9 +1,7 @@
 {
-  "parent": "minecraft:block/cube_all",
+  "parent": "simpleflightring:block/tinted_cube_all",
   "textures": {
-    "all": {
-      "sprite": "simpleflightring:block/cloud_block",
-      "force_translucent": true
-    }
-  }
+    "all": "simpleflightring:block/cloud_block"
+  },
+  "render_type": "minecraft:translucent"
 }
