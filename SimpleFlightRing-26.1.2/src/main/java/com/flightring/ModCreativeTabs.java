@@ -33,6 +33,7 @@ public class ModCreativeTabs {
                         output.accept(new ItemStack(ModItems.CLOUD_WOOD_ITEM.get()));
                         output.accept(new ItemStack(ModItems.CLOUD_PLANKS_ITEM.get()));
                         output.accept(new ItemStack(ModItems.CLOUD_LEAVES_ITEM.get()));
+                        output.accept(new ItemStack(ModItems.CLOUD_SAPLING_ITEM.get()));
                         output.accept(new ItemStack(ModItems.THICK_CLOUD_BLOCK_ITEM.get()));
                         output.accept(new ItemStack(ModItems.THICK_CLOUD_BRICKS_ITEM.get()));
                         output.accept(new ItemStack(ModItems.THICK_CLOUD_SLAB_ITEM.get()));

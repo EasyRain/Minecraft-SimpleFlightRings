@@ -61,7 +61,7 @@ public final class ModBlocks {
      */
     public static final DeferredBlock<Block> THICK_CLOUD_BLOCK = BLOCKS.registerBlock(
             "thick_cloud_block",
-            Block::new,
+            ThickCloudBlock::new,
             BlockBehaviour.Properties.of().strength(0.6F)
                     .sound(ModSounds.THICK_SOUND_TYPE)
                     .isViewBlocking((state, level, pos) -> false));
@@ -160,6 +160,14 @@ public final class ModBlocks {
             BlockBehaviour.Properties.of()
                     .strength(2.0F, 3.0F)
                     .sound(SoundType.WOOD));
+
+    /** 云树苗：能种在土上，也能直接种在厚云块上。 */
+    public static final DeferredBlock<Block> CLOUD_SAPLING = BLOCKS.registerBlock(
+            "cloud_sapling",
+            CloudSaplingBlock::new,
+            BlockBehaviour.Properties.of().noCollission().randomTicks().instabreak()
+                    .sound(SoundType.GRASS)
+                    .pushReaction(PushReaction.DESTROY));
 
     /** 云叶：云树的树冠。 */
     public static final DeferredBlock<Block> CLOUD_LEAVES = BLOCKS.registerBlock(

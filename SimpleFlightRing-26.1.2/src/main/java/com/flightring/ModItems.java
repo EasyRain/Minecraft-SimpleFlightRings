@@ -56,6 +56,8 @@ public class ModItems {
             ITEMS.registerSimpleBlockItem("cloud_planks", () -> ModBlocks.CLOUD_PLANKS.get());
     public static final DeferredItem<BlockItem> CLOUD_LEAVES_ITEM =
             ITEMS.registerSimpleBlockItem("cloud_leaves", () -> ModBlocks.CLOUD_LEAVES.get());
+    public static final DeferredItem<BlockItem> CLOUD_SAPLING_ITEM =
+            ITEMS.registerSimpleBlockItem("cloud_sapling", () -> ModBlocks.CLOUD_SAPLING.get());
     public static final DeferredItem<BlockItem> THICK_CLOUD_BLOCK_ITEM =
             ITEMS.registerSimpleBlockItem("thick_cloud_block", () -> ModBlocks.THICK_CLOUD_BLOCK.get());
     public static final DeferredItem<BlockItem> THICK_CLOUD_BRICKS_ITEM =

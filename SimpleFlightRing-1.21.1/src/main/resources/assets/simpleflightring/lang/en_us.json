@@ -354,5 +354,6 @@
   "block.simpleflightring.cloud_log": "Cloud Log",
   "block.simpleflightring.cloud_wood": "Cloud Wood",
   "block.simpleflightring.cloud_planks": "Cloud Planks",
-  "block.simpleflightring.cloud_leaves": "Cloud Leaves"
+  "block.simpleflightring.cloud_leaves": "Cloud Leaves",
+  "block.simpleflightring.cloud_sapling": "Cloud Sapling"
 }
