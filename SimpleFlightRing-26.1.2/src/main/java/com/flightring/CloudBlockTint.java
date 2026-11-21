@@ -78,6 +78,12 @@ public final class CloudBlockTint {
                 ModBlocks.THICK_CLOUD_BLOCK.get(),
                 ModBlocks.THICK_CLOUD_SLAB.get(),
                 ModBlocks.THICK_CLOUD_STAIRS.get(),
-                ModBlocks.THICK_CLOUD_WALL.get());
+                ModBlocks.THICK_CLOUD_WALL.get(),
+                ModBlocks.THICK_CLOUD_BRICKS.get(),
+                ModBlocks.THICK_CLOUD_BRICKS_SLAB.get(),
+                ModBlocks.THICK_CLOUD_BRICKS_STAIRS.get(),
+                ModBlocks.THICK_CLOUD_BRICKS_WALL.get(),
+                // 树叶：只染叶子，树干/木板保持原色
+                ModBlocks.CLOUD_LEAVES.get());
     }
 }
