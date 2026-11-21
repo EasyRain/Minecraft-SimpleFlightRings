@@ -243,6 +243,55 @@ public final class ModBlocks {
             properties -> new CloudWallHangingSignBlock(CloudWoodTypes.CLOUD_WOOD_TYPE, properties),
             BlockBehaviour.Properties.of().strength(1.0F).sound(SoundType.WOOD).noCollission());
 
+
+    /** 变体：cloud_block_slab。 */
+    public static final DeferredBlock<Block> CLOUD_BLOCK_SLAB = BLOCKS.registerBlock(
+            "cloud_block_slab",
+            CloudSlabBlock::new,
+            BlockBehaviour.Properties.of().strength(0.2F)
+                    .sound(ModSounds.CLOUD_SOUND_TYPE)
+                    .noOcclusion()
+                    .isSuffocating((state, level, pos) -> false)
+                    .isViewBlocking((state, level, pos) -> false));
+
+    /** 变体：cloud_block_stairs。 */
+    public static final DeferredBlock<Block> CLOUD_BLOCK_STAIRS = BLOCKS.registerBlock(
+            "cloud_block_stairs",
+            properties -> new CloudStairBlock(ModBlocks.CLOUD_BLOCK.get().defaultBlockState(), properties),
+            BlockBehaviour.Properties.of().strength(0.2F)
+                    .sound(ModSounds.CLOUD_SOUND_TYPE)
+                    .noOcclusion()
+                    .isSuffocating((state, level, pos) -> false)
+                    .isViewBlocking((state, level, pos) -> false));
+
+    /** 变体：cloud_block_wall。 */
+    public static final DeferredBlock<Block> CLOUD_BLOCK_WALL = BLOCKS.registerBlock(
+            "cloud_block_wall",
+            CloudWallBlock::new,
+            BlockBehaviour.Properties.of().strength(0.2F)
+                    .sound(ModSounds.CLOUD_SOUND_TYPE)
+                    .noOcclusion()
+                    .isSuffocating((state, level, pos) -> false)
+                    .isViewBlocking((state, level, pos) -> false));
+
+    /** 变体：thick_cloud_bricks_slab。 */
+    public static final DeferredBlock<Block> THICK_CLOUD_BRICKS_SLAB = BLOCKS.registerBlock(
+            "thick_cloud_bricks_slab",
+            SlabBlock::new,
+            BlockBehaviour.Properties.of().strength(0.8F).sound(ModSounds.THICK_SOUND_TYPE));
+
+    /** 变体：thick_cloud_bricks_stairs。 */
+    public static final DeferredBlock<Block> THICK_CLOUD_BRICKS_STAIRS = BLOCKS.registerBlock(
+            "thick_cloud_bricks_stairs",
+            properties -> new StairBlock(ModBlocks.THICK_CLOUD_BRICKS.get().defaultBlockState(), properties),
+            BlockBehaviour.Properties.of().strength(0.8F).sound(ModSounds.THICK_SOUND_TYPE));
+
+    /** 变体：thick_cloud_bricks_wall。 */
+    public static final DeferredBlock<Block> THICK_CLOUD_BRICKS_WALL = BLOCKS.registerBlock(
+            "thick_cloud_bricks_wall",
+            WallBlock::new,
+            BlockBehaviour.Properties.of().strength(0.8F).sound(ModSounds.THICK_SOUND_TYPE));
+
     /** 云树苗：能种在土上，也能直接种在厚云块上。 */
     public static final DeferredBlock<Block> CLOUD_SAPLING = BLOCKS.registerBlock(
             "cloud_sapling",

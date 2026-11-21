@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/slab_top",
+  "textures": {
+    "bottom": "simpleflightring:block/cloud_block",
+    "top": "simpleflightring:block/cloud_block",
+    "side": "simpleflightring:block/cloud_block"
+  },
+  "render_type": "minecraft:translucent"
+}

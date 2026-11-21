@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "simpleflightring:thick_cloud_bricks_slab",
+    "simpleflightring:thick_cloud_bricks_stairs",
+    "simpleflightring:thick_cloud_bricks_wall"
+  ]
+}

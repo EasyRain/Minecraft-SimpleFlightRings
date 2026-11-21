@@ -361,5 +361,11 @@
   "block.simpleflightring.cloud_wall_hanging_sign": "云木悬挂告示牌",
   "item.simpleflightring.cloud_sign": "云木告示牌",
   "item.simpleflightring.cloud_hanging_sign": "云木悬挂告示牌",
-  "block.simpleflightring.thick_cloud_chest": "云木箱子"
+  "block.simpleflightring.thick_cloud_chest": "云木箱子",
+  "block.simpleflightring.cloud_block_slab": "云块半砖",
+  "block.simpleflightring.cloud_block_stairs": "云块台阶",
+  "block.simpleflightring.cloud_block_wall": "云块墙",
+  "block.simpleflightring.thick_cloud_bricks_slab": "厚云砖半砖",
+  "block.simpleflightring.thick_cloud_bricks_stairs": "厚云砖台阶",
+  "block.simpleflightring.thick_cloud_bricks_wall": "厚云砖墙"
 }

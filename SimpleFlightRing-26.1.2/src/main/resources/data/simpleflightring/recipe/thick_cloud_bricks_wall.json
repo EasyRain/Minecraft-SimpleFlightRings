@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": "simpleflightring:thick_cloud_bricks"
+  },
+  "result": {
+    "count": 6,
+    "id": "simpleflightring:thick_cloud_bricks_wall"
+  }
+}

@@ -54,6 +54,12 @@ public final class CloudCreativeTabContents {
         accept(event, ModItems.THICK_CLOUD_WALL_ITEM.get());
         accept(event, ModItems.THICK_CLOUD_CHEST_ITEM.get());
         accept(event, ModItems.THICK_CLOUD_BED_ITEM.get());
+        accept(event, ModItems.CLOUD_BLOCK_SLAB_ITEM.get());
+        accept(event, ModItems.CLOUD_BLOCK_STAIRS_ITEM.get());
+        accept(event, ModItems.CLOUD_BLOCK_WALL_ITEM.get());
+        accept(event, ModItems.THICK_CLOUD_BRICKS_SLAB_ITEM.get());
+        accept(event, ModItems.THICK_CLOUD_BRICKS_STAIRS_ITEM.get());
+        accept(event, ModItems.THICK_CLOUD_BRICKS_WALL_ITEM.get());
     }
 
     private static void accept(BuildCreativeModeTabContentsEvent event, net.minecraft.world.item.Item item) {

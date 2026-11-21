@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "###"
+  ],
+  "key": {
+    "#": "simpleflightring:cloud_block"
+  },
+  "result": {
+    "count": 6,
+    "id": "simpleflightring:cloud_block_slab"
+  }
+}

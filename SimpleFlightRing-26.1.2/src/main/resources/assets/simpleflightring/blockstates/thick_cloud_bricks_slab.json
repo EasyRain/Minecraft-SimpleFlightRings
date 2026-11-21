@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "simpleflightring:block/thick_cloud_bricks_slab"
+    },
+    "type=double": {
+      "model": "simpleflightring:block/thick_cloud_bricks_double"
+    },
+    "type=top": {
+      "model": "simpleflightring:block/thick_cloud_bricks_slab_top"
+    }
+  }
+}

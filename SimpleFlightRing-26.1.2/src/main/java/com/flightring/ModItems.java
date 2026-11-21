@@ -66,6 +66,18 @@ public class ModItems {
      * 云木告示牌物品：必须用 {@link net.minecraft.world.item.SignItem}，
      * 否则只能放地上（普通 BlockItem 不会转成墙式），而且放置后不会打开编辑框。
      */
+    public static final DeferredItem<BlockItem> CLOUD_BLOCK_SLAB_ITEM =
+            ITEMS.registerSimpleBlockItem("cloud_block_slab", () -> ModBlocks.CLOUD_BLOCK_SLAB.get());
+    public static final DeferredItem<BlockItem> CLOUD_BLOCK_STAIRS_ITEM =
+            ITEMS.registerSimpleBlockItem("cloud_block_stairs", () -> ModBlocks.CLOUD_BLOCK_STAIRS.get());
+    public static final DeferredItem<BlockItem> CLOUD_BLOCK_WALL_ITEM =
+            ITEMS.registerSimpleBlockItem("cloud_block_wall", () -> ModBlocks.CLOUD_BLOCK_WALL.get());
+    public static final DeferredItem<BlockItem> THICK_CLOUD_BRICKS_SLAB_ITEM =
+            ITEMS.registerSimpleBlockItem("thick_cloud_bricks_slab", () -> ModBlocks.THICK_CLOUD_BRICKS_SLAB.get());
+    public static final DeferredItem<BlockItem> THICK_CLOUD_BRICKS_STAIRS_ITEM =
+            ITEMS.registerSimpleBlockItem("thick_cloud_bricks_stairs", () -> ModBlocks.THICK_CLOUD_BRICKS_STAIRS.get());
+    public static final DeferredItem<BlockItem> THICK_CLOUD_BRICKS_WALL_ITEM =
+            ITEMS.registerSimpleBlockItem("thick_cloud_bricks_wall", () -> ModBlocks.THICK_CLOUD_BRICKS_WALL.get());
     public static final DeferredItem<BlockItem> CLOUD_SIGN_ITEM =
             ITEMS.registerItem("cloud_sign",
                     properties -> new net.minecraft.world.item.SignItem(

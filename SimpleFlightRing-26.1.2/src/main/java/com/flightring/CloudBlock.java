@@ -42,6 +42,14 @@ public class CloudBlock extends Block {
                     Identifier.fromNamespaceAndPath(FlightRingMod.MODID, "the_cloud"));
 
     /** Sink speed while inside: 50% horizontal, 30% vertical (cobweb is 25% / 5%; clouds sink faster). */
+    /**
+     * 这个实体在当前维度/状态下能不能站在云上：玩家看戒指，其它生物在云维度里直接可以。
+     * 云块的变体（半砖/楼梯/墙）共用这套判定，保证"穿透"特性一致。
+     */
+    public static boolean mayStandOnCloud(BlockGetter level, Entity entity) {
+        return entity instanceof Player player ? FlightHandler.hasUsableRing(player) : isCloudDimension(level);
+    }
+
     private static final Vec3 SINK_SPEED = new Vec3(0.5D, 0.3D, 0.5D);
 
     public CloudBlock(Properties properties) {
@@ -83,7 +91,7 @@ public class CloudBlock extends Block {
         return neighbour.is(this) || super.skipRendering(state, neighbour, direction);
     }
 
-    private static boolean isCloudDimension(BlockGetter level) {
+    static boolean isCloudDimension(BlockGetter level) {
         return level instanceof net.minecraft.world.level.Level world && world.dimension().equals(THE_CLOUD);
     }
 
