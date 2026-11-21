@@ -96,7 +96,7 @@ public final class AuroraSky {
         RenderSystem.disableCull();
         RenderSystem.depthMask(false);
         RenderSystem.disableDepthTest();
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
         RenderSystem.setShaderTexture(0, TEXTURE);
 
         poseStack.pushPose();
@@ -119,28 +119,26 @@ public final class AuroraSky {
     private static void drawLayer(PoseStack poseStack, float offset, float yShift, float radius, float alpha) {
         Tesselator tesselator = Tesselator.getInstance();
         BufferBuilder buffer = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-        // 一条横贯东西的带子，上下各占 80 格；UV 横向滚动
-        float top = 70.0F + yShift;
-        float bottom = -10.0F + yShift;
-        int segments = 8;
+        // 头顶的水平光带：贴在 y = 0 平面上（调用方已经把它抬到 HEIGHT），uv 横向滚动
+        float size = radius;
+        int segments = 6;
+        float step = (2 * size) / segments;
         for (int i = 0; i < segments; i++) {
-            float x0 = -radius + (2 * radius) * i / segments;
-            float x1 = -radius + (2 * radius) * (i + 1) / segments;
-            float u0 = (i / (float) segments) * 3.0F + offset;
-            float u1 = ((i + 1) / (float) segments) * 3.0F + offset;
-            // 带一点弧度：两端压低
-            float sag0 = sag(x0 / radius) * 60.0F;
-            float sag1 = sag(x1 / radius) * 60.0F;
-            buffer.addVertex(poseStack.last().pose(), x0, top + sag0, 0.0F)
-                    .setUv(u0, 0.0F).setColor(1.0F, 1.0F, 1.0F, alpha);
-            buffer.addVertex(poseStack.last().pose(), x1, top + sag1, 0.0F)
-                    .setUv(u1, 0.0F).setColor(1.0F, 1.0F, 1.0F, alpha);
-            buffer.addVertex(poseStack.last().pose(), x1, bottom + sag1, 0.0F)
-                    .setUv(u1, 1.0F).setColor(1.0F, 1.0F, 1.0F, alpha * 0.15F);
-            buffer.addVertex(poseStack.last().pose(), x0, bottom + sag0, 0.0F)
-                    .setUv(u0, 1.0F).setColor(1.0F, 1.0F, 1.0F, alpha * 0.15F);
+            float z0 = -size + step * i;
+            float z1 = z0 + step;
+            float v0 = (i / (float) segments) * 2.0F + offset;
+            float v1 = ((i + 1) / (float) segments) * 2.0F + offset;
+            buffer.addVertex(poseStack.last().pose(), -size, yShift, z0)
+                    .setUv(0.0F, v0).setColor(1.0F, 1.0F, 1.0F, alpha);
+            buffer.addVertex(poseStack.last().pose(), size, yShift, z0)
+                    .setUv(3.0F, v0).setColor(1.0F, 1.0F, 1.0F, alpha);
+            buffer.addVertex(poseStack.last().pose(), size, yShift, z1)
+                    .setUv(3.0F, v1).setColor(1.0F, 1.0F, 1.0F, alpha);
+            buffer.addVertex(poseStack.last().pose(), -size, yShift, z1)
+                    .setUv(0.0F, v1).setColor(1.0F, 1.0F, 1.0F, alpha);
         }
-        net.minecraft.client.renderer.RenderType.translucent().draw(buffer.buildOrThrow());
+        // 用显式 shader 直接上传（RenderType.translucent() 期望 BLOCK 顶点格式，与我们不符，会静默失败）
+        com.mojang.blaze3d.vertex.BufferUploader.drawWithShader(buffer.buildOrThrow());
     }
 
     /** 两端下垂的弧度。 */
