@@ -1,13 +1,8 @@
 package com.flightring;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
 
 /**
  * 云门不再显示那层紫色滤镜（用户 2026-11-22）。
@@ -25,28 +20,11 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
  * </ul>
  * 站在云门里时把这两个值清零，滤镜自然就不画了，而且不需要 mixin。
  */
-@EventBusSubscriber(modid = FlightRingMod.MODID, value = Dist.CLIENT)
 public final class CloudPortalOverlay {
 
     private CloudPortalOverlay() {
     }
 
-    @SubscribeEvent
-    public static void onClientTick(ClientTickEvent.Post event) {
-        Minecraft minecraft = Minecraft.getInstance();
-        LocalPlayer player = minecraft.player;
-        if (player == null || minecraft.level == null) {
-            return;
-        }
-        if (!isInsideCloudPortal(player)) {
-            return;
-        }
-        // 1.21.1 用的是 spinningEffectIntensity（Gui#renderPortalOverlay 的驱动值）
-        player.spinningEffectIntensity = 0.0F;
-        player.oSpinningEffectIntensity = 0.0F;
-    }
-
-    /** 玩家身体或眼睛是否在云门/破门方块里。 */
     /** 供 mixin 复用：玩家身体/眼睛是否在云门里。 */
     public static boolean isInsideCloudPortal(LocalPlayer player) {
         for (int i = 0; i < 8; i++) {
