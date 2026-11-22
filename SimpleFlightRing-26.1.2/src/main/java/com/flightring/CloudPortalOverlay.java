@@ -47,7 +47,8 @@ public final class CloudPortalOverlay {
     }
 
     /** 玩家身体或眼睛是否在云门/破门方块里。 */
-    private static boolean isInsideCloudPortal(LocalPlayer player) {
+    /** 供 mixin 复用：玩家身体/眼睛是否在云门里。 */
+    public static boolean isInsideCloudPortal(LocalPlayer player) {
         for (int i = 0; i < 8; i++) {
             double dx = (((i >> 0) % 2) - 0.5D) * player.getBbWidth() * 0.8D;
             double dy = (((i >> 1) % 2) - 0.5D) * 0.1D * player.getScale();

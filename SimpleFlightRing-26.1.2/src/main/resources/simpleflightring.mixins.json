@@ -21,7 +21,8 @@
     "ClientFireAnimationMixin",
     "ClientFireOverlayMixin",
     "ClientRebirthAnimationMixin",
-    "ElderGuardianCurseMixin"
+    "ElderGuardianCurseMixin",
+    "CloudPortalOverlayMixin"
   ],
   "injectors": {
     "defaultRequire": 1
