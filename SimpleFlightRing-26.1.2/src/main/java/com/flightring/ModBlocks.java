@@ -113,7 +113,7 @@ public final class ModBlocks {
     public static final DeferredBlock<Block> THICK_CLOUD_BED = BLOCKS.registerBlock(
             "thick_cloud_bed",
             ThickCloudBedBlock::new,
-            properties -> properties.strength(0.2F)
+            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.COLOR_LIGHT_GRAY).strength(0.2F)
                     .sound(SoundType.WOOD)
                     .noOcclusion());
 
@@ -121,7 +121,7 @@ public final class ModBlocks {
     public static final DeferredBlock<Block> THICK_CLOUD_CHEST = BLOCKS.registerBlock(
             "thick_cloud_chest",
             ThickCloudChestBlock::new,
-            properties -> properties.strength(2.0F)
+            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.WOOD).strength(2.0F)
                     .sound(SoundType.WOOD)
                     .noOcclusion());
 
@@ -195,24 +195,24 @@ public final class ModBlocks {
     public static final DeferredBlock<Block> CLOUD_DOOR = BLOCKS.registerBlock(
             "cloud_door",
             properties -> new DoorBlock(CloudWoodTypes.CLOUD_SET, properties),
-            properties -> properties.strength(3.0F).noOcclusion().sound(SoundType.WOOD));
+            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.WOOD).strength(3.0F).noOcclusion().sound(SoundType.WOOD));
 
     public static final DeferredBlock<Block> CLOUD_TRAPDOOR = BLOCKS.registerBlock(
             "cloud_trapdoor",
             properties -> new TrapDoorBlock(CloudWoodTypes.CLOUD_SET, properties),
-            properties -> properties.strength(3.0F).noOcclusion()
+            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.WOOD).strength(3.0F).noOcclusion()
                     .isValidSpawn((state, level, pos, type) -> false).sound(SoundType.WOOD));
 
     public static final DeferredBlock<Block> CLOUD_BUTTON = BLOCKS.registerBlock(
             "cloud_button",
             properties -> new ButtonBlock(CloudWoodTypes.CLOUD_SET, 30, properties),
-            properties -> properties.noCollision().strength(0.5F)
+            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.WOOD).noCollision().strength(0.5F)
                     .pushReaction(PushReaction.DESTROY).sound(SoundType.WOOD));
 
     public static final DeferredBlock<Block> CLOUD_PRESSURE_PLATE = BLOCKS.registerBlock(
             "cloud_pressure_plate",
             properties -> new PressurePlateBlock(CloudWoodTypes.CLOUD_SET, properties),
-            properties -> properties.noCollision().strength(0.5F)
+            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.WOOD).noCollision().strength(0.5F)
                     .pushReaction(PushReaction.DESTROY).sound(SoundType.WOOD));
 
 
@@ -220,25 +220,25 @@ public final class ModBlocks {
     public static final DeferredBlock<Block> CLOUD_SIGN = BLOCKS.registerBlock(
             "cloud_sign",
             properties -> new CloudStandingSignBlock(CloudWoodTypes.CLOUD_WOOD_TYPE, properties),
-            properties -> properties.strength(1.0F).sound(SoundType.WOOD).noCollision());
+            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.WOOD).strength(1.0F).sound(SoundType.WOOD).noCollision());
 
     /** 云木告示牌（墙式）。 */
     public static final DeferredBlock<Block> CLOUD_WALL_SIGN = BLOCKS.registerBlock(
             "cloud_wall_sign",
             properties -> new CloudWallSignBlock(CloudWoodTypes.CLOUD_WOOD_TYPE, properties),
-            properties -> properties.strength(1.0F).sound(SoundType.WOOD).noCollision());
+            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.WOOD).strength(1.0F).sound(SoundType.WOOD).noCollision());
 
     /** 云木悬挂告示牌（吊顶式）。 */
     public static final DeferredBlock<Block> CLOUD_HANGING_SIGN = BLOCKS.registerBlock(
             "cloud_hanging_sign",
             properties -> new CloudHangingSignBlock(CloudWoodTypes.CLOUD_WOOD_TYPE, properties),
-            properties -> properties.strength(1.0F).sound(SoundType.WOOD).noCollision());
+            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.WOOD).strength(1.0F).sound(SoundType.WOOD).noCollision());
 
     /** 云木悬挂告示牌（墙式）。 */
     public static final DeferredBlock<Block> CLOUD_WALL_HANGING_SIGN = BLOCKS.registerBlock(
             "cloud_wall_hanging_sign",
             properties -> new CloudWallHangingSignBlock(CloudWoodTypes.CLOUD_WOOD_TYPE, properties),
-            properties -> properties.strength(1.0F).sound(SoundType.WOOD).noCollision());
+            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.WOOD).strength(1.0F).sound(SoundType.WOOD).noCollision());
 
 
     /** 变体：cloud_block_slab。 */
