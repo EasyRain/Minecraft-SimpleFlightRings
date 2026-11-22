@@ -93,10 +93,7 @@ public final class AuroraSky {
     }
 
     @SubscribeEvent
-    public static void onRenderStage(RenderLevelStageEvent event) {
-        if (!(event instanceof RenderLevelStageEvent.AfterSky)) {
-            return;
-        }
+    public static void onAfterSky(RenderLevelStageEvent.AfterSky event) {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.level == null || pipeline == null) {
             return;
