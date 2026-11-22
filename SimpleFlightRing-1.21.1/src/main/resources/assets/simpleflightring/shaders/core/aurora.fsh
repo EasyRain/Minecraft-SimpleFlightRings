@@ -21,6 +21,7 @@ uniform float Time;        // 世界年龄（秒）= (tick + partialTick) / 20
 uniform vec3 CameraPos;    // 相机绝对世界坐标
 uniform float RainFactor;  // 0~1，雨量（原版 rainLevel）
 uniform float SunFade;     // 0=深夜 1=白天，替代光影的 sunVisibility（平滑昼夜过渡）
+uniform float BiomeWeight; // 0~1，极光群系权重（跨界平滑过渡）
 
 in vec3 worldDir;    // 世界朝向（顶点位置未归一化，vsh 直传）
 in vec4 vertexColor; // 占位（POSITION_COLOR 格式要求），不参与计算
@@ -58,7 +59,7 @@ void main() {
     float VdotU = dir.y;
 
     // ---- GetAuroraVisibility(VdotU, 1.0)，AURORA_DRAW_DISTANCE 0.65 ----
-    float visibility = sqrt1(clamp01(VdotU * (0.65 * 1.125 + 0.75) - 0.225)) - SunFade - RainFactor;
+    float visibility = sqrt1(clamp01(VdotU * (0.65 * 1.125 + 0.75) - 0.225)) * BiomeWeight - SunFade - RainFactor;
     visibility *= 1.0 - VdotU * 0.9;  // VdotUAmount = 1.0：靠近天顶渐隐、地平线附近最亮
     if (visibility <= 0.0) {
         fragColor = vec4(0.0);

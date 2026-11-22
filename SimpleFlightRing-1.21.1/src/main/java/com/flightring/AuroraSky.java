@@ -110,16 +110,16 @@ public final class AuroraSky {
             return;
         }
         Vec3 cameraPos = camera.getPosition();
-        boolean auroraBiome = inAuroraBiome(minecraft, cameraPos);
+        float biomeWeight = auroraBiomeWeight(minecraft, cameraPos);
         // 昼夜淡入淡出（替代光影的 sunVisibility；夜晚 SunFade≈0，白天≈1）
         float sunFade = sunVisibility(minecraft);
         int ticks = minecraft.player == null ? 0 : minecraft.player.tickCount;
         if (ticks - lastLoggedTick > 200) {
             lastLoggedTick = ticks;
-            FlightRingMod.LOGGER.info("[Aurora] stage fired: dim={} auroraBiome={} sunFade={}",
-                    minecraft.level.dimension().location(), auroraBiome, sunFade);
+            FlightRingMod.LOGGER.info("[Aurora] stage fired: dim={} biomeWeight={} sunFade={}",
+                    minecraft.level.dimension().location(), biomeWeight, sunFade);
         }
-        if (!auroraBiome || sunFade >= 0.999F) {
+        if (biomeWeight <= 0.001F || sunFade >= 0.999F) {
             return;
         }
 
@@ -146,6 +146,10 @@ public final class AuroraSky {
         var rainUniform = SHADER.safeGetUniform("RainFactor");
         if (rainUniform != null) {
             rainUniform.set(rainFactor);
+        }
+        var biomeUniform = SHADER.safeGetUniform("BiomeWeight");
+        if (biomeUniform != null) {
+            biomeUniform.set(biomeWeight);
         }
         var sunUniform = SHADER.safeGetUniform("SunFade");
         if (sunUniform != null) {
@@ -193,6 +197,42 @@ public final class AuroraSky {
         RenderSystem.depthMask(true);
         RenderSystem.enableCull();
         RenderSystem.disableBlend();
+    }
+
+    /** 群系过渡半径（格）：跨过边界时在这个距离内平滑淡入淡出。 */
+    private static final double BIOME_BLEND_RADIUS = 24.0;
+    private static final int BIOME_RING_SAMPLES = 8;
+
+    /**
+     * 群系"极光权重" 0~1。
+     * <p>
+     * 用户 2026-11-22：站在两个群系交界处时，左一步极光突然出现、右一步又突然消失。
+     * 原因是之前只判断**相机所在方块**的群系（布尔值）。现在改为在相机周围取一圈采样点
+     * （中心加权 + 8 个点，半径 {@value #BIOME_BLEND_RADIUS} 格），按命中比例给权重，
+     * 跨过边界时会有一圈平滑过渡。
+     */
+    private static float auroraBiomeWeight(Minecraft minecraft, Vec3 cameraPos) {
+        int hits = isAuroraAt(minecraft, cameraPos.x, cameraPos.y, cameraPos.z) ? 2 : 0;
+        for (int i = 0; i < BIOME_RING_SAMPLES; i++) {
+            double a = Math.PI * 2.0 * i / BIOME_RING_SAMPLES;
+            if (isAuroraAt(minecraft,
+                    cameraPos.x + Math.cos(a) * BIOME_BLEND_RADIUS,
+                    cameraPos.y,
+                    cameraPos.z + Math.sin(a) * BIOME_BLEND_RADIUS)) {
+                hits++;
+            }
+        }
+        float w = hits / (float) (BIOME_RING_SAMPLES + 2);
+        return w * w * (3.0F - 2.0F * w);   // smoothstep，过渡更自然
+    }
+
+    private static boolean isAuroraAt(Minecraft minecraft, double x, double y, double z) {
+        var pos = net.minecraft.core.BlockPos.containing(x, y, z);
+        if (!minecraft.level.hasChunkAt(pos)) {
+            return false;
+        }
+        return minecraft.level.getBiome(pos).unwrapKey()
+                .map(key -> key.location().equals(AURORA_BIOME)).orElse(false);
     }
 
     private static boolean inAuroraBiome(Minecraft minecraft, Vec3 cameraPos) {
