@@ -78,11 +78,22 @@ public final class VoidFallout {
      */
     private static BlockPos respawnPos(ServerPlayer player, ServerLevel overworld) {
         BlockPos bed = player.getRespawnPosition();
-        if (bed != null) {
+        boolean inOverworld = player.getRespawnDimension().equals(Level.OVERWORLD);
+        // 床/重生锚：必须在主世界、且方块还在（被拆掉 = 失效，退回世界出生点，和原版一致）
+        if (bed != null && inOverworld && isValidSpawnBlock(overworld, bed)) {
             return new BlockPos(bed.getX(), bed.getY() + 1, bed.getZ());   // 床高 0.5625，+1 才不会卡进床里
         }
-        BlockPos spawn = overworld.getSharedSpawnPos();
-        return snapToSurface(overworld, spawn);
+        return snapToSurface(overworld, overworld.getSharedSpawnPos());
+    }
+
+    /** 重生点方块是否还有效（床 / 重生锚）。 */
+    private static boolean isValidSpawnBlock(ServerLevel level, BlockPos pos) {
+        if (!level.hasChunkAt(pos)) {
+            return false;
+        }
+        var state = level.getBlockState(pos);
+        return state.is(net.minecraft.tags.BlockTags.BEDS)
+                || state.is(net.minecraft.world.level.block.Blocks.RESPAWN_ANCHOR);
     }
 
     /** 把坐标的 Y 吸附到该列的地表（找不到地面就保持原 Y）。 */

@@ -71,15 +71,27 @@ public final class VoidFallout {
 
     /** 优先用玩家的重生点（床/重生锚），没有就用世界出生点。 */
     private static BlockPos respawnPos(ServerPlayer player, ServerLevel overworld) {
-        // 26.x：重生点存在 RespawnConfig -> RespawnData -> GlobalPos
         var config = player.getRespawnConfig();
         if (config != null && config.respawnData() != null) {
-            BlockPos bed = config.respawnData().pos();
-            if (bed != null) {
+            var globalPos = config.respawnData().globalPos();
+            BlockPos bed = globalPos.pos();
+            boolean inOverworld = globalPos.dimension().equals(Level.OVERWORLD);
+            // 床/重生锚：必须在主世界、且方块还在（被拆掉 = 失效，退回世界出生点）
+            if (bed != null && inOverworld && isValidSpawnBlock(overworld, bed)) {
                 return new BlockPos(bed.getX(), bed.getY() + 1, bed.getZ());   // 床高 0.5625，+1 才不会卡进床里
             }
         }
         return snapToSurface(overworld, overworld.getRespawnData().pos());
+    }
+
+    /** 重生点方块是否还有效（床 / 重生锚）。 */
+    private static boolean isValidSpawnBlock(ServerLevel level, BlockPos pos) {
+        if (!level.hasChunkAt(pos)) {
+            return false;
+        }
+        var state = level.getBlockState(pos);
+        return state.is(net.minecraft.tags.BlockTags.BEDS)
+                || state.is(net.minecraft.world.level.block.Blocks.RESPAWN_ANCHOR);
     }
 
     /** 把坐标的 Y 吸附到该列的地表（找不到地面就保持原 Y）。 */
