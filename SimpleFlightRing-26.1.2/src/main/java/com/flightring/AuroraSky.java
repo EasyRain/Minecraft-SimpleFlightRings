@@ -84,7 +84,7 @@ public final class AuroraSky {
                 .withVertexShader(Identifier.fromNamespaceAndPath(FlightRingMod.MODID, "core/aurora"))
                 .withFragmentShader(Identifier.fromNamespaceAndPath(FlightRingMod.MODID, "core/aurora"))
                 .withSampler("Sampler0")
-                .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS)
+                .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.TRIANGLES)
                 .withColorTargetState(new ColorTargetState(BlendFunction.ADDITIVE))
                 .withDepthStencilState(new DepthStencilState(CompareOp.ALWAYS_PASS, false))
                 .withCull(false)
@@ -166,7 +166,8 @@ public final class AuroraSky {
         final double elevRange = Math.toRadians(100.0);
 
         Tesselator tesselator = Tesselator.getInstance();
-        BufferBuilder buffer = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+        // ★ 26.x 的 RenderPass.draw 画的是三角形列表；发四边形会被每 4 顶点强行重组 ⇒ 三角片（Shizuku 踩过同样的坑）
+        BufferBuilder buffer = tesselator.begin(VertexFormat.Mode.TRIANGLES, DefaultVertexFormat.POSITION_COLOR);
         for (int r = 0; r < rings; r++) {
             double t0 = (double) r / rings;
             double t1 = (double) (r + 1) / rings;
@@ -187,10 +188,16 @@ public final class AuroraSky {
                 float z11 = (float) (Math.sin(az1) * cosE1) * DOME_RADIUS;
                 float x01 = (float) (Math.cos(az0) * cosE1) * DOME_RADIUS;
                 float z01 = (float) (Math.sin(az0) * cosE1) * DOME_RADIUS;
-                buffer.addVertex(x00, (float) sinE0 * DOME_RADIUS, z00).setColor(255, 255, 255, 255);
-                buffer.addVertex(x10, (float) sinE0 * DOME_RADIUS, z10).setColor(255, 255, 255, 255);
-                buffer.addVertex(x11, (float) sinE1 * DOME_RADIUS, z11).setColor(255, 255, 255, 255);
-                buffer.addVertex(x01, (float) sinE1 * DOME_RADIUS, z01).setColor(255, 255, 255, 255);
+                float y0 = (float) sinE0 * DOME_RADIUS;
+                float y1 = (float) sinE1 * DOME_RADIUS;
+                // 两个三角形 = 一个四边形（顺序保持环绕一致）
+                buffer.addVertex(x00, y0, z00).setColor(255, 255, 255, 255);
+                buffer.addVertex(x10, y0, z10).setColor(255, 255, 255, 255);
+                buffer.addVertex(x11, y1, z11).setColor(255, 255, 255, 255);
+
+                buffer.addVertex(x00, y0, z00).setColor(255, 255, 255, 255);
+                buffer.addVertex(x11, y1, z11).setColor(255, 255, 255, 255);
+                buffer.addVertex(x01, y1, z01).setColor(255, 255, 255, 255);
             }
         }
         return buffer.buildOrThrow();
