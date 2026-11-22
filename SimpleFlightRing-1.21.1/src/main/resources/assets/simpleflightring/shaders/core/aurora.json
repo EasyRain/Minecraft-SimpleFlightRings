@@ -11,6 +11,7 @@
     { "name": "Time", "type": "float", "count": 1, "values": [ 0.0 ] },
     { "name": "CameraPos", "type": "float", "count": 3, "values": [ 0.0, 0.0, 0.0 ] },
     { "name": "RainFactor", "type": "float", "count": 1, "values": [ 0.0 ] },
-    { "name": "SunFade", "type": "float", "count": 1, "values": [ 1.0 ] }
+    { "name": "SunFade", "type": "float", "count": 1, "values": [ 1.0 ] },
+    { "name": "BiomeWeight", "type": "float", "count": 1, "values": [ 0.0 ] }
   ]
 }
