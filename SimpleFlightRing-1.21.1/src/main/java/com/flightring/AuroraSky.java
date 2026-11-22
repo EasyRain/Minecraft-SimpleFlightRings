@@ -203,7 +203,14 @@ public final class AuroraSky {
 
     /**
      * 光影包 sunVisibility 的等价物：0=深夜、1=白天，日出日落平滑过渡。
-     * 深夜 [13500,22500]=0；白天 [0,12000]=1；黄昏 [12000,13500] 与黎明 [22500,24000] smoothstep。
+     * <p>
+     * 时间窗（用户 2026-11-22 调整：入夜延后、日出提前）：
+     * <ul>
+     *   <li>白天 [0, 13200] = 1；</li>
+     *   <li><b>黄昏 13200 → 15000</b> 淡入（太阳快落山、天开始黑时才出现）；</li>
+     *   <li>深夜 [15000, 21000] = 0（完全显示）；</li>
+     *   <li><b>黎明 21000 → 22400</b> 淡出（太阳升起前就收掉，不会"太阳出来还在"）。</li>
+     * </ul>
      * 白天 &gt;= 0.999 时直接不画（省一次 draw call）。
      */
     private static float sunVisibility(Minecraft minecraft) {
@@ -211,16 +218,16 @@ public final class AuroraSky {
         if (dayTime < 0) {
             dayTime += 24000L;
         }
-        if (dayTime >= 13500L && dayTime <= 22500L) {
+        if (dayTime >= 15000L && dayTime <= 21000L) {
             return 0.0F;                       // 深夜
         }
-        if (dayTime <= 12000L) {
+        if (dayTime <= 13200L) {
             return 1.0F;                       // 白天（含 24000 环绕无缝）
         }
-        if (dayTime < 13500L) {
-            return 1.0F - smoothstep((dayTime - 12000L) / 1500.0F);   // 黄昏 1→0
+        if (dayTime < 15000L) {
+            return 1.0F - smoothstep((dayTime - 13200L) / 1800.0F);   // 黄昏 1→0（延后入夜）
         }
-        return smoothstep((dayTime - 22500L) / 1500.0F);               // 黎明 0→1
+        return smoothstep((dayTime - 21000L) / 1400.0F);               // 黎明 0→1（提前收尾）
     }
 
     private static float smoothstep(float t) {

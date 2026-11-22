@@ -28,6 +28,8 @@ in vec4 vertexColor; // 占位（POSITION_COLOR 格式要求），不参与计�
 out vec4 fragColor;
 
 const float AURORA_SIZE = 1.0;
+// 图案整体尺度：越小 => 极光纹理越大（用户 2026-11-22：之前像"地图被缩小"）
+const float AURORA_PATTERN_SCALE = 6.0;
 const float AURORA_NOISE_SCALE = 1.0;
 const int sampleCount = 25;     // deferred1 天空通道用 25；gbuffers 版本才降到 10
 const int sampleCountP = sampleCount + 5;
@@ -85,7 +87,7 @@ void main() {
     vec3 aurora = vec3(0.0);
     for (int i = 0; i < sampleCount; i++) {
         float current = pow2((float(i) + ditherM) / float(sampleCountP));
-        vec2 planePos = wposXZ * (AURORA_SIZE * 0.8 + current) * 11.0 * AURORA_NOISE_SCALE + cameraPositionM;
+        vec2 planePos = wposXZ * (AURORA_SIZE * 0.8 + current) * AURORA_PATTERN_SCALE * AURORA_NOISE_SCALE + cameraPositionM;
         planePos *= 0.0007;
 
         // 主结构：白噪声 ridged 化（1-2|n-0.5| 的 16 次方 => 只留 0.5 附近的窄带 = 丝缕）
