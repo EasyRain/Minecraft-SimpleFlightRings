@@ -41,9 +41,6 @@ import net.minecraft.world.level.levelgen.structure.StructureSet;
  */
 public class CloudChunkGenerator extends ChunkGenerator {
 
-    /** 临时：生成后打印高度图（排查地图 mod 高度问题）。 */
-    private static final boolean DEBUG_HEIGHTMAP = true;
-
     public static final MapCodec<CloudChunkGenerator> CODEC =
             RecordCodecBuilder.mapCodec(instance -> instance.group(
                     BiomeSource.CODEC.fieldOf("biome_source").forGetter(ChunkGenerator::getBiomeSource)
@@ -293,17 +290,6 @@ public class CloudChunkGenerator extends ChunkGenerator {
                 Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
                 Heightmap.Types.WORLD_SURFACE_WG,
                 Heightmap.Types.OCEAN_FLOOR_WG));
-        if (DEBUG_HEIGHTMAP && Math.floorMod(chunk.getPos().x * 31 + chunk.getPos().z, 64) == 0) {
-            int cx = chunk.getPos().getMinBlockX();
-            int cz = chunk.getPos().getMinBlockZ();
-            FlightRingMod.LOGGER.info("[GenHeight] chunk={},{} col={},{} WS={} OF={} MB={} MBL={} WG_WS={}",
-                    chunk.getPos().x, chunk.getPos().z, cx, cz,
-                    chunk.getHeight(Heightmap.Types.WORLD_SURFACE, cx, cz),
-                    chunk.getHeight(Heightmap.Types.OCEAN_FLOOR, cx, cz),
-                    chunk.getHeight(Heightmap.Types.MOTION_BLOCKING, cx, cz),
-                    chunk.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, cx, cz),
-                    chunk.getHeight(Heightmap.Types.WORLD_SURFACE_WG, cx, cz));
-        }
         return CompletableFuture.completedFuture(chunk);
     }
 
