@@ -45,6 +45,11 @@ public final class CloudBlockColors {
             var key = minecraft.level.registryAccess().registryOrThrow(Registries.BIOME).getResourceKey(b).orElse(null);
             int color = CloudColors.of(key == null ? null : key.location());
             if (key != null) {
+                // 晚霞群系：白天暖桃、夜里冷白（1 = 白天）
+                color = CloudColors.applyTimeTint(key.location().getPath(), color,
+                        FlightRingMod.auroraDayFactor(minecraft));
+            }
+            if (key != null) {
                 FlightRingMod.LOGGER.info("[CloudTint] biome {} -> #{}", key.location(), String.format("%06X", color));
             }
             return color;

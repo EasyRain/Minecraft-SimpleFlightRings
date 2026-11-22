@@ -115,4 +115,31 @@ public class FlightRingMod {
             ModList.get().getModContainerById(MODID).ifPresent(ConfigScreens::register);
         }
     }
+
+    /**
+     * 时间染色用的"白天程度"：1 = 白天、0 = 深夜，日落/日出窗口中平滑过渡。
+     * <p>
+     * 与极光的 {@code sunVisibility} 用同一套窗口，保证"晚霞暖色"和"极光出现"的节奏一致。
+     */
+    public static float auroraDayFactor(net.minecraft.client.Minecraft minecraft) {
+        if (minecraft.level == null) {
+            return 1.0F;
+        }
+        long dayTime = minecraft.level.getDayTime() % 24000L;
+        if (dayTime < 0) {
+            dayTime += 24000L;
+        }
+        if (dayTime >= 13500L && dayTime <= 22500L) {
+            return 0.0F;
+        }
+        if (dayTime <= 12500L) {
+            return 1.0F;
+        }
+        if (dayTime < 13500L) {
+            float t = (dayTime - 12500L) / 1000.0F;
+            return 1.0F - t * t * (3.0F - 2.0F * t);
+        }
+        float t = (dayTime - 22500L) / 1000.0F;
+        return t * t * (3.0F - 2.0F * t);
+    }
 }

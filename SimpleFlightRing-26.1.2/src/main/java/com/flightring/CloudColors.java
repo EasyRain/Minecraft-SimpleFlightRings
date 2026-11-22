@@ -32,4 +32,28 @@ public final class CloudColors {
             default -> DEFAULT;
         };
     }
+
+    /** 晚霞群系：白天暖桃色，入夜后恢复成冷白（用户 2026-11-22 要求）。 */
+    private static final int SUNSET_WARM = 0xFFDCC4;
+
+    /**
+     * 按"白天程度"给晚霞群系做时间混合：{@code dayFactor} 1 = 白天（暖色）、0 = 深夜（冷白）。
+     * <p>
+     * 白天程度用与极光同一套日出日落窗口反算：
+     * 日落 12500→13500 暖色渐隐、日出 22500→23500 暖色渐显，深夜完全冷白。
+     */
+    public static int applyTimeTint(String biomePath, int color, float dayFactor) {
+        if (!"sunset_clouds".equals(biomePath)) {
+            return color;
+        }
+        float t = Math.clamp(dayFactor, 0.0F, 1.0F);
+        return lerpColor(DEFAULT, SUNSET_WARM, t);
+    }
+
+    private static int lerpColor(int from, int to, float t) {
+        int r = (int) (((from >> 16) & 0xFF) + (((to >> 16) & 0xFF) - ((from >> 16) & 0xFF)) * t);
+        int g = (int) (((from >> 8) & 0xFF) + (((to >> 8) & 0xFF) - ((from >> 8) & 0xFF)) * t);
+        int b = (int) ((from & 0xFF) + ((to & 0xFF) - (from & 0xFF)) * t);
+        return (Math.clamp(r, 0, 255) << 16) | (Math.clamp(g, 0, 255) << 8) | Math.clamp(b, 0, 255);
+    }
 }
