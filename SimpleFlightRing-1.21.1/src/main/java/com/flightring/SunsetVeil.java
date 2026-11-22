@@ -145,8 +145,8 @@ public final class SunsetVeil {
     private static void drawDome() {
         final int sectors = 48;
         final int rings = 20;
-        final double elevMin = Math.toRadians(-10.0);
-        final double elevRange = Math.toRadians(100.0);
+        final double elevMin = Math.toRadians(-30.0);   // 压到地平线以下，避免露出原版天空（白边）
+        final double elevRange = Math.toRadians(120.0);
         final float radius = 100.0F;
 
         Tesselator tesselator = Tesselator.getInstance();

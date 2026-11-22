@@ -130,8 +130,8 @@ public final class SunsetVeil {
     private static MeshData buildDome() {
         final int sectors = 48;
         final int rings = 20;
-        final double elevMin = Math.toRadians(-10.0);
-        final double elevRange = Math.toRadians(100.0);
+        final double elevMin = Math.toRadians(-30.0);   // 压到地平线以下，避免露出原版天空（白边）
+        final double elevRange = Math.toRadians(120.0);
 
         Tesselator tesselator = Tesselator.getInstance();
         BufferBuilder buffer = tesselator.begin(VertexFormat.Mode.TRIANGLES, DefaultVertexFormat.POSITION_COLOR);
