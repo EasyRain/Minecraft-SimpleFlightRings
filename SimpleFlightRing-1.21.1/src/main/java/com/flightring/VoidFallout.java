@@ -88,9 +88,9 @@ public final class VoidFallout {
 
     /** 重生点方块是否还有效（床 / 重生锚）。 */
     private static boolean isValidSpawnBlock(ServerLevel level, BlockPos pos) {
-        if (!level.hasChunkAt(pos)) {
-            return false;
-        }
+        // ★ 不要用 hasChunkAt 拦：重生点常在未加载的区块里（玩家跑远了），
+        //   getBlockState 会按需加载区块（原版复活时也是这么做的），
+        //   用 hasChunkAt 判会让"设过床"永远失效（用户 2026-11-22）。
         var state = level.getBlockState(pos);
         return state.is(net.minecraft.tags.BlockTags.BEDS)
                 || state.is(net.minecraft.world.level.block.Blocks.RESPAWN_ANCHOR);
