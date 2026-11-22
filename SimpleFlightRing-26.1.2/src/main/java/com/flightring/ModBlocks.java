@@ -52,6 +52,11 @@ public final class ModBlocks {
             properties -> properties.strength(0.5F)
                     .sound(ModSounds.CLOUD_SOUND_TYPE)
                     .noOcclusion()
+                    // ★ forceSolidOn：让 blocksMotion()/legacySolid 为真。
+                    // 我们的碰撞形状是带上下文的动态形状，缓存里是空的 => 默认 legacySolid=false
+                    // => MOTION_BLOCKING 高度图跳过云皮、把地面认成云皮下面的厚云块，
+                    // 地图 mod 传送因此落进岛内部（用户 2026-11-22）。标记固体后高度图正确。
+                    .forceSolidOn()
                     .isSuffocating((state, level, pos) -> false)
                     .isViewBlocking((state, level, pos) -> false)
                     .isValidSpawn((state, level, pos, type) -> false));
@@ -243,6 +248,11 @@ public final class ModBlocks {
             properties -> properties.strength(0.5F)
                     .sound(ModSounds.CLOUD_SOUND_TYPE)
                     .noOcclusion()
+                    // ★ forceSolidOn：让 blocksMotion()/legacySolid 为真。
+                    // 我们的碰撞形状是带上下文的动态形状，缓存里是空的 => 默认 legacySolid=false
+                    // => MOTION_BLOCKING 高度图跳过云皮、把地面认成云皮下面的厚云块，
+                    // 地图 mod 传送因此落进岛内部（用户 2026-11-22）。标记固体后高度图正确。
+                    .forceSolidOn()
                     .isSuffocating((state, level, pos) -> false)
                     .isViewBlocking((state, level, pos) -> false));
 
@@ -253,6 +263,11 @@ public final class ModBlocks {
             properties -> properties.strength(0.5F)
                     .sound(ModSounds.CLOUD_SOUND_TYPE)
                     .noOcclusion()
+                    // ★ forceSolidOn：让 blocksMotion()/legacySolid 为真。
+                    // 我们的碰撞形状是带上下文的动态形状，缓存里是空的 => 默认 legacySolid=false
+                    // => MOTION_BLOCKING 高度图跳过云皮、把地面认成云皮下面的厚云块，
+                    // 地图 mod 传送因此落进岛内部（用户 2026-11-22）。标记固体后高度图正确。
+                    .forceSolidOn()
                     .isSuffocating((state, level, pos) -> false)
                     .isViewBlocking((state, level, pos) -> false));
 
@@ -263,6 +278,11 @@ public final class ModBlocks {
             properties -> properties.strength(0.5F)
                     .sound(ModSounds.CLOUD_SOUND_TYPE)
                     .noOcclusion()
+                    // ★ forceSolidOn：让 blocksMotion()/legacySolid 为真。
+                    // 我们的碰撞形状是带上下文的动态形状，缓存里是空的 => 默认 legacySolid=false
+                    // => MOTION_BLOCKING 高度图跳过云皮、把地面认成云皮下面的厚云块，
+                    // 地图 mod 传送因此落进岛内部（用户 2026-11-22）。标记固体后高度图正确。
+                    .forceSolidOn()
                     .isSuffocating((state, level, pos) -> false)
                     .isViewBlocking((state, level, pos) -> false));
 
