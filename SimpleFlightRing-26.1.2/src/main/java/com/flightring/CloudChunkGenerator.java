@@ -278,6 +278,18 @@ public class CloudChunkGenerator extends ChunkGenerator {
                 }
             }
         }
+        // ★ 显式重算全部高度图。
+        // 只靠 setBlockState 的增量更新不够：worldgen 阶段只 prime 了 *WG 变体，
+        // 而客户端/地图 mod 用的是 WORLD_SURFACE / OCEAN_FLOOR / MOTION_BLOCKING(_NO_LEAVES)。
+        // 实测（用户 2026-11-22）：OCEAN_FLOOR / MOTION_BLOCKING_NO_LEAVES 整列都停在 minY，
+        // 于是 Xaero / FTB Chunks 认为"地面在岛底"，传送落进岛内部。
+        Heightmap.primeHeightmaps(chunk, java.util.EnumSet.of(
+                Heightmap.Types.WORLD_SURFACE,
+                Heightmap.Types.OCEAN_FLOOR,
+                Heightmap.Types.MOTION_BLOCKING,
+                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                Heightmap.Types.WORLD_SURFACE_WG,
+                Heightmap.Types.OCEAN_FLOOR_WG));
         return CompletableFuture.completedFuture(chunk);
     }
 
