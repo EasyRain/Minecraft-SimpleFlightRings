@@ -202,31 +202,32 @@ public final class AuroraSky {
     }
 
     /**
-     * 光影包 sunVisibility 的等价物：0=深夜、1=白天，日出日落平滑过渡。
+     * 光影包 sunVisibility 的等价物：0=深夜（极光完全显示）、1=白天（完全不显示）。
      * <p>
-     * 时间窗按用户实测校正（2026-11-22）：
+     * 用户给出的实测区间是**太阳切入/切出的过程**（2026-11-22）：
      * <ul>
-     *   <li><b>日落 12500~13500</b> ⇒ 极光 <b>13500 之后</b>才开始淡入（太阳完全落下去才出现）；</li>
-     *   <li>深夜 [13500, 21500] 完全显示；淡入到 14000 收尾，保证不会跟夕阳同屏；</li>
-     *   <li><b>日出 22500~23500</b> ⇒ 极光 <b>21500~22500 淡出</b>（太阳冒头之前就收干净）。</li>
+     *   <li><b>日落过程 12500 → 13500</b>（13500 太阳完全落下）⇒ 极光在这段里**淡入**，
+     *       太阳刚落完时正好完全显现；</li>
+     *   <li><b>日出过程 22500 → 23500</b>（23500 太阳完全升起）⇒ 极光在这段里**淡出**，
+     *       太阳完全升起时正好消失。</li>
      * </ul>
-     * 白天 &gt;= 0.999 时直接不画（省一次 draw call）。
+     * 也就是说：极光的淡入淡出**和太阳的切入切出同步**，两者共用同一段时间窗。
      */
     private static float sunVisibility(Minecraft minecraft) {
         long dayTime = minecraft.level.getDayTime() % 24000L;
         if (dayTime < 0) {
             dayTime += 24000L;
         }
-        if (dayTime >= 14000L && dayTime <= 21500L) {
+        if (dayTime >= 13500L && dayTime <= 22500L) {
             return 0.0F;                       // 深夜：完全显示
         }
-        if (dayTime <= 13000L) {
+        if (dayTime <= 12500L) {
             return 1.0F;                       // 白天（含 24000 环绕无缝）
         }
-        if (dayTime < 14000L) {
-            return 1.0F - smoothstep((dayTime - 13000L) / 1000.0F);   // 黄昏 13500 后淡入，14000 满
+        if (dayTime < 13500L) {
+            return 1.0F - smoothstep((dayTime - 12500L) / 1000.0F);   // 日落 12500→13500 淡入
         }
-        return smoothstep((dayTime - 21500L) / 1000.0F);               // 黎明 21500~22500 淡出
+        return smoothstep((dayTime - 22500L) / 1000.0F);               // 日出 22500→23500 淡出
     }
 
     private static float smoothstep(float t) {
