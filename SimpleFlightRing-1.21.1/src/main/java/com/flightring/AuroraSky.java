@@ -199,8 +199,8 @@ public final class AuroraSky {
         RenderSystem.disableBlend();
     }
 
-    /** 群系过渡半径（格）：跨过边界时在这个距离内平滑淡入淡出。 */
-    private static final double BIOME_BLEND_RADIUS = 24.0;
+    /** 群系过渡半径（格）：跨过边界时在这个距离内平滑淡入淡出（用户 2026-11-22：12 格）。 */
+    private static final double BIOME_BLEND_RADIUS = 12.0;
     private static final int BIOME_RING_SAMPLES = 8;
 
     /**
