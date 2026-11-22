@@ -79,6 +79,18 @@ public final class VoidFallout {
                 return bed;
             }
         }
-        return overworld.getRespawnData().pos();
+        return snapToSurface(overworld, overworld.getRespawnData().pos());
+    }
+
+    /** 把坐标的 Y 吸附到该列的地表（找不到地面就保持原 Y）。 */
+    private static BlockPos snapToSurface(ServerLevel level, BlockPos pos) {
+        int surface = level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                pos.getX(), pos.getZ());
+        int minY = level.getMinY();
+        int maxY = minY + level.getHeight() - 1;
+        if (surface <= minY || surface > maxY) {
+            return pos;
+        }
+        return new BlockPos(pos.getX(), surface, pos.getZ());
     }
 }

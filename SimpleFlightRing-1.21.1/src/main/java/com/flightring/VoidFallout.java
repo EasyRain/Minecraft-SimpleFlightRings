@@ -69,12 +69,31 @@ public final class VoidFallout {
         FlightRingMod.LOGGER.debug("[VoidFallout] {} returned to overworld at {}", player.getGameProfile().getName(), target);
     }
 
-    /** 优先用玩家的重生点（床/重生锚），没有就用世界出生点。 */
+    /**
+     * 优先用玩家的重生点（床/重生锚），没有就用世界出生点。
+     * <p>
+     * ★ 世界出生点的 Y 可能是"生成时的高度"（超平坦、或出生点被挖过），直接用它会把玩家
+     * 丢在半空摔下来（用户 2026-11-22）。所以这里按 x/z **重新取地表高度**，
+     * 和原版重生时的落点判定保持一致。
+     */
     private static BlockPos respawnPos(ServerPlayer player, ServerLevel overworld) {
         BlockPos bed = player.getRespawnPosition();
         if (bed != null) {
             return new BlockPos(bed.getX(), bed.getY(), bed.getZ());
         }
-        return overworld.getSharedSpawnPos();
+        BlockPos spawn = overworld.getSharedSpawnPos();
+        return snapToSurface(overworld, spawn);
+    }
+
+    /** 把坐标的 Y 吸附到该列的地表（找不到地面就保持原 Y）。 */
+    private static BlockPos snapToSurface(ServerLevel level, BlockPos pos) {
+        int surface = level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                pos.getX(), pos.getZ());
+        int minY = level.getMinBuildHeight();
+        int maxY = minY + level.getHeight() - 1;
+        if (surface <= minY || surface > maxY) {
+            return pos;   // 这一列没有地面（虚空/未生成）：别乱改 Y
+        }
+        return new BlockPos(pos.getX(), surface, pos.getZ());
     }
 }
