@@ -48,6 +48,13 @@ float hash12(vec2 p) {
 }
 
 void main() {
+    // 26.x 没有自定义 uniform：参数从 DynamicTransforms 取（必须在任何使用之前声明）
+    float Time = ModelOffset.z;
+    float BiomeWeight = ColorModulator.x;
+    float SunFade = ColorModulator.y;
+    float RainFactor = ColorModulator.z;
+    vec2 cameraPositionM = ModelOffset.xy;
+
     vec3 dir = normalize(worldDir);
     float VdotU = dir.y;
 
@@ -63,12 +70,7 @@ void main() {
     float y = max(dir.y, 0.06);
     vec2 wposXZ = dir.xz / y;
 
-    // 视差 + 慢漂移由 Java 侧烘进 ModelOffset.xy（26.x 没有自定义 uniform）
-    float Time = ModelOffset.z;
-    float SunFade = ColorModulator.y;
-    float RainFactor = ColorModulator.z;
-    float BiomeWeight = ColorModulator.x;
-    vec2 cameraPositionM = ModelOffset.xy;
+    // 视差 + 慢漂移已由 Java 侧烘进 ModelOffset.xy（见 main 开头）
 
     float dither = hash12(gl_FragCoord.xy);
     float ditherM = dither + 5.0;
