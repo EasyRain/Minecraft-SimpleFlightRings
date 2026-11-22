@@ -1,19 +1,29 @@
 package com.flightring;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.RenderBlockScreenEffectEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
 
 /**
- * 传送门屏幕滤镜（换掉地狱门那层紫色）。
+ * 云门不再显示那层紫色滤镜（用户 2026-11-22）。
  * <p>
- * 原版机制：{@code ScreenEffectRenderer} 在玩家身处方块内时，取该方块模型自带的
- * <b>particle 贴图</b> 铺满全屏、颜色乘 0.1。我们的传送门方块在这条路径上最终拿到的是
- * 地狱门的紫色贴图（用户 2026-11-22 反馈"和下界门一模一样"）。
- * <p>
- * 与其继续猜原版从哪儿取图，直接把这个 overlay 取消 —— 云门不再有紫色滤镜，
- * 维度切换本身的原版闪光仍然保留。
+ * 关键发现：原版那层"进门滤镜"的贴图是<b>写死的</b> ——
+ * <ul>
+ *   <li>1.21.1：{@code Gui#renderPortalOverlay} 用 {@code Blocks.NETHER_PORTAL} 的 particle 图标；</li>
+ *   <li>26.1.2：{@code Gui#extractPortalOverlay} 同样写死 {@code Blocks.NETHER_PORTAL}。</li>
+ * </ul>
+ * 所以换我们方块的贴图、取消 {@code RenderBlockScreenEffectEvent} 都没用 —— 那根本不是同一条路径。
+ * 真正驱动它的是玩家身上的"旋转/传送门"强度值：
+ * <ul>
+ *   <li>1.21.1：{@code LocalPlayer#spinningEffectIntensity}（+ o... 上一帧）；</li>
+ *   <li>26.1.2：{@code LocalPlayer#portalEffectIntensity}（+ o... 上一帧）。</li>
+ * </ul>
+ * 站在云门里时把这两个值清零，滤镜自然就不画了，而且不需要 mixin。
  */
 @EventBusSubscriber(modid = FlightRingMod.MODID, value = Dist.CLIENT)
 public final class CloudPortalOverlay {
@@ -22,13 +32,32 @@ public final class CloudPortalOverlay {
     }
 
     @SubscribeEvent
-    public static void onBlockOverlay(RenderBlockScreenEffectEvent event) {
-        if (event.getOverlayType() != RenderBlockScreenEffectEvent.OverlayType.BLOCK) {
+    public static void onClientTick(ClientTickEvent.Post event) {
+        Minecraft minecraft = Minecraft.getInstance();
+        LocalPlayer player = minecraft.player;
+        if (player == null || minecraft.level == null) {
             return;
         }
-        if (!(event.getBlockState().getBlock() instanceof BrokenPortalBlock)) {
+        if (!isInsideCloudPortal(player)) {
             return;
         }
-        event.setCanceled(true);
+        // 1.21.1 用的是 spinningEffectIntensity（Gui#renderPortalOverlay 的驱动值）
+        player.spinningEffectIntensity = 0.0F;
+        player.oSpinningEffectIntensity = 0.0F;
+    }
+
+    /** 玩家身体或眼睛是否在云门/破门方块里。 */
+    private static boolean isInsideCloudPortal(LocalPlayer player) {
+        for (int i = 0; i < 8; i++) {
+            double dx = (((i >> 0) % 2) - 0.5D) * player.getBbWidth() * 0.8D;
+            double dy = (((i >> 1) % 2) - 0.5D) * 0.1D * player.getScale();
+            double dz = (((i >> 2) % 2) - 0.5D) * player.getBbWidth() * 0.8D;
+            BlockPos pos = BlockPos.containing(player.getX() + dx, player.getEyeY() + dy, player.getZ() + dz);
+            BlockState state = player.level().getBlockState(pos);
+            if (state.getBlock() instanceof BrokenPortalBlock) {
+                return true;
+            }
+        }
+        return false;
     }
 }
