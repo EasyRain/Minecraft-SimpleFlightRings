@@ -263,11 +263,6 @@ public final class AuroraSky {
      * </ul>
      * 也就是说：极光的淡入淡出**和太阳的切入切出同步**，两者共用同一段时间窗。
      */
-    /** 供其它天空效果复用（0=深夜、1=白天）。 */
-    public static float sunVisibilityPublic(Minecraft minecraft) {
-        return sunVisibility(minecraft);
-    }
-
     private static float sunVisibility(Minecraft minecraft) {
         long dayTime = minecraft.level.getDayTime() % 24000L;
         if (dayTime < 0) {

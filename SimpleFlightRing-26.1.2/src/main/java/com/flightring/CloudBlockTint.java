@@ -57,10 +57,6 @@ public final class CloudBlockTint {
             var key = minecraft.level.registryAccess().lookupOrThrow(Registries.BIOME).getResourceKey(b).orElse(null);
             int color = CloudColors.of(key == null ? null : key.identifier());
             if (key != null) {
-                color = CloudColors.applyTimeTint(key.identifier().getPath(), color,
-                        FlightRingMod.auroraDayFactor(minecraft));
-            }
-            if (key != null) {
                 FlightRingMod.LOGGER.info("[CloudTint] biome {} -> #{}", key.identifier(), String.format("%06X", color));
             }
             return color;
