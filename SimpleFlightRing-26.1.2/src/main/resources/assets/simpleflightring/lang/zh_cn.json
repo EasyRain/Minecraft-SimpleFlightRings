@@ -367,5 +367,10 @@
   "block.simpleflightring.cloud_block_wall": "云块墙",
   "block.simpleflightring.thick_cloud_bricks_slab": "厚云砖半砖",
   "block.simpleflightring.thick_cloud_bricks_stairs": "厚云砖台阶",
-  "block.simpleflightring.thick_cloud_bricks_wall": "厚云砖墙"
+  "block.simpleflightring.thick_cloud_bricks_wall": "厚云砖墙",
+  "biome.simpleflightring.cloud_sea": "云海",
+  "biome.simpleflightring.clear_sky": "晴空",
+  "biome.simpleflightring.thunderhead": "雷云",
+  "biome.simpleflightring.aurora": "极光",
+  "biome.simpleflightring.sunset_clouds": "晚霞"
 }

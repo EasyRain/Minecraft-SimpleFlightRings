@@ -367,5 +367,10 @@
   "block.simpleflightring.cloud_block_wall": "Cloud Wall",
   "block.simpleflightring.thick_cloud_bricks_slab": "Thick Cloud Brick Slab",
   "block.simpleflightring.thick_cloud_bricks_stairs": "Thick Cloud Brick Stairs",
-  "block.simpleflightring.thick_cloud_bricks_wall": "Thick Cloud Brick Wall"
+  "block.simpleflightring.thick_cloud_bricks_wall": "Thick Cloud Brick Wall",
+  "biome.simpleflightring.cloud_sea": "Cloud Sea",
+  "biome.simpleflightring.clear_sky": "Clear Sky",
+  "biome.simpleflightring.thunderhead": "Thunderhead",
+  "biome.simpleflightring.aurora": "Aurora",
+  "biome.simpleflightring.sunset_clouds": "Sunset Clouds"
 }
