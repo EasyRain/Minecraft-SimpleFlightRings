@@ -95,7 +95,8 @@ public final class SunsetVeil {
             return;
         }
         float day = AuroraSky.sunVisibilityPublic(minecraft);   // 0=深夜 1=白天
-        float alpha = 0.88F * (1.0F - day);                     // 夜里透明
+        // ★ 白天遮阳、夜里透明（之前写成 1-day，结果夜里盖了一整颗白球）
+        float alpha = 0.92F * day;
         if (alpha <= 0.01F) {
             return;
         }
@@ -108,7 +109,7 @@ public final class SunsetVeil {
         RenderSystem.setShader(() -> shader);
         var colorUniform = shader.safeGetUniform("ColorModulator");
         if (colorUniform != null) {
-            colorUniform.set(0.78F, 0.81F, 0.85F, alpha);
+            colorUniform.set(0.70F, 0.73F, 0.78F, alpha);   // 阴天的灰蓝色，别用纯白
         }
 
         var poseStack = event.getPoseStack();

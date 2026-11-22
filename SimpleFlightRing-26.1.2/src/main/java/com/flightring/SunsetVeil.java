@@ -81,14 +81,15 @@ public final class SunsetVeil {
             return;
         }
         float day = FlightRingMod.auroraDayFactor(minecraft);
-        float alpha = 0.88F * (1.0F - day);
+        // ★ 白天遮阳、夜里透明（之前写成 1-day，结果夜里盖了一整颗白球）
+        float alpha = 0.92F * day;
         if (alpha <= 0.01F) {
             return;
         }
 
         Matrix4f view = new Matrix4f(event.getModelViewMatrix());
         GpuBufferSlice dynamicTransforms = RenderSystem.getDynamicUniforms().writeTransform(
-                view, new Vector4f(0.78F, 0.81F, 0.85F, alpha), new Vector3f(), new Matrix4f());
+                view, new Vector4f(0.70F, 0.73F, 0.78F, alpha), new Vector3f(), new Matrix4f());
 
         MeshData mesh = buildDome();
         GpuBuffer old = vertexBuffer;
