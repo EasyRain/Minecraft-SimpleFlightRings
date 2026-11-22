@@ -32,7 +32,7 @@ public abstract class CloudPortalOverlayMixin {
     @Inject(method = "renderPortalOverlay", at = @At("HEAD"), cancellable = true)
     private void simpleflightring$cloudPortalOverlay(GuiGraphics graphics, float alpha, CallbackInfo ci) {
         Minecraft minecraft = Minecraft.getInstance();
-        if (minecraft.player == null || !CloudPortalOverlay.isInsideCloudPortal(minecraft.player)) {
+        if (minecraft.player == null || !CloudPortalOverlay.shouldDrawCloudOverlay(minecraft.player)) {
             return;   // 站在别处（比如真下界门）：交给原版
         }
         if (alpha < 1.0F) {

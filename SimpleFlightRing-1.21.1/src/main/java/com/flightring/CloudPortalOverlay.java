@@ -25,6 +25,28 @@ public final class CloudPortalOverlay {
     private CloudPortalOverlay() {
     }
 
+    /** 最近一次"人在云门里"的 tick，用于滤镜淡出期间保持我们的颜色（用户 2026-11-22）。 */
+    private static int lastInsideTick = Integer.MIN_VALUE / 2;
+
+    /**
+     * 滤镜是否该由我们接管。
+     * <p>
+     * 只看"此刻在不在门里"会漏掉**中途退出传送门**的情况：原版那层滤镜不会立刻消失，
+     * 而是快速淡出；一旦我们已经离开方块，判定为 false => 退回原版紫色，
+     * 于是"蓝 → 紫"闪一下。所以这里额外记住最近一次在门里的 tick，
+     * 淡出期间（{@value #FADE_GRACE_TICKS} tick 内）继续用我们的贴图。
+     */
+    public static boolean shouldDrawCloudOverlay(LocalPlayer player) {
+        if (isInsideCloudPortal(player)) {
+            lastInsideTick = player.tickCount;
+            return true;
+        }
+        return player.tickCount - lastInsideTick <= FADE_GRACE_TICKS;
+    }
+
+    /** 滤镜淡出的宽限时长（tick）。原版的淡出大约 1 秒，这里给 2 秒更保险。 */
+    private static final int FADE_GRACE_TICKS = 40;
+
     /** 供 mixin 复用：玩家身体/眼睛是否在云门里。 */
     public static boolean isInsideCloudPortal(LocalPlayer player) {
         for (int i = 0; i < 8; i++) {
