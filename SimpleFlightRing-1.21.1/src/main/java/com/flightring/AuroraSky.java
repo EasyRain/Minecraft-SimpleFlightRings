@@ -201,29 +201,49 @@ public final class AuroraSky {
 
     /** 群系过渡半径（格）：跨过边界时在这个距离内平滑淡入淡出（用户 2026-11-22：12 格）。 */
     private static final double BIOME_BLEND_RADIUS = 12.0;
-    private static final int BIOME_RING_SAMPLES = 8;
+    /** 采样网格：以相机为中心 (GRID)² 个点，之后做双线性插值。 */
+    private static final int BIOME_GRID = 5;
 
     /**
      * 群系"极光权重" 0~1。
      * <p>
-     * 用户 2026-11-22：站在两个群系交界处时，左一步极光突然出现、右一步又突然消失。
-     * 原因是之前只判断**相机所在方块**的群系（布尔值）。现在改为在相机周围取一圈采样点
-     * （中心加权 + 8 个点，半径 {@value #BIOME_BLEND_RADIUS} 格），按命中比例给权重，
-     * 跨过边界时会有一圈平滑过渡。
+     * 用户 2026-11-22 两次反馈：① 跨一步极光突现/突消；② 加权重后像"有挡位的灯"一阶一阶变。
+     * 原因分别是"只看中心点"和"只数命中比例"（命中数只有 0~10 十一个整数档）。
+     * <p>
+     * 现在改为：在相机周围取 {@link #BIOME_GRID}×{@link #BIOME_GRID} 的布尔网格
+     * （间距 = 2×半径/(GRID-1)），再按相机在网格内的位置做**双线性插值** ⇒ 权重随位置连续变化，
+     * 不再有台阶。
      */
     private static float auroraBiomeWeight(Minecraft minecraft, Vec3 cameraPos) {
-        int hits = isAuroraAt(minecraft, cameraPos.x, cameraPos.y, cameraPos.z) ? 2 : 0;
-        for (int i = 0; i < BIOME_RING_SAMPLES; i++) {
-            double a = Math.PI * 2.0 * i / BIOME_RING_SAMPLES;
-            if (isAuroraAt(minecraft,
-                    cameraPos.x + Math.cos(a) * BIOME_BLEND_RADIUS,
-                    cameraPos.y,
-                    cameraPos.z + Math.sin(a) * BIOME_BLEND_RADIUS)) {
-                hits++;
+        double span = BIOME_BLEND_RADIUS * 2.0;
+        double step = span / (BIOME_GRID - 1);
+        double baseX = cameraPos.x - BIOME_BLEND_RADIUS;
+        double baseZ = cameraPos.z - BIOME_BLEND_RADIUS;
+
+        boolean[][] cell = new boolean[BIOME_GRID][BIOME_GRID];
+        for (int ix = 0; ix < BIOME_GRID; ix++) {
+            for (int iz = 0; iz < BIOME_GRID; iz++) {
+                cell[ix][iz] = isAuroraAt(minecraft,
+                        baseX + step * ix, cameraPos.y, baseZ + step * iz);
             }
         }
-        float w = hits / (float) (BIOME_RING_SAMPLES + 2);
-        return w * w * (3.0F - 2.0F * w);   // smoothstep，过渡更自然
+
+        // 双线性插值：先算出相机在这张网格里的相对位置（0 ~ GRID-1）
+        double gx = Math.clamp((cameraPos.x - baseX) / step, 0.0, BIOME_GRID - 1.0);
+        double gz = Math.clamp((cameraPos.z - baseZ) / step, 0.0, BIOME_GRID - 1.0);
+        int x0 = Math.min((int) Math.floor(gx), BIOME_GRID - 2);
+        int z0 = Math.min((int) Math.floor(gz), BIOME_GRID - 2);
+        double tx = gx - x0;
+        double tz = gz - z0;
+
+        double v00 = cell[x0][z0] ? 1.0 : 0.0;
+        double v10 = cell[x0 + 1][z0] ? 1.0 : 0.0;
+        double v01 = cell[x0][z0 + 1] ? 1.0 : 0.0;
+        double v11 = cell[x0 + 1][z0 + 1] ? 1.0 : 0.0;
+        double a = v00 * (1 - tx) + v10 * tx;
+        double b = v01 * (1 - tx) + v11 * tx;
+        float w = (float) (a * (1 - tz) + b * tz);
+        return w * w * (3.0F - 2.0F * w);   // smoothstep：两端更柔和
     }
 
     private static boolean isAuroraAt(Minecraft minecraft, double x, double y, double z) {
