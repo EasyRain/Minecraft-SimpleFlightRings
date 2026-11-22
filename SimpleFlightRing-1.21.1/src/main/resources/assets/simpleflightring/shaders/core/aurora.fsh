@@ -29,7 +29,7 @@ out vec4 fragColor;
 
 const float AURORA_SIZE = 1.0;
 // 图案整体尺度：越小 => 极光纹理越大（用户 2026-11-22：之前像"地图被缩小"）
-const float AURORA_PATTERN_SCALE = 6.0;
+const float AURORA_PATTERN_SCALE = 8.0;
 const float AURORA_NOISE_SCALE = 1.0;
 const int sampleCount = 25;     // deferred1 天空通道用 25；gbuffers 版本才降到 10
 const int sampleCountP = sampleCount + 5;

@@ -204,12 +204,11 @@ public final class AuroraSky {
     /**
      * 光影包 sunVisibility 的等价物：0=深夜、1=白天，日出日落平滑过渡。
      * <p>
-     * 时间窗（用户 2026-11-22 调整：入夜延后、日出提前）：
+     * 时间窗按用户实测校正（2026-11-22）：
      * <ul>
-     *   <li>白天 [0, 13200] = 1；</li>
-     *   <li><b>黄昏 13200 → 15000</b> 淡入（太阳快落山、天开始黑时才出现）；</li>
-     *   <li>深夜 [15000, 21000] = 0（完全显示）；</li>
-     *   <li><b>黎明 21000 → 22400</b> 淡出（太阳升起前就收掉，不会"太阳出来还在"）。</li>
+     *   <li><b>日落 12500~13500</b> ⇒ 极光 <b>13500 之后</b>才开始淡入（太阳完全落下去才出现）；</li>
+     *   <li>深夜 [13500, 21500] 完全显示；淡入到 14000 收尾，保证不会跟夕阳同屏；</li>
+     *   <li><b>日出 22500~23500</b> ⇒ 极光 <b>21500~22500 淡出</b>（太阳冒头之前就收干净）。</li>
      * </ul>
      * 白天 &gt;= 0.999 时直接不画（省一次 draw call）。
      */
@@ -218,16 +217,16 @@ public final class AuroraSky {
         if (dayTime < 0) {
             dayTime += 24000L;
         }
-        if (dayTime >= 15000L && dayTime <= 21000L) {
-            return 0.0F;                       // 深夜
+        if (dayTime >= 14000L && dayTime <= 21500L) {
+            return 0.0F;                       // 深夜：完全显示
         }
-        if (dayTime <= 13200L) {
+        if (dayTime <= 13000L) {
             return 1.0F;                       // 白天（含 24000 环绕无缝）
         }
-        if (dayTime < 15000L) {
-            return 1.0F - smoothstep((dayTime - 13200L) / 1800.0F);   // 黄昏 1→0（延后入夜）
+        if (dayTime < 14000L) {
+            return 1.0F - smoothstep((dayTime - 13000L) / 1000.0F);   // 黄昏 13500 后淡入，14000 满
         }
-        return smoothstep((dayTime - 21000L) / 1400.0F);               // 黎明 0→1（提前收尾）
+        return smoothstep((dayTime - 21500L) / 1000.0F);               // 黎明 21500~22500 淡出
     }
 
     private static float smoothstep(float t) {
