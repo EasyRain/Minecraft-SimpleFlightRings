@@ -49,7 +49,7 @@ public final class ModBlocks {
     public static final DeferredBlock<Block> CLOUD_BLOCK = BLOCKS.registerBlock(
             "cloud_block",
             CloudBlock::new,
-            properties -> properties.strength(0.5F)
+            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.SNOW).strength(0.5F)
                     .sound(ModSounds.CLOUD_SOUND_TYPE)
                     .noOcclusion()
                     // ★ forceSolidOn：让 blocksMotion()/legacySolid 为真。
@@ -71,7 +71,7 @@ public final class ModBlocks {
     public static final DeferredBlock<Block> THICK_CLOUD_BLOCK = BLOCKS.registerBlock(
             "thick_cloud_block",
             ThickCloudBlock::new,
-            properties -> properties.strength(2.0F)
+            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.SNOW).forceSolidOn().strength(2.0F)
                     .sound(ModSounds.THICK_SOUND_TYPE)
                     .isViewBlocking((state, level, pos) -> false));
 
@@ -79,13 +79,13 @@ public final class ModBlocks {
     public static final DeferredBlock<Block> THICK_CLOUD_BRICKS = BLOCKS.registerBlock(
             "thick_cloud_bricks",
             ThickCloudBrickBlock::new,
-            properties -> properties.strength(0.8F)
+            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.COLOR_LIGHT_GRAY).forceSolidOn().strength(0.8F)
                     .sound(ModSounds.THICK_SOUND_TYPE));
 
     public static final DeferredBlock<Block> THICK_CLOUD_SLAB = BLOCKS.registerBlock(
             "thick_cloud_slab",
             SlabBlock::new,
-            properties -> properties.strength(0.8F)
+            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.SNOW).strength(0.8F)
                     .sound(ModSounds.THICK_SOUND_TYPE));
 
 
@@ -93,7 +93,7 @@ public final class ModBlocks {
     public static final DeferredBlock<Block> THICK_CLOUD_STAIRS = BLOCKS.registerBlock(
             "thick_cloud_stairs",
             properties -> new StairBlock(net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(), properties),
-            properties -> properties.strength(0.8F)
+            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.SNOW).strength(0.8F)
                     .sound(ModSounds.THICK_SOUND_TYPE));
 
     /** 云门：厚云砖框里点亮出来的传送门方块（无物品、无掉落）。 */
@@ -129,7 +129,7 @@ public final class ModBlocks {
     public static final DeferredBlock<Block> THICK_CLOUD_WALL = BLOCKS.registerBlock(
             "thick_cloud_wall",
             WallBlock::new,
-            properties -> properties.strength(0.8F)
+            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.SNOW).strength(0.8F)
                     .sound(ModSounds.THICK_SOUND_TYPE));
 
     private ModBlocks() {
@@ -141,32 +141,32 @@ public final class ModBlocks {
     public static final DeferredBlock<Block> CLOUD_LOG = BLOCKS.registerBlock(
             "cloud_log",
             RotatedPillarBlock::new,
-            properties -> properties.strength(2.0F).sound(SoundType.WOOD));
+            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.WOOD).forceSolidOn().strength(2.0F).sound(SoundType.WOOD));
 
     /** 云木：六面都是树皮纹理。 */
     public static final DeferredBlock<Block> CLOUD_WOOD = BLOCKS.registerBlock(
             "cloud_wood",
             RotatedPillarBlock::new,
-            properties -> properties.strength(2.0F).sound(SoundType.WOOD));
+            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.WOOD).forceSolidOn().strength(2.0F).sound(SoundType.WOOD));
 
 
     /** 去皮云木原木：用斧头给云木原木去皮得到。 */
     public static final DeferredBlock<Block> STRIPPED_CLOUD_LOG = BLOCKS.registerBlock(
             "stripped_cloud_log",
             RotatedPillarBlock::new,
-            properties -> properties.strength(2.0F).sound(SoundType.WOOD));
+            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.WOOD).forceSolidOn().strength(2.0F).sound(SoundType.WOOD));
 
     /** 去皮云木。 */
     public static final DeferredBlock<Block> STRIPPED_CLOUD_WOOD = BLOCKS.registerBlock(
             "stripped_cloud_wood",
             RotatedPillarBlock::new,
-            properties -> properties.strength(2.0F).sound(SoundType.WOOD));
+            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.WOOD).forceSolidOn().strength(2.0F).sound(SoundType.WOOD));
 
     /** 云母木板。 */
     public static final DeferredBlock<Block> CLOUD_PLANKS = BLOCKS.registerBlock(
             "cloud_planks",
             Block::new,
-            properties -> properties.strength(2.0F, 3.0F).sound(SoundType.WOOD));
+            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.WOOD).forceSolidOn().strength(2.0F, 3.0F).sound(SoundType.WOOD));
 
 
     // ---- 云母木变体（M5）：台阶 / 楼梯 / 栅栏 / 栅栏门 / 门 / 活板门 / 按钮 / 压力板 ----------
@@ -175,22 +175,22 @@ public final class ModBlocks {
     public static final DeferredBlock<Block> CLOUD_STAIRS = BLOCKS.registerBlock(
             "cloud_stairs",
             properties -> new StairBlock(ModBlocks.CLOUD_PLANKS.get().defaultBlockState(), properties),
-            properties -> properties.strength(2.0F, 3.0F).sound(SoundType.WOOD));
+            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.WOOD).strength(2.0F, 3.0F).sound(SoundType.WOOD));
 
     public static final DeferredBlock<Block> CLOUD_SLAB = BLOCKS.registerBlock(
             "cloud_slab",
             SlabBlock::new,
-            properties -> properties.strength(2.0F, 3.0F).sound(SoundType.WOOD));
+            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.WOOD).strength(2.0F, 3.0F).sound(SoundType.WOOD));
 
     public static final DeferredBlock<Block> CLOUD_FENCE = BLOCKS.registerBlock(
             "cloud_fence",
             FenceBlock::new,
-            properties -> properties.strength(2.0F, 3.0F).sound(SoundType.WOOD));
+            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.WOOD).strength(2.0F, 3.0F).sound(SoundType.WOOD));
 
     public static final DeferredBlock<Block> CLOUD_FENCE_GATE = BLOCKS.registerBlock(
             "cloud_fence_gate",
             properties -> new FenceGateBlock(CloudWoodTypes.CLOUD_WOOD_TYPE, properties),
-            properties -> properties.strength(2.0F, 3.0F).sound(SoundType.WOOD));
+            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.WOOD).strength(2.0F, 3.0F).sound(SoundType.WOOD));
 
     public static final DeferredBlock<Block> CLOUD_DOOR = BLOCKS.registerBlock(
             "cloud_door",
@@ -245,7 +245,7 @@ public final class ModBlocks {
     public static final DeferredBlock<Block> CLOUD_BLOCK_SLAB = BLOCKS.registerBlock(
             "cloud_block_slab",
             CloudSlabBlock::new,
-            properties -> properties.strength(0.5F)
+            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.SNOW).strength(0.5F)
                     .sound(ModSounds.CLOUD_SOUND_TYPE)
                     .noOcclusion()
                     // ★ forceSolidOn：让 blocksMotion()/legacySolid 为真。
@@ -260,7 +260,7 @@ public final class ModBlocks {
     public static final DeferredBlock<Block> CLOUD_BLOCK_STAIRS = BLOCKS.registerBlock(
             "cloud_block_stairs",
             properties -> new CloudStairBlock(ModBlocks.CLOUD_BLOCK.get().defaultBlockState(), properties),
-            properties -> properties.strength(0.5F)
+            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.SNOW).strength(0.5F)
                     .sound(ModSounds.CLOUD_SOUND_TYPE)
                     .noOcclusion()
                     // ★ forceSolidOn：让 blocksMotion()/legacySolid 为真。
@@ -275,7 +275,7 @@ public final class ModBlocks {
     public static final DeferredBlock<Block> CLOUD_BLOCK_WALL = BLOCKS.registerBlock(
             "cloud_block_wall",
             CloudWallBlock::new,
-            properties -> properties.strength(0.5F)
+            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.SNOW).strength(0.5F)
                     .sound(ModSounds.CLOUD_SOUND_TYPE)
                     .noOcclusion()
                     // ★ forceSolidOn：让 blocksMotion()/legacySolid 为真。
@@ -290,25 +290,25 @@ public final class ModBlocks {
     public static final DeferredBlock<Block> THICK_CLOUD_BRICKS_SLAB = BLOCKS.registerBlock(
             "thick_cloud_bricks_slab",
             SlabBlock::new,
-            properties -> properties.strength(0.8F).sound(ModSounds.THICK_SOUND_TYPE));
+            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.COLOR_LIGHT_GRAY).strength(0.8F).sound(ModSounds.THICK_SOUND_TYPE));
 
     /** 变体：thick_cloud_bricks_stairs。 */
     public static final DeferredBlock<Block> THICK_CLOUD_BRICKS_STAIRS = BLOCKS.registerBlock(
             "thick_cloud_bricks_stairs",
             properties -> new StairBlock(ModBlocks.THICK_CLOUD_BRICKS.get().defaultBlockState(), properties),
-            properties -> properties.strength(0.8F).sound(ModSounds.THICK_SOUND_TYPE));
+            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.COLOR_LIGHT_GRAY).strength(0.8F).sound(ModSounds.THICK_SOUND_TYPE));
 
     /** 变体：thick_cloud_bricks_wall。 */
     public static final DeferredBlock<Block> THICK_CLOUD_BRICKS_WALL = BLOCKS.registerBlock(
             "thick_cloud_bricks_wall",
             WallBlock::new,
-            properties -> properties.strength(0.8F).sound(ModSounds.THICK_SOUND_TYPE));
+            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.COLOR_LIGHT_GRAY).strength(0.8F).sound(ModSounds.THICK_SOUND_TYPE));
 
     /** 云树苗：能种在土上，也能直接种在厚云块上。 */
     public static final DeferredBlock<Block> CLOUD_SAPLING = BLOCKS.registerBlock(
             "cloud_sapling",
             CloudSaplingBlock::new,
-            properties -> properties.noCollision().randomTicks().instabreak()
+            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.PLANT).noCollision().randomTicks().instabreak()
                     .sound(SoundType.GRASS)
                     .pushReaction(PushReaction.DESTROY));
 
@@ -316,7 +316,7 @@ public final class ModBlocks {
     public static final DeferredBlock<Block> CLOUD_LEAVES = BLOCKS.registerBlock(
             "cloud_leaves",
             CloudLeavesBlock::new,
-            properties -> properties.strength(0.2F)
+            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.PLANT).forceSolidOn().strength(0.2F)
                     .randomTicks()
                     .sound(SoundType.GRASS)
                     .noOcclusion()
