@@ -90,7 +90,9 @@ public final class VoidFallout {
         //   getBlockState 会按需加载区块（原版复活时也是这么做的），
         //   用 hasChunkAt 判会让"设过床"永远失效（用户 2026-11-22）。
         var state = level.getBlockState(pos);
-        return state.is(net.minecraft.tags.BlockTags.BEDS)
+        // 用自己的 BedBlock 判断，而不是 #minecraft:beds 标签：
+        // 自建床如果没有加进原版标签，标签判定会失败（用户 2026-11-22 的云木床就是这个）。
+        return state.getBlock() instanceof net.minecraft.world.level.block.BedBlock
                 || state.is(net.minecraft.world.level.block.Blocks.RESPAWN_ANCHOR);
     }
 
