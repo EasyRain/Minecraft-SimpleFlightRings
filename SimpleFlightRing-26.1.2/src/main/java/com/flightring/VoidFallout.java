@@ -76,7 +76,7 @@ public final class VoidFallout {
         if (config != null && config.respawnData() != null) {
             BlockPos bed = config.respawnData().pos();
             if (bed != null) {
-                return bed;
+                return new BlockPos(bed.getX(), bed.getY() + 1, bed.getZ());   // 床高 0.5625，+1 才不会卡进床里
             }
         }
         return snapToSurface(overworld, overworld.getRespawnData().pos());

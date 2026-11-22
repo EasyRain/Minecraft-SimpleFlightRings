@@ -79,7 +79,7 @@ public final class VoidFallout {
     private static BlockPos respawnPos(ServerPlayer player, ServerLevel overworld) {
         BlockPos bed = player.getRespawnPosition();
         if (bed != null) {
-            return new BlockPos(bed.getX(), bed.getY(), bed.getZ());
+            return new BlockPos(bed.getX(), bed.getY() + 1, bed.getZ());   // 床高 0.5625，+1 才不会卡进床里
         }
         BlockPos spawn = overworld.getSharedSpawnPos();
         return snapToSurface(overworld, spawn);
