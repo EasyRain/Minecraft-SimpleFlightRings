@@ -304,6 +304,37 @@ public final class ModBlocks {
             WallBlock::new,
             properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.COLOR_LIGHT_GRAY).strength(2.0F).sound(ModSounds.THICK_SOUND_TYPE));
 
+    /** 云绒草：云层地表的小草丛（晴空/雷云/晚霞常见，云海稀疏）。 */
+    public static final DeferredBlock<Block> CLOUD_GRASS = BLOCKS.registerBlock(
+            "cloud_grass",
+            CloudPlantBlock::new,
+            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.PLANT)
+                    .noCollision().instabreak()
+                    .sound(SoundType.GRASS)
+                    .offsetType(BlockBehaviour.OffsetType.XZ)
+                    .pushReaction(PushReaction.DESTROY));
+
+    /** 云絮花：白蓝色小花，晴空与晚霞群系。 */
+    public static final DeferredBlock<Block> CLOUD_BLOOM = BLOCKS.registerBlock(
+            "cloud_bloom",
+            CloudPlantBlock::new,
+            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.PLANT)
+                    .noCollision().instabreak()
+                    .sound(SoundType.GRASS)
+                    .offsetType(BlockBehaviour.OffsetType.XZ)
+                    .pushReaction(PushReaction.DESTROY));
+
+    /** 极光花：青绿色、会发光的小花，极光群系专属。 */
+    public static final DeferredBlock<Block> AURORA_BLOOM = BLOCKS.registerBlock(
+            "aurora_bloom",
+            CloudPlantBlock::new,
+            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.PLANT)
+                    .noCollision().instabreak()
+                    .sound(SoundType.GRASS)
+                    .offsetType(BlockBehaviour.OffsetType.XZ)
+                    .lightLevel(state -> 8)
+                    .pushReaction(PushReaction.DESTROY));
+
     /** 云树苗：能种在土上，也能直接种在厚云块上。 */
     public static final DeferredBlock<Block> CLOUD_SAPLING = BLOCKS.registerBlock(
             "cloud_sapling",

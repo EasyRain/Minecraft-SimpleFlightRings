@@ -34,6 +34,9 @@ public final class CloudCreativeTabContents {
         accept(event, ModItems.STRIPPED_CLOUD_WOOD_ITEM.get());
         accept(event, ModItems.CLOUD_PLANKS_ITEM.get());
         accept(event, ModItems.CLOUD_LEAVES_ITEM.get());
+        accept(event, ModItems.CLOUD_GRASS_ITEM.get());
+        accept(event, ModItems.CLOUD_BLOOM_ITEM.get());
+        accept(event, ModItems.AURORA_BLOOM_ITEM.get());
         accept(event, ModItems.CLOUD_SAPLING_ITEM.get());
         // 云木变体
         accept(event, ModItems.CLOUD_STAIRS_ITEM.get());

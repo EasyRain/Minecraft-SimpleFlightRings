@@ -1,0 +1,8 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": [
+    "simpleflightring:aurora"
+  ],
+  "features": "simpleflightring:aurora_bloom",
+  "step": "vegetal_decoration"
+}

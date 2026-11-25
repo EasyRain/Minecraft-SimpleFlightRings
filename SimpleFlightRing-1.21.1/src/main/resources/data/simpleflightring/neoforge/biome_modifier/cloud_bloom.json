@@ -1,0 +1,9 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": [
+    "simpleflightring:clear_sky",
+    "simpleflightring:sunset_clouds"
+  ],
+  "features": "simpleflightring:cloud_bloom",
+  "step": "vegetal_decoration"
+}
