@@ -2,7 +2,6 @@
   "replace": false,
   "values": [
     "simpleflightring:thick_cloud_block",
-    "simpleflightring:cloud_block",
     "#minecraft:supports_vegetation"
   ]
 }

@@ -314,7 +314,7 @@ public final class ModBlocks {
                     .offsetType(BlockBehaviour.OffsetType.XZ)
                     .pushReaction(PushReaction.DESTROY));
 
-    /** 云絮花：白蓝色小花，晴空与晚霞群系。 */
+    /** 云絮花：白蓝色小花，晴空与雷云群系，夜里会发光（红石火把亮度 7）。 */
     public static final DeferredBlock<Block> CLOUD_BLOOM = BLOCKS.registerBlock(
             "cloud_bloom",
             CloudPlantBlock::new,
@@ -322,9 +322,10 @@ public final class ModBlocks {
                     .noCollision().instabreak()
                     .sound(SoundType.GRASS)
                     .offsetType(BlockBehaviour.OffsetType.XZ)
+                    .lightLevel(state -> 7)
                     .pushReaction(PushReaction.DESTROY));
 
-    /** 极光花：青绿色、会发光的小花，极光群系专属。 */
+    /** 极光花：青绿色的小花，极光群系专属，夜里会发光（红石火把亮度 7）。 */
     public static final DeferredBlock<Block> AURORA_BLOOM = BLOCKS.registerBlock(
             "aurora_bloom",
             CloudPlantBlock::new,
@@ -332,9 +333,9 @@ public final class ModBlocks {
                     .noCollision().instabreak()
                     .sound(SoundType.GRASS)
                     .offsetType(BlockBehaviour.OffsetType.XZ)
-                    .lightLevel(state -> 8)
+                    .lightLevel(state -> 7)
                     .pushReaction(PushReaction.DESTROY));
-    /** 阳光花：暖橙色的小花，晚霞群系。 */
+    /** 阳光花：暖橙色的小花，晚霞群系，夜里会发光（红石火把亮度 7）。 */
     public static final DeferredBlock<Block> SUNLIGHT_BLOOM = BLOCKS.registerBlock(
             "sunlight_bloom",
             CloudPlantBlock::new,
@@ -342,6 +343,7 @@ public final class ModBlocks {
                     .noCollision().instabreak()
                     .sound(SoundType.GRASS)
                     .offsetType(BlockBehaviour.OffsetType.XZ)
+                    .lightLevel(state -> 7)
                     .pushReaction(PushReaction.DESTROY));
 
     /** 云树苗：能种在土上，也能直接种在厚云块上。 */

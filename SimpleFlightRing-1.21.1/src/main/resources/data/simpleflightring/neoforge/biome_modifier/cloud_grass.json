@@ -3,7 +3,8 @@
   "biomes": [
     "simpleflightring:clear_sky",
     "simpleflightring:thunderhead",
-    "simpleflightring:sunset_clouds"
+    "simpleflightring:sunset_clouds",
+    "simpleflightring:aurora"
   ],
   "features": "simpleflightring:cloud_grass",
   "step": "vegetal_decoration"
