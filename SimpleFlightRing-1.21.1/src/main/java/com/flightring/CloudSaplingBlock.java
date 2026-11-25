@@ -7,6 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SaplingBlock;
 import net.minecraft.world.level.block.grower.TreeGrower;
 import net.minecraft.world.level.block.state.BlockState;
@@ -32,8 +33,12 @@ public class CloudSaplingBlock extends SaplingBlock {
         super(GROWER, properties);
     }
 
+    /**
+     * 1.21.1 的 {@code #minecraft:dirt} 已经包含全部"泥土家族"（草方块/灰化土/砂土/菌丝/缠根泥土/苔藓/泥），
+     * 这里再加耕地（原版树苗也认）和厚云块（用户 2026-11-25）。
+     */
     @Override
     protected boolean mayPlaceOn(BlockState state, BlockGetter level, BlockPos pos) {
-        return state.is(BlockTags.DIRT) || state.is(ModBlocks.THICK_CLOUD_BLOCK.get());
+        return state.is(BlockTags.DIRT) || state.is(Blocks.FARMLAND) || state.is(ModBlocks.THICK_CLOUD_BLOCK.get());
     }
 }

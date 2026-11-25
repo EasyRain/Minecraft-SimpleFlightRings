@@ -88,7 +88,7 @@ public final class ModBlocks {
     public static final DeferredBlock<Block> THICK_CLOUD_SLAB = BLOCKS.registerBlock(
             "thick_cloud_slab",
             SlabBlock::new,
-            BlockBehaviour.Properties.of().mapColor(net.minecraft.world.level.material.MapColor.SNOW).strength(0.8F)
+            BlockBehaviour.Properties.of().mapColor(net.minecraft.world.level.material.MapColor.SNOW).strength(2.0F)
                     .sound(ModSounds.THICK_SOUND_TYPE));
 
 
@@ -96,7 +96,7 @@ public final class ModBlocks {
     public static final DeferredBlock<Block> THICK_CLOUD_STAIRS = BLOCKS.registerBlock(
             "thick_cloud_stairs",
             properties -> new StairBlock(net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(), properties),
-            BlockBehaviour.Properties.of().mapColor(net.minecraft.world.level.material.MapColor.SNOW).strength(0.8F)
+            BlockBehaviour.Properties.of().mapColor(net.minecraft.world.level.material.MapColor.SNOW).strength(2.0F)
                     .sound(ModSounds.THICK_SOUND_TYPE));
 
     /** 云门：厚云砖框里点亮出来的传送门方块（无物品、无掉落）。 */
@@ -132,7 +132,7 @@ public final class ModBlocks {
     public static final DeferredBlock<Block> THICK_CLOUD_WALL = BLOCKS.registerBlock(
             "thick_cloud_wall",
             WallBlock::new,
-            BlockBehaviour.Properties.of().mapColor(net.minecraft.world.level.material.MapColor.SNOW).strength(0.8F)
+            BlockBehaviour.Properties.of().mapColor(net.minecraft.world.level.material.MapColor.SNOW).strength(2.0F)
                     .sound(ModSounds.THICK_SOUND_TYPE));
 
     private ModBlocks() {

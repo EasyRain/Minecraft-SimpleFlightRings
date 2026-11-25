@@ -29,8 +29,13 @@ public class CloudSaplingBlock extends SaplingBlock {
         super(GROWER, properties);
     }
 
+    /**
+     * 26.x 把 {@code #minecraft:dirt} 缩成了「泥土/砂土/缠根泥土」三种，灰化土、草方块、菌丝、苔藓、泥
+     * 全被移走；原版树苗跟着改用 {@code #minecraft:supports_vegetation}（= 上述泥土全家 + 耕地）。
+     * 我们照原版的走法，再加上厚云块（用户 2026-11-25）。
+     */
     @Override
     protected boolean mayPlaceOn(BlockState state, BlockGetter level, BlockPos pos) {
-        return state.is(BlockTags.DIRT) || state.is(ModBlocks.THICK_CLOUD_BLOCK.get());
+        return state.is(BlockTags.SUPPORTS_VEGETATION) || state.is(ModBlocks.THICK_CLOUD_BLOCK.get());
     }
 }
