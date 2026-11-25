@@ -102,4 +102,39 @@ public final class ThunderheadStrikes {
         bolt.setVisualOnly(false);
         level.addFreshEntity(bolt);
     }
+    /**
+     * 检查落雷条件（给 {@code /sfr ambience check} 用）。
+     * 返回每一条的布尔值和脚下列的地表高度、剩余冷却，方便"为什么没劈"一眼看出来。
+     */
+    public static Report check(ServerPlayer player) {
+        ServerLevel level = player.serverLevel();
+        long now = level.getGameTime();
+        Long last = LAST_STRIKE.get(player.getUUID());
+        long cooldown = last == null ? 0L : Math.max(0L, MIN_INTERVAL_TICKS - (now - last));
+        int surfaceY = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                player.getBlockX(), player.getBlockZ());
+        return new Report(
+                level.getBiome(player.blockPosition()).is(THUNDERHEAD),
+                player.onGround(),
+                isAtSurface(level, player),
+                surfaceY,
+                cooldown,
+                player.isSpectator());
+    }
+
+    /** 无视概率与冷却，立刻落一次雷（测试用；条件不满足也照劈）。 */
+    public static void strikeNow(ServerPlayer player) {
+        ServerLevel level = player.serverLevel();
+        LAST_STRIKE.put(player.getUUID(), level.getGameTime());
+        strike(level, player);
+    }
+
+    /** {@link #check(ServerPlayer)} 的结果。 */
+    public record Report(boolean inBiome, boolean onGround, boolean atSurface,
+                         int surfaceY, long cooldownTicks, boolean spectator) {
+
+        public boolean ready() {
+            return inBiome && onGround && atSurface && cooldownTicks <= 0L && !spectator;
+        }
+    }
 }
