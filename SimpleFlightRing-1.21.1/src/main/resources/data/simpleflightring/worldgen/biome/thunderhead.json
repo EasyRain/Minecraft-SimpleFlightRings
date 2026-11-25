@@ -31,6 +31,10 @@
     "sky_color": 5925765,
     "fog_color": 10135741,
     "water_color": 4159204,
-    "water_fog_color": 329011
+    "water_fog_color": 329011,
+    "additions_sound": {
+      "sound": "minecraft:entity.lightning_bolt.thunder",
+      "tick_chance": 0.0004
+    }
   }
 }

@@ -31,6 +31,12 @@
     "sky_color": 9423103,
     "fog_color": 15267071,
     "water_color": 4159204,
-    "water_fog_color": 329011
+    "water_fog_color": 329011,
+    "particle": {
+      "options": {
+        "type": "minecraft:white_ash"
+      },
+      "probability": 0.02
+    }
   }
 }

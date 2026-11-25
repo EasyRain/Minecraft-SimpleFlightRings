@@ -29,7 +29,15 @@
   },
   "attributes": {
     "minecraft:visual/sky_color": "#5a6b85",
-    "minecraft:visual/fog_color": "#9aa8bd"
+    "minecraft:visual/fog_color": "#9aa8bd",
+    "minecraft:audio/ambient_sounds": {
+      "additions": [
+        {
+          "sound": "minecraft:entity.lightning_bolt.thunder",
+          "tick_chance": 0.0004
+        }
+      ]
+    }
   },
   "effects": {
     "water_color": "#3f76e4"

@@ -29,7 +29,15 @@
   },
   "attributes": {
     "minecraft:visual/sky_color": "#8fc8ff",
-    "minecraft:visual/fog_color": "#e8f4ff"
+    "minecraft:visual/fog_color": "#e8f4ff",
+    "minecraft:visual/ambient_particles": [
+      {
+        "particle": {
+          "type": "minecraft:white_ash"
+        },
+        "probability": 0.02
+      }
+    ]
   },
   "effects": {
     "water_color": "#3f76e4"
