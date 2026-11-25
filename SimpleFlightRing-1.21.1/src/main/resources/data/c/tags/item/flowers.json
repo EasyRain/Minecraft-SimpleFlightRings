@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "simpleflightring:cloud_bloom",
+    "simpleflightring:aurora_bloom",
+    "simpleflightring:sunlight_bloom"
+  ]
+}
