@@ -381,5 +381,9 @@
   "biome.simpleflightring.clear_sky": "晴空",
   "biome.simpleflightring.thunderhead": "雷云",
   "biome.simpleflightring.aurora": "极光",
-  "biome.simpleflightring.sunset_clouds": "晚霞"
+  "biome.simpleflightring.sunset_clouds": "晚霞",
+  "block.simpleflightring.potted_cloud_bloom": "云絮花盆栽",
+  "block.simpleflightring.potted_aurora_bloom": "极光花盆栽",
+  "block.simpleflightring.potted_sunlight_bloom": "阳光花盆栽",
+  "block.simpleflightring.potted_cloud_sapling": "云树苗盆栽"
 }

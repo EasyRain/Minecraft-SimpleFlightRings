@@ -6,6 +6,7 @@ import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.ButtonBlock;
 import net.minecraft.world.level.block.FenceBlock;
 import net.minecraft.world.level.block.FenceGateBlock;
+import net.minecraft.world.level.block.FlowerPotBlock;
 import net.minecraft.world.level.block.PressurePlateBlock;
 import net.minecraft.world.level.block.TrapDoorBlock;
 import net.minecraft.world.level.block.SlabBlock;
@@ -365,4 +366,37 @@ public final class ModBlocks {
                     .isValidSpawn((state, level, pos, type) -> false)
                     .isSuffocating((state, level, pos) -> false)
                     .isViewBlocking((state, level, pos) -> false));
+
+    /** 云絮花盆栽：右键花盆可放入，打掉时掉出花盆 + 云絮花。 */
+    @SuppressWarnings("deprecation") // 旧版构造器会自动把盆栽登记进原版花盆，正是需要的
+    public static final DeferredBlock<Block> POTTED_CLOUD_BLOOM = BLOCKS.registerBlock(
+            "potted_cloud_bloom",
+            properties -> new FlowerPotBlock(CLOUD_BLOOM.get(), properties),
+            ModBlocks::flowerPotProperties);
+
+    /** 极光花盆栽：右键花盆可放入，打掉时掉出花盆 + 极光花。 */
+    @SuppressWarnings("deprecation") // 旧版构造器会自动把盆栽登记进原版花盆，正是需要的
+    public static final DeferredBlock<Block> POTTED_AURORA_BLOOM = BLOCKS.registerBlock(
+            "potted_aurora_bloom",
+            properties -> new FlowerPotBlock(AURORA_BLOOM.get(), properties),
+            ModBlocks::flowerPotProperties);
+
+    /** 阳光花盆栽：右键花盆可放入，打掉时掉出花盆 + 阳光花。 */
+    @SuppressWarnings("deprecation") // 旧版构造器会自动把盆栽登记进原版花盆，正是需要的
+    public static final DeferredBlock<Block> POTTED_SUNLIGHT_BLOOM = BLOCKS.registerBlock(
+            "potted_sunlight_bloom",
+            properties -> new FlowerPotBlock(SUNLIGHT_BLOOM.get(), properties),
+            ModBlocks::flowerPotProperties);
+
+    /** 云树苗盆栽：右键花盆可放入，打掉时掉出花盆 + 云树苗。 */
+    @SuppressWarnings("deprecation") // 旧版构造器会自动把盆栽登记进原版花盆，正是需要的
+    public static final DeferredBlock<Block> POTTED_CLOUD_SAPLING = BLOCKS.registerBlock(
+            "potted_cloud_sapling",
+            properties -> new FlowerPotBlock(CLOUD_SAPLING.get(), properties),
+            ModBlocks::flowerPotProperties);
+
+    /** 花盆的通用属性（与原版 flower_pot 一致：瞬破、不遮挡、活塞直接破坏）。 */
+    private static BlockBehaviour.Properties flowerPotProperties(BlockBehaviour.Properties properties) {
+        return properties.instabreak().noOcclusion().pushReaction(PushReaction.DESTROY);
+    }
 }

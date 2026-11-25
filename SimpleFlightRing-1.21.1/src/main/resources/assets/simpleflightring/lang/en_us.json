@@ -381,5 +381,9 @@
   "biome.simpleflightring.clear_sky": "Clear Sky",
   "biome.simpleflightring.thunderhead": "Thunderhead",
   "biome.simpleflightring.aurora": "Aurora",
-  "biome.simpleflightring.sunset_clouds": "Sunset Clouds"
+  "biome.simpleflightring.sunset_clouds": "Sunset Clouds",
+  "block.simpleflightring.potted_cloud_bloom": "Potted Cloud Bloom",
+  "block.simpleflightring.potted_aurora_bloom": "Potted Aurora Bloom",
+  "block.simpleflightring.potted_sunlight_bloom": "Potted Sunlight Bloom",
+  "block.simpleflightring.potted_cloud_sapling": "Potted Cloud Sapling"
 }

@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "simpleflightring:potted_cloud_bloom",
+    "simpleflightring:potted_aurora_bloom",
+    "simpleflightring:potted_sunlight_bloom",
+    "simpleflightring:potted_cloud_sapling"
+  ]
+}
