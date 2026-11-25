@@ -1,0 +1,15 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:shears",
+    "#c:tools/shear",
+    {
+      "id": "#c:tools/shears",
+      "required": false
+    },
+    {
+      "id": "#forge:shears",
+      "required": false
+    }
+  ]
+}
