@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "simpleflightring:thick_cloud_block",
+  "result": {
+    "count": 1,
+    "id": "simpleflightring:thick_cloud_bricks_wall"
+  }
+}

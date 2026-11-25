@@ -79,7 +79,7 @@ public final class ModBlocks {
     public static final DeferredBlock<Block> THICK_CLOUD_BRICKS = BLOCKS.registerBlock(
             "thick_cloud_bricks",
             ThickCloudBrickBlock::new,
-            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.COLOR_LIGHT_GRAY).forceSolidOn().strength(0.8F)
+            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.COLOR_LIGHT_GRAY).forceSolidOn().strength(2.0F)
                     .sound(ModSounds.THICK_SOUND_TYPE));
 
     public static final DeferredBlock<Block> THICK_CLOUD_SLAB = BLOCKS.registerBlock(
@@ -290,19 +290,19 @@ public final class ModBlocks {
     public static final DeferredBlock<Block> THICK_CLOUD_BRICKS_SLAB = BLOCKS.registerBlock(
             "thick_cloud_bricks_slab",
             SlabBlock::new,
-            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.COLOR_LIGHT_GRAY).strength(0.8F).sound(ModSounds.THICK_SOUND_TYPE));
+            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.COLOR_LIGHT_GRAY).strength(2.0F).sound(ModSounds.THICK_SOUND_TYPE));
 
     /** 变体：thick_cloud_bricks_stairs。 */
     public static final DeferredBlock<Block> THICK_CLOUD_BRICKS_STAIRS = BLOCKS.registerBlock(
             "thick_cloud_bricks_stairs",
             properties -> new StairBlock(ModBlocks.THICK_CLOUD_BRICKS.get().defaultBlockState(), properties),
-            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.COLOR_LIGHT_GRAY).strength(0.8F).sound(ModSounds.THICK_SOUND_TYPE));
+            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.COLOR_LIGHT_GRAY).strength(2.0F).sound(ModSounds.THICK_SOUND_TYPE));
 
     /** 变体：thick_cloud_bricks_wall。 */
     public static final DeferredBlock<Block> THICK_CLOUD_BRICKS_WALL = BLOCKS.registerBlock(
             "thick_cloud_bricks_wall",
             WallBlock::new,
-            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.COLOR_LIGHT_GRAY).strength(0.8F).sound(ModSounds.THICK_SOUND_TYPE));
+            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.COLOR_LIGHT_GRAY).strength(2.0F).sound(ModSounds.THICK_SOUND_TYPE));
 
     /** 云树苗：能种在土上，也能直接种在厚云块上。 */
     public static final DeferredBlock<Block> CLOUD_SAPLING = BLOCKS.registerBlock(
