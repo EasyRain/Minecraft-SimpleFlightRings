@@ -7,7 +7,7 @@
     "item": "simpleflightring:diamond_flight_ring"
   },
   "addition": {
-    "item": "minecraft:netherite_ingot"
+    "tag": "c:ingots/netherite"
   },
   "result": {
     "id": "simpleflightring:netherite_flight_ring",

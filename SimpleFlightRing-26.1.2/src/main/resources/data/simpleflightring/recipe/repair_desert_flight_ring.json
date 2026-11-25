@@ -1,7 +1,7 @@
 {
   "type": "simpleflightring:ring_repair",
   "category": "equipment",
-  "material": "minecraft:gold_ingot",
+  "material": "#c:ingots/gold",
   "result": {
     "id": "simpleflightring:desert_flight_ring",
     "count": 1

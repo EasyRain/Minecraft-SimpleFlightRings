@@ -11,7 +11,7 @@
       "tag": "minecraft:planks"
     },
     "F": {
-      "item": "minecraft:feather"
+      "tag": "c:feathers"
     }
   },
   "result": {

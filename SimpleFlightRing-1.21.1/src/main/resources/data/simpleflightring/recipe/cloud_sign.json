@@ -11,7 +11,7 @@
       "item": "simpleflightring:cloud_planks"
     },
     "X": {
-      "item": "minecraft:stick"
+      "tag": "c:rods/wooden"
     }
   },
   "result": {

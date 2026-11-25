@@ -3,7 +3,7 @@
   "category": "equipment",
   "materials": [
     "minecraft:lava_bucket",
-    "minecraft:blaze_rod",
+    "#c:rods/blaze",
     "minecraft:blaze_powder"
   ],
   "result": {

@@ -2,7 +2,7 @@
   "type": "simpleflightring:ring_repair",
   "category": "equipment",
   "material": {
-    "item": "minecraft:gold_ingot"
+    "tag": "c:ingots/gold"
   },
   "result": {
     "id": "simpleflightring:gold_flight_ring",

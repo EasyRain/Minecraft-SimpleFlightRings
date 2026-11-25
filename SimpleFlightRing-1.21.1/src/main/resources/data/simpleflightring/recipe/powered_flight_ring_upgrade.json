@@ -8,7 +8,7 @@
     "item": "minecraft:gunpowder"
   },
   "binder": {
-    "item": "minecraft:redstone"
+    "tag": "c:dusts/redstone"
   },
   "result": {
     "id": "simpleflightring:powered_flight_ring",

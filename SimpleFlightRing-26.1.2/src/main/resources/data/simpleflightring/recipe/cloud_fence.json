@@ -7,7 +7,7 @@
   ],
   "key": {
     "#": "simpleflightring:cloud_planks",
-    "/": "minecraft:stick"
+    "/": "#c:rods/wooden"
   },
   "result": {
     "count": 3,

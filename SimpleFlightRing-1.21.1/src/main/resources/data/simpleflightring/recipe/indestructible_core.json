@@ -3,7 +3,7 @@
   "category": "misc",
   "ingredients": [
     {
-      "item": "minecraft:netherite_ingot"
+      "tag": "c:ingots/netherite"
     },
     {
       "item": "minecraft:nether_star"

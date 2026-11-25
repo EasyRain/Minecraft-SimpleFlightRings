@@ -2,7 +2,7 @@
   "type": "simpleflightring:ring_repair",
   "category": "equipment",
   "material": {
-    "item": "minecraft:iron_ingot"
+    "tag": "c:ingots/iron"
   },
   "result": {
     "id": "simpleflightring:iron_flight_ring",

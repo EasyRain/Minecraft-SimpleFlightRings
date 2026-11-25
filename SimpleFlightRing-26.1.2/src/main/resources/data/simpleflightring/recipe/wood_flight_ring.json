@@ -1,7 +1,17 @@
 {
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
-  "pattern": ["PPP","PFP","PPP"],
-  "key": { "P": "#minecraft:planks", "F": "minecraft:feather" },
-  "result": { "id": "simpleflightring:wood_flight_ring", "count": 1 }
+  "pattern": [
+    "PPP",
+    "PFP",
+    "PPP"
+  ],
+  "key": {
+    "P": "#minecraft:planks",
+    "F": "#c:feathers"
+  },
+  "result": {
+    "id": "simpleflightring:wood_flight_ring",
+    "count": 1
+  }
 }

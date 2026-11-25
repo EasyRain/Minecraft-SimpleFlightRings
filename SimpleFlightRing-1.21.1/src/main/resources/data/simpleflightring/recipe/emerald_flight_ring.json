@@ -8,7 +8,7 @@
   ],
   "key": {
     "E": {
-      "item": "minecraft:emerald"
+      "tag": "c:gems/emerald"
     },
     "R": {
       "type": "neoforge:components",

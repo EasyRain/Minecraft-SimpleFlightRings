@@ -8,7 +8,7 @@
   ],
   "key": {
     "D": {
-      "item": "minecraft:diamond"
+      "tag": "c:gems/diamond"
     },
     "R": {
       "item": "simpleflightring:gold_flight_ring"

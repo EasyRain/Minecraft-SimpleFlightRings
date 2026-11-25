@@ -3,10 +3,10 @@
   "category": "equipment",
   "materials": [
     {
-      "item": "minecraft:emerald"
+      "tag": "c:gems/emerald"
     },
     {
-      "item": "minecraft:emerald"
+      "tag": "c:gems/emerald"
     }
   ],
   "result": {

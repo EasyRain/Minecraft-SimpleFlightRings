@@ -8,7 +8,7 @@
   ],
   "key": {
     "I": {
-      "item": "minecraft:iron_ingot"
+      "tag": "c:ingots/iron"
     },
     "R": {
       "item": "simpleflightring:stone_flight_ring"

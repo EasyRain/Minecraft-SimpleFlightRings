@@ -6,7 +6,7 @@
       "item": "minecraft:lava_bucket"
     },
     {
-      "item": "minecraft:blaze_rod"
+      "tag": "c:rods/blaze"
     },
     {
       "item": "minecraft:blaze_powder"

@@ -8,7 +8,7 @@
   ],
   "key": {
     "B": {
-      "item": "minecraft:redstone"
+      "tag": "c:dusts/redstone"
     },
     "G": {
       "item": "minecraft:gunpowder"

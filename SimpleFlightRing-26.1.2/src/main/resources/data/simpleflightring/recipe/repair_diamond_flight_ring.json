@@ -1,6 +1,9 @@
 {
   "type": "simpleflightring:ring_repair",
   "category": "equipment",
-  "material": "minecraft:diamond",
-  "result": { "id": "simpleflightring:diamond_flight_ring", "count": 1 }
+  "material": "#c:gems/diamond",
+  "result": {
+    "id": "simpleflightring:diamond_flight_ring",
+    "count": 1
+  }
 }

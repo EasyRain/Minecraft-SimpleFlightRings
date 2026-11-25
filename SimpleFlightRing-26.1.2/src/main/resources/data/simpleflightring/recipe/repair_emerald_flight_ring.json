@@ -2,8 +2,8 @@
   "type": "simpleflightring:ring_repair",
   "category": "equipment",
   "materials": [
-    "minecraft:emerald",
-    "minecraft:emerald"
+    "#c:gems/emerald",
+    "#c:gems/emerald"
   ],
   "result": {
     "id": "simpleflightring:emerald_flight_ring",

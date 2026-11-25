@@ -1,10 +1,17 @@
 {
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
-  "pattern": ["AAA","ARA","AAA"],
+  "pattern": [
+    "AAA",
+    "ARA",
+    "AAA"
+  ],
   "key": {
-    "A": "minecraft:amethyst_shard",
+    "A": "#c:gems/amethyst",
     "R": "simpleflightring:iron_flight_ring"
   },
-  "result": { "id": "simpleflightring:stable_flight_ring", "count": 1 }
+  "result": {
+    "id": "simpleflightring:stable_flight_ring",
+    "count": 1
+  }
 }

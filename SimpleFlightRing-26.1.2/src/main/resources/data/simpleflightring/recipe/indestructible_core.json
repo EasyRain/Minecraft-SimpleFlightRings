@@ -2,8 +2,11 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    "minecraft:netherite_ingot",
+    "#c:ingots/netherite",
     "minecraft:nether_star"
   ],
-  "result": { "id": "simpleflightring:indestructible_core", "count": 1 }
+  "result": {
+    "id": "simpleflightring:indestructible_core",
+    "count": 1
+  }
 }

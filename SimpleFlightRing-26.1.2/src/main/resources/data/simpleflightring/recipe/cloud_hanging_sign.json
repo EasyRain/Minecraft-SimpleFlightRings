@@ -12,7 +12,7 @@
   },
   "key": {
     "#": "simpleflightring:stripped_cloud_log",
-    "X": "minecraft:iron_chain"
+    "X": "#c:chains"
   },
   "group": "hanging_sign"
 }

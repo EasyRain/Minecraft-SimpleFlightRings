@@ -1,9 +1,13 @@
 {
   "type": "simpleflightring:emerald_forge",
   "category": "equipment",
-  "pattern": ["EEE","ERE","EEE"],
+  "pattern": [
+    "EEE",
+    "ERE",
+    "EEE"
+  ],
   "key": {
-    "E": "minecraft:emerald",
+    "E": "#c:gems/emerald",
     "R": {
       "neoforge:ingredient_type": "neoforge:components",
       "items": "simpleflightring:damaged_emerald_flight_ring",
