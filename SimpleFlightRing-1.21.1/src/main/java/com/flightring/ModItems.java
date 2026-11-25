@@ -81,6 +81,8 @@ public class ModItems {
             ITEMS.registerSimpleBlockItem("cloud_bloom", () -> ModBlocks.CLOUD_BLOOM.get());
     public static final DeferredItem<BlockItem> AURORA_BLOOM_ITEM =
             ITEMS.registerSimpleBlockItem("aurora_bloom", () -> ModBlocks.AURORA_BLOOM.get());
+    public static final DeferredItem<BlockItem> SUNLIGHT_BLOOM_ITEM =
+            ITEMS.registerSimpleBlockItem("sunlight_bloom", () -> ModBlocks.SUNLIGHT_BLOOM.get());
     public static final DeferredItem<BlockItem> CLOUD_SAPLING_ITEM =
             ITEMS.registerSimpleBlockItem("cloud_sapling", () -> ModBlocks.CLOUD_SAPLING.get());
     public static final DeferredItem<BlockItem> CLOUD_HANGING_SIGN_ITEM =

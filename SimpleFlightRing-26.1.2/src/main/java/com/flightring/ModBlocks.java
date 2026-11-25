@@ -334,6 +334,15 @@ public final class ModBlocks {
                     .offsetType(BlockBehaviour.OffsetType.XZ)
                     .lightLevel(state -> 8)
                     .pushReaction(PushReaction.DESTROY));
+    /** 阳光花：暖橙色的小花，晚霞群系。 */
+    public static final DeferredBlock<Block> SUNLIGHT_BLOOM = BLOCKS.registerBlock(
+            "sunlight_bloom",
+            CloudPlantBlock::new,
+            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.PLANT)
+                    .noCollision().instabreak()
+                    .sound(SoundType.GRASS)
+                    .offsetType(BlockBehaviour.OffsetType.XZ)
+                    .pushReaction(PushReaction.DESTROY));
 
     /** 云树苗：能种在土上，也能直接种在厚云块上。 */
     public static final DeferredBlock<Block> CLOUD_SAPLING = BLOCKS.registerBlock(
