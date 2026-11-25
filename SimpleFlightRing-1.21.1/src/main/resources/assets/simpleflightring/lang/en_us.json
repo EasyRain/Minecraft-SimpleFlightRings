@@ -348,7 +348,7 @@
   "block.simpleflightring.cloud_grass": "Cloud Tuft",
   "block.simpleflightring.cloud_bloom": "Cloud Bloom",
   "simpleflightring.command.ambience.no_player": "This command needs a player",
-  "simpleflightring.command.ambience.check": "Thunderhead strike: biome %1$s · on ground %2$s · surface %3$s · surface y=%4$s · cooldown %5$ss",
+  "simpleflightring.command.ambience.check": "Thunderhead strike: biome %1$s · above surface %2$s · surface y=%3$s · cooldown %4$ss",
   "simpleflightring.command.ambience.struck": "Conditions met - strike forced",
   "simpleflightring.command.ambience.not_ready": "Conditions not met - no strike",
   "simpleflightring.command.ambience.struck_forced": "Strike forced (conditions ignored)",

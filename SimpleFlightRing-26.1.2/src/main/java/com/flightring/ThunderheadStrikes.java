@@ -18,12 +18,15 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
 /**
- * 雷云群系：玩家站在地表时，有小概率被落雷直接劈中（用户 2026-11-25）。
+ * 雷云群系：玩家在<b>露天空域</b>里有小概率被落雷直接劈中（用户 2026-11-25）。
  * <p>
  * 规则：
  * <ul>
  *   <li>只在 {@code thunderhead} 群系触发；</li>
- *   <li>要求玩家<b>站在地表</b>（脚踩着地，且所在列的地表高度就在脚下 2 格内）；</li>
+ *   <li>要求玩家在<b>所在列的地表之上</b>（{@code y >= 地表高度 - 1}）——
+ *       站在地表、飞在岛上方、飘在两座岛之间的空中都算；<b>不要求站立</b>，
+ *       因为这个模组就是主打飞行的，要求落地等于让规则永远不生效（用户 2026-11-25 指出）；</li>
+ *   <li>钻在岛体内部 / 洞穴里时，所在列的地表在头顶，自然被排除；</li>
  *   <li>每 tick {@value #INV_CHANCE_TEXT} 分之一的概率 ⇒ 平均约 6 分钟一次；</li>
  *   <li>同一位玩家至少间隔 {@value #MIN_INTERVAL_SECONDS} 秒，避免连续劈；</li>
  *   <li>旁观者不触发（创造模式会触发，但没伤害，只是画面/音效）。</li>
@@ -39,7 +42,7 @@ public final class ThunderheadStrikes {
             Registries.BIOME,
             Identifier.fromNamespaceAndPath(FlightRingMod.MODID, "thunderhead"));
 
-    /** 每 tick 触发概率：1/7200 ≈ 站在地表平均 6 分钟一次。 */
+    /** 每 tick 触发概率：1/7200 ≈ 平均 6 分钟一次。 */
     private static final double CHANCE_PER_TICK = 1.0D / 7200.0D;
 
     static final String INV_CHANCE_TEXT = "7200";
@@ -48,8 +51,11 @@ public final class ThunderheadStrikes {
     static final int MIN_INTERVAL_SECONDS = 45;
     private static final long MIN_INTERVAL_TICKS = 20L * MIN_INTERVAL_SECONDS;
 
-    /** 脚下离地表高度图最多几格才算"站在地表"（容许站在矮墙/台阶上）。 */
-    private static final double SURFACE_TOLERANCE = 2.0D;
+    /**
+     * 允许比地表低多少格仍算"在地表之上"（脚下这块方块顶面就在脚底时，
+     * 高度图给的是 y+1，所以要留 1 格余量）。
+     */
+    private static final double SURFACE_SLACK = 1.0D;
 
     /** 玩家 -> 上次被劈的游戏刻。 */
     private static final Map<UUID, Long> LAST_STRIKE = new ConcurrentHashMap<>();
@@ -62,14 +68,14 @@ public final class ThunderheadStrikes {
         if (!(event.getEntity() instanceof ServerPlayer player)) {
             return;
         }
-        if (player.isSpectator() || !player.onGround()) {
+        if (player.isSpectator()) {
             return;
         }
         ServerLevel level = player.level();
         if (!level.getBiome(player.blockPosition()).is(THUNDERHEAD)) {
             return;
         }
-        if (!isAtSurface(level, player)) {
+        if (!isAboveSurface(level, player)) {
             return;
         }
 
@@ -86,23 +92,18 @@ public final class ThunderheadStrikes {
         strike(level, player);
     }
 
-    /** 所在列的地表高度就在脚下附近（= 站在地表，而不是洞穴/岛体内部）。 */
-    private static boolean isAtSurface(ServerLevel level, ServerPlayer player) {
+    /**
+     * 玩家是否在所在列的地表之上（站着 / 飞着 / 漂浮都算）。
+     * <p>
+     * 用高度图而不是 {@code canSeeSky}：高度图两种版本 API 一致，
+     * 而且"岛体内部/洞穴"这一情形天然满足 {@code y < 地表}，不需要额外判天空。
+     */
+    private static boolean isAboveSurface(ServerLevel level, ServerPlayer player) {
         int surfaceY = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
                 player.getBlockX(), player.getBlockZ());
-        double feetY = player.getY();
-        return feetY >= surfaceY - 1.0D && feetY <= surfaceY + SURFACE_TOLERANCE;
+        return player.getY() >= surfaceY - SURFACE_SLACK;
     }
 
-    private static void strike(ServerLevel level, ServerPlayer player) {
-        LightningBolt bolt = EntityType.LIGHTNING_BOLT.create(level, EntitySpawnReason.TRIGGERED);
-        if (bolt == null) {
-            return;
-        }
-        bolt.setPos(player.getX(), player.getY(), player.getZ());
-        bolt.setVisualOnly(false);
-        level.addFreshEntity(bolt);
-    }
     /**
      * 检查落雷条件（给 {@code /sfr ambience check} 用）。
      * 返回每一条的布尔值和脚下列的地表高度、剩余冷却，方便"为什么没劈"一眼看出来。
@@ -116,8 +117,7 @@ public final class ThunderheadStrikes {
                 player.getBlockX(), player.getBlockZ());
         return new Report(
                 level.getBiome(player.blockPosition()).is(THUNDERHEAD),
-                player.onGround(),
-                isAtSurface(level, player),
+                isAboveSurface(level, player),
                 surfaceY,
                 cooldown,
                 player.isSpectator());
@@ -131,11 +131,21 @@ public final class ThunderheadStrikes {
     }
 
     /** {@link #check(ServerPlayer)} 的结果。 */
-    public record Report(boolean inBiome, boolean onGround, boolean atSurface,
+    public record Report(boolean inBiome, boolean aboveSurface,
                          int surfaceY, long cooldownTicks, boolean spectator) {
 
         public boolean ready() {
-            return inBiome && onGround && atSurface && cooldownTicks <= 0L && !spectator;
+            return inBiome && aboveSurface && cooldownTicks <= 0L && !spectator;
         }
+    }
+
+    private static void strike(ServerLevel level, ServerPlayer player) {
+        LightningBolt bolt = EntityType.LIGHTNING_BOLT.create(level, EntitySpawnReason.TRIGGERED);
+        if (bolt == null) {
+            return;
+        }
+        bolt.setPos(player.getX(), player.getY(), player.getZ());
+        bolt.setVisualOnly(false);
+        level.addFreshEntity(bolt);
     }
 }

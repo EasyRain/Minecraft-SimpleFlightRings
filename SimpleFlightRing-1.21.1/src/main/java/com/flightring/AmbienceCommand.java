@@ -48,8 +48,7 @@ public final class AmbienceCommand {
         ThunderheadStrikes.Report report = ThunderheadStrikes.check(player);
         Component line = Component.translatable("simpleflightring.command.ambience.check",
                 mark(report.inBiome()),
-                mark(report.onGround()),
-                mark(report.atSurface()),
+                mark(report.aboveSurface()),
                 report.surfaceY(),
                 report.cooldownTicks() / 20L);
         source.sendSuccess(() -> line, false);
