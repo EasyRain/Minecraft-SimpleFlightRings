@@ -74,7 +74,19 @@ public final class StarlightFluidClient {
 
         @Override
         public int colorInWorld(BlockState blockState, BlockAndTintGetter getter, BlockPos pos) {
-            return MAP_TINT;
+            // 诊断：按坐标给四档颜色，一次看清"多暗会被过滤掉"
+            boolean evenX = (pos.getX() & 1) == 0;
+            boolean evenZ = (pos.getZ() & 1) == 0;
+            if (evenX && evenZ) {
+                return 0xFFFF0000;   // 对照组
+            }
+            if (evenX) {
+                return 0xFF23232B;   // 很暗
+            }
+            if (evenZ) {
+                return 0xFF3A3A44;   // 中暗
+            }
+            return 0xFF50505C;       // 偏暗灰
         }
 
         // 带 FluidState 的那个：流体渲染走这条，必须不染色，否则星点会被乘掉
