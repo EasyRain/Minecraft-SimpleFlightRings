@@ -3,7 +3,7 @@ package com.flightring;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.level.material.Fluid;
-import net.neoforged.neoforge.common.SoundAction;
+import net.neoforged.neoforge.common.SoundActions;
 import net.neoforged.neoforge.fluids.BaseFlowingFluid;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -52,8 +52,10 @@ public final class ModFluids {
                     // 掉进去不受摔落伤害
                     .fallDistanceModifier(0.0F)
                     .lightLevel(10)
-                    .sound(SoundAction.get("swim"), SoundEvents.GENERIC_SWIM)
-                    .sound(SoundAction.get("splash"), SoundEvents.GENERIC_SPLASH)));
+                    // 桶的声音必须按原版的两个 action 注册，否则舀起来完全没声音
+                    // （倾倒有声音是因为那条路径有默认回退）
+                    .sound(SoundActions.BUCKET_FILL, SoundEvents.BUCKET_FILL)
+                    .sound(SoundActions.BUCKET_EMPTY, SoundEvents.BUCKET_EMPTY)));
 
     public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> LIQUID_STARLIGHT =
             FLUIDS.register("liquid_starlight", () -> new BaseFlowingFluid.Source(properties()));
