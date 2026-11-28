@@ -37,8 +37,8 @@ public final class StarlightFluidClient {
 
             @Override
             public int getTintColor() {
-                // 游戏内渲染：贴图已是最终色，不做乘法
-                return 0xFFFFFFFF;
+                // 无坐标查询（地图 mod / 其它 mod）：给接近本体的深灰
+                return 0xFF2E2E34;
             }
 
             @Override
@@ -46,9 +46,9 @@ public final class StarlightFluidClient {
                                     net.minecraft.world.level.BlockAndTintGetter getter,
                                     net.minecraft.core.BlockPos pos) {
                 // 地图 mod（Xaero 用自己的 getter）要一个显眼的地图色；游戏内渲染给白
-                // 地图 mod（Xaero 用自己的 getter）→ 深灰蓝；游戏内渲染 → 不染色
+                // 带坐标查询：地图 mod 给深灰，游戏内渲染不染色（贴图已是最终色）
                 return getter != null && getter.getClass().getName().startsWith("xaero.")
-                        ? 0xFF23232B : 0xFFFFFFFF;
+                        ? 0xFF2E2E34 : 0xFFFFFFFF;
             }
         }, ModFluids.LIQUID_STARLIGHT_TYPE.get());
     }

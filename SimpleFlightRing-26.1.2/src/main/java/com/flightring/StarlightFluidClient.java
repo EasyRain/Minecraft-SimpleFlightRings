@@ -51,20 +51,15 @@ public final class StarlightFluidClient {
      * 在一片浅灰白的云块中间，深色池子反而最像它本身。
      */
     /**
-     * 地图上的颜色（实测结论见下）。
+     * 对外（地图 mod、其它查询方）报的颜色。
      * <p>
-     * Xaero 会对这个颜色做两步处理，靠两轮对照实验摸出来的：
-     * <ol>
-     *   <li><b>低饱和度（近灰）的颜色会被丢弃</b>，回退成生物群系水色（就是原版水蓝）。
-     *       实测：纯红保留；三档灰 {@code 0x23232B/0x3A3A44/0x50505C} 全变水蓝；
-     *       饱和 50~77% 的靛蓝/绿/红棕全部保留。</li>
-     *   <li><b>颜色会被整体提亮</b>（暗棕→粉、暗绿→亮绿），所以"地图上是纯黑"做不到。</li>
-     * </ol>
-     * 结论：给一个<b>高饱和的深靛蓝</b>——既过得了饱和度门槛，色相上也最接近夜空，
-     * 和原版水的青蓝、ATM 那种紫都能区分开。
+     * 星液本体是"深黑底 + 稀疏白星"，所以这里给**深灰**——语义上最接近本体，
+     * 别的 mod 来问色时拿到的不会是一个离谱的颜色。
+     * <p>
+     * 至于 Xaero 会不会用：实测它对没有 overlay / 半透明水贴图的模组流体会退回
+     * 生物群系水色（蓝色），多条路都试过无效 ⇒ 就让它那样，不再为它扭曲配色。
      */
-    private static final int MAP_TINT = 0xFF3A2A9C;
-
+    private static final int MAP_TINT = 0xFF2E2E34;
 
     private static final FluidTintSource STARLIGHT_TINT = new FluidTintSource() {
         // 无坐标 / 带 BlockState 的这几个重载：地图 mod 取色用（Xaero 的
