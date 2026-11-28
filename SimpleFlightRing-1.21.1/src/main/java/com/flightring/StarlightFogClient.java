@@ -57,6 +57,11 @@ public final class StarlightFogClient {
         }
         event.setNearPlaneDistance(FOG_NEAR);
         event.setFarPlaneDistance(FOG_FAR);
+        // ★ 1.21.1 的 ClientHooks.onFogRender 只有在事件被**取消**时才把新值写进
+        // RenderSystem.setShaderFogStart/End：
+        //     if (NeoForge.EVENT_BUS.post(event).isCanceled()) { ...apply... }
+        // 不取消的话，光是 set 值完全不会生效（26.x 的事件直接持有 FogData，所以那边不用取消）。
+        event.setCanceled(true);
     }
 
     /** 眼睛是否浸在液态星光里（液面以上不算）。 */
