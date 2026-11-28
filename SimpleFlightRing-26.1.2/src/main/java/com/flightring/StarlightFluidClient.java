@@ -53,6 +53,8 @@ public final class StarlightFluidClient {
     private static final int MAP_TINT = 0xFF23232B;
 
     private static final FluidTintSource STARLIGHT_TINT = new FluidTintSource() {
+        // 无坐标 / 带 BlockState 的这几个重载：地图 mod 取色用（Xaero 的
+        // BlockTintProvider 就是在 getBiomeColor 里问 tint 的颜色）
         @Override
         public int color(FluidState state) {
             return WORLD_TINT;
@@ -60,25 +62,21 @@ public final class StarlightFluidClient {
 
         @Override
         public int color(BlockState state) {
-            return WORLD_TINT;
+            return MAP_TINT;
         }
 
+        @Override
+        public int colorInWorld(BlockState blockState, BlockAndTintGetter getter, BlockPos pos) {
+            return MAP_TINT;
+        }
+
+        // 带 FluidState 的那个：流体渲染走这条，必须不染色，否则星点会被乘掉
         @Override
         public int colorInWorld(FluidState state, BlockState blockState,
                                 BlockAndTintGetter getter, BlockPos pos) {
             return WORLD_TINT;
         }
-
-        @Override
-        public int colorInWorld(BlockState blockState, BlockAndTintGetter getter, BlockPos pos) {
-            return isMapTool(getter) ? MAP_TINT : WORLD_TINT;
-        }
     };
-
-    /** 是否是地图 mod 在问颜色（Xaero 用自己的 BlockTintProvider 当 getter）。 */
-    private static boolean isMapTool(BlockAndTintGetter getter) {
-        return getter != null && getter.getClass().getName().startsWith("xaero.");
-    }
 
     private StarlightFluidClient() {
     }
