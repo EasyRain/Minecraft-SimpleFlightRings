@@ -36,15 +36,21 @@ public final class ModFluids {
             "liquid_starlight",
             () -> new FluidType(FluidType.Properties.create()
                     .descriptionId("fluid_type.simpleflightring.liquid_starlight")
-                    .density(-100)
-                    .viscosity(3000)
+                    // 密度必须为正：NeoForge 规定 density <= 0 的流体算"比空气轻"，
+                    // 会把模型顶点翻转（见 FluidType#isLighterThanAir）。
+                    .density(1200)
+                    // 手感偏"稠"，但粘度只影响扩散速度，不影响玩家移动
+                    .viscosity(2000)
                     .canSwim(true)
                     .canDrown(false)
-                    .canPushEntity(true)
+                    // 关键：不让流体推人。默认 motionScale 是 Entity.WATER_FLOW_SCALE = 0.014，
+                    // 之前填 0.6（43 倍）导致池子里被水流按着动不了、边缘像弹簧。
+                    .canPushEntity(false)
+                    .motionScale(0.014D)   // = 原版 Entity.WATER_FLOW_SCALE（1.21.1 里是 private，写字面量）
                     .supportsBoating(false)
                     .canConvertToSource(false)
+                    // 掉进去不受摔落伤害
                     .fallDistanceModifier(0.0F)
-                    .motionScale(0.6D)
                     .lightLevel(10)
                     .sound(SoundAction.get("swim"), SoundEvents.GENERIC_SWIM)
                     .sound(SoundAction.get("splash"), SoundEvents.GENERIC_SPLASH)));
