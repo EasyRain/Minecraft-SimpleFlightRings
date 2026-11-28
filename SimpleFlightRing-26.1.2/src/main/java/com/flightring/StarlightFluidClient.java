@@ -30,41 +30,50 @@ public final class StarlightFluidClient {
     /**
      * 显式的染色源。
      * <p>
-     * Xaero 之类的地图 mod 对 {@code LiquidBlock} 取色的实际分支是
-     * <pre>
-     *   BlockTintSource tint = FluidStateModelSet.get(fluidState).tintSource();
-     *   if (tint == null) return -1;                       // 没有 tint ⇒ 走"当水"的兜底
-     *   return tint.colorInWorld(state, getter, pos);      // ← 注意是**带坐标**的这个重载
-     * </pre>
-     * 所以四个重载必须给同一个颜色，只控制无坐标那个没用（那是上一版的错误）。
-     * <p>
-     * 颜色取"淡星光白蓝"：它同时是游戏内染色的乘数，太暗会把贴图压黑，
-     * 淡色几乎不改变世界里的观感，却能让地图上明显不是水的蓝。
+     * 这一个值有<b>两个消费者</b>，必须区分开：
+     * <ul>
+     *   <li><b>游戏内渲染</b>：tint 是贴图的<b>乘数</b>。我们的贴图已经是最终色（深黑底 + 白星点），
+     *       所以这里必须给不透明白，否则星点会被染色（实测拿洋红做对照时，池子里的星全变洋红了）。</li>
+     *   <li><b>地图 mod（Xaero）</b>：`BlockTintProvider` 直接拿 tint 的颜色当像素色，
+     *       见 {@code tintSource().colorInWorld(state, getter, pos)}。没 tint 时它会退化成
+     *       "当水处理"、套生物群系水色（就是原版水蓝）。</li>
+     * </ul>
+     * 区分方式：Xaero 传进来的 {@code getter} 是它自己的 {@code BlockTintProvider}
+     * （包名以 "xaero" 开头），而游戏内渲染传的是区块/世界 getter。于是——
+     * 点到地图那边就给星液的蓝紫色，世界内一律给白色。这样两边都好看。
      */
-    private static final int STARLIGHT_TINT_COLOR = 0xFFD8E2FF;
+    private static final int WORLD_TINT = 0xFFFFFFFF;
+
+    /** 地图上的颜色（蓝紫，接近星液的色相，但足够亮才在地图上看得见）。 */
+    private static final int MAP_TINT = 0xFF6A5AE0;
 
     private static final FluidTintSource STARLIGHT_TINT = new FluidTintSource() {
         @Override
         public int color(FluidState state) {
-            return STARLIGHT_TINT_COLOR;
+            return WORLD_TINT;
         }
 
         @Override
         public int color(BlockState state) {
-            return STARLIGHT_TINT_COLOR;
+            return WORLD_TINT;
         }
 
         @Override
         public int colorInWorld(FluidState state, BlockState blockState,
                                 BlockAndTintGetter getter, BlockPos pos) {
-            return STARLIGHT_TINT_COLOR;
+            return WORLD_TINT;
         }
 
         @Override
         public int colorInWorld(BlockState blockState, BlockAndTintGetter getter, BlockPos pos) {
-            return STARLIGHT_TINT_COLOR;
+            return isMapTool(getter) ? MAP_TINT : WORLD_TINT;
         }
     };
+
+    /** 是否是地图 mod 在问颜色（Xaero 用自己的 BlockTintProvider 当 getter）。 */
+    private static boolean isMapTool(BlockAndTintGetter getter) {
+        return getter != null && getter.getClass().getName().startsWith("xaero.");
+    }
 
     private StarlightFluidClient() {
     }

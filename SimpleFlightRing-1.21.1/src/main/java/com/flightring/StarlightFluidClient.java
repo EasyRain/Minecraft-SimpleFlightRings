@@ -37,17 +37,17 @@ public final class StarlightFluidClient {
 
             @Override
             public int getTintColor() {
-                // "淡星光白蓝"：既是游戏内染色的乘数（淡色几乎不改变观感），
-                // 也是 map mod 取到的颜色 —— 明显不是原版水的蓝
-                return 0xFFD8E2FF;
+                // 游戏内渲染：贴图已是最终色，不做乘法
+                return 0xFFFFFFFF;
             }
 
             @Override
             public int getTintColor(net.minecraft.world.level.material.FluidState state,
                                     net.minecraft.world.level.BlockAndTintGetter getter,
                                     net.minecraft.core.BlockPos pos) {
-                // 带坐标的重载必须给同一个颜色（map mod 走的可能就是这条）
-                return 0xFFD8E2FF;
+                // 地图 mod（Xaero 用自己的 getter）要一个显眼的地图色；游戏内渲染给白
+                return getter != null && getter.getClass().getName().startsWith("xaero.")
+                        ? 0xFF6A5AE0 : 0xFFFFFFFF;
             }
         }, ModFluids.LIQUID_STARLIGHT_TYPE.get());
     }
