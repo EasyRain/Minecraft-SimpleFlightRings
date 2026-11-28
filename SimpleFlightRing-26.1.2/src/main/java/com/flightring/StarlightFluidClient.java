@@ -50,38 +50,30 @@ public final class StarlightFluidClient {
      * 星液本体是"黑色占大头 + 稀疏白星"，所以地图上给一个**很深的灰蓝**（不是水蓝、也不是亮紫）：
      * 在一片浅灰白的云块中间，深色池子反而最像它本身。
      */
-    private static final int MAP_TINT = 0xFFFF0000;   // 诊断：纯红
+    /**
+     * 地图上的颜色。
+     * <p>
+     * 星液本体是"黑色占大头 + 稀疏白星"，所以地图上给一个**很深的灰蓝**：
+     * 在一片浅灰白的云块中间，深色池子反而最像它本身。
+     */
+    private static final int MAP_TINT = 0xFF23232B;
 
-
-    /** 诊断用：第一次见到某个"重载 + getter 类型"组合时打一行日志，方便定位地图取色走的是哪条。 */
-    private static final java.util.Set<String> LOGGED_QUERIES = java.util.concurrent.ConcurrentHashMap.newKeySet();
-
-    private static void note(String overload, BlockAndTintGetter getter, int color) {
-        String key = overload + " <- " + (getter == null ? "null" : getter.getClass().getName());
-        if (LOGGED_QUERIES.add(key)) {
-            FlightRingMod.LOGGER.info("[FlightRing] liquid_starlight tint {} => #{}", key,
-                    String.format("%08X", color));
-        }
-    }
 
     private static final FluidTintSource STARLIGHT_TINT = new FluidTintSource() {
         // 无坐标 / 带 BlockState 的这几个重载：地图 mod 取色用（Xaero 的
         // BlockTintProvider 就是在 getBiomeColor 里问 tint 的颜色）
         @Override
         public int color(FluidState state) {
-            note("color(FluidState)", null, WORLD_TINT);
             return WORLD_TINT;
         }
 
         @Override
         public int color(BlockState state) {
-            note("color(BlockState)", null, MAP_TINT);
             return MAP_TINT;
         }
 
         @Override
         public int colorInWorld(BlockState blockState, BlockAndTintGetter getter, BlockPos pos) {
-            note("colorInWorld(BlockState)", getter, MAP_TINT);
             return MAP_TINT;
         }
 
@@ -89,7 +81,6 @@ public final class StarlightFluidClient {
         @Override
         public int colorInWorld(FluidState state, BlockState blockState,
                                 BlockAndTintGetter getter, BlockPos pos) {
-            note("colorInWorld(FluidState)", getter, WORLD_TINT);
             return WORLD_TINT;
         }
     };
