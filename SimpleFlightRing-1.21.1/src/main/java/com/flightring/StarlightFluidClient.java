@@ -46,8 +46,9 @@ public final class StarlightFluidClient {
                                     net.minecraft.world.level.BlockAndTintGetter getter,
                                     net.minecraft.core.BlockPos pos) {
                 // 地图 mod（Xaero 用自己的 getter）要一个显眼的地图色；游戏内渲染给白
+                // 地图 mod（Xaero 用自己的 getter）→ 深灰蓝；游戏内渲染 → 不染色
                 return getter != null && getter.getClass().getName().startsWith("xaero.")
-                        ? 0xFF6A5AE0 : 0xFFFFFFFF;
+                        ? 0xFF23232B : 0xFFFFFFFF;
             }
         }, ModFluids.LIQUID_STARLIGHT_TYPE.get());
     }

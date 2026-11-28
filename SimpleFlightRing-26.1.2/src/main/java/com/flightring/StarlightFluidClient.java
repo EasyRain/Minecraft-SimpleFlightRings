@@ -44,8 +44,13 @@ public final class StarlightFluidClient {
      */
     private static final int WORLD_TINT = 0xFFFFFFFF;
 
-    /** 地图上的颜色（蓝紫，接近星液的色相，但足够亮才在地图上看得见）。 */
-    private static final int MAP_TINT = 0xFF6A5AE0;
+    /**
+     * 地图上的颜色。
+     * <p>
+     * 星液本体是"黑色占大头 + 稀疏白星"，所以地图上给一个**很深的灰蓝**（不是水蓝、也不是亮紫）：
+     * 在一片浅灰白的云块中间，深色池子反而最像它本身。
+     */
+    private static final int MAP_TINT = 0xFF23232B;
 
     private static final FluidTintSource STARLIGHT_TINT = new FluidTintSource() {
         @Override
