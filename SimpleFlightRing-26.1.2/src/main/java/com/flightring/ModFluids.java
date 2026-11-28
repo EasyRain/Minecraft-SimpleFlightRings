@@ -34,7 +34,7 @@ public final class ModFluids {
 
     public static final DeferredHolder<FluidType, FluidType> LIQUID_STARLIGHT_TYPE = FLUID_TYPES.register(
             "liquid_starlight",
-            () -> new FluidType(FluidType.Properties.create()
+            () -> new StarlightFluidType(FluidType.Properties.create()
                     .descriptionId("fluid_type.simpleflightring.liquid_starlight")
                     // 密度必须为正：NeoForge 规定 density <= 0 的流体算"比空气轻"，
                     // 会把模型顶点翻转（见 FluidType#isLighterThanAir）。
@@ -47,6 +47,9 @@ public final class ModFluids {
                     // 之前填 0.6（43 倍）导致池子里被水流按着动不了、边缘像弹簧。
                     .canPushEntity(false)
                     .motionScale(0.014D)   // = 原版 Entity.WATER_FLOW_SCALE（1.21.1 里是 private，写字面量）
+                    // 26.x 专属：让"眼睛在水里"这类判定也把我们当液体（水下挖掘速度、游泳姿势）。
+                    // 真正的移动逻辑由 StarlightFluidType#move 提供（默认实现返回 false ⇒ 玩家会完全定住）。
+                    .isWaterLike(true)
                     .supportsBoating(false)
                     .canConvertToSource(false)
                     // 掉进去不受摔落伤害

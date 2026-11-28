@@ -34,7 +34,7 @@ public final class ModFluids {
 
     public static final DeferredHolder<FluidType, FluidType> LIQUID_STARLIGHT_TYPE = FLUID_TYPES.register(
             "liquid_starlight",
-            () -> new FluidType(FluidType.Properties.create()
+            () -> new StarlightFluidType(FluidType.Properties.create()
                     .descriptionId("fluid_type.simpleflightring.liquid_starlight")
                     // 密度必须为正：NeoForge 规定 density <= 0 的流体算"比空气轻"，
                     // 会把模型顶点翻转（见 FluidType#isLighterThanAir）。
