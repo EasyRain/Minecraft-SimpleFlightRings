@@ -37,6 +37,15 @@ public final class StarlightFluidClient {
 
             @Override
             public int getTintColor() {
+                // 无坐标查询（map mod 常用这条）给星液的深蓝紫色
+                return 0xFF10142A;
+            }
+
+            @Override
+            public int getTintColor(net.minecraft.world.level.material.FluidState state,
+                                    net.minecraft.world.level.BlockAndTintGetter getter,
+                                    net.minecraft.core.BlockPos pos) {
+                // 世界内不染色：贴图本身已经是深蓝黑 + 星点
                 return 0xFFFFFFFF;
             }
         }, ModFluids.LIQUID_STARLIGHT_TYPE.get());
