@@ -8,6 +8,7 @@ import net.minecraft.world.level.block.ButtonBlock;
 import net.minecraft.world.level.block.FenceBlock;
 import net.minecraft.world.level.block.FenceGateBlock;
 import net.minecraft.world.level.block.FlowerPotBlock;
+import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.PressurePlateBlock;
 import net.minecraft.world.level.block.TrapDoorBlock;
 import net.minecraft.world.level.block.SlabBlock;
@@ -416,4 +417,16 @@ public final class ModBlocks {
     private static BlockBehaviour.Properties flowerPotProperties(BlockBehaviour.Properties properties) {
         return properties.instabreak().noOcclusion().pushReaction(PushReaction.DESTROY);
     }
+
+    /** 液态星光（源方块）：发光 10 的深色流体，粘稠、不淹人、掉进去不受摔落伤害。 */
+    public static final DeferredBlock<LiquidBlock> LIQUID_STARLIGHT = BLOCKS.registerBlock(
+            "liquid_starlight",
+            properties -> new LiquidBlock(ModFluids.LIQUID_STARLIGHT.get(), properties),
+            BlockBehaviour.Properties.of().mapColor(net.minecraft.world.level.material.MapColor.COLOR_BLACK)
+                    .replaceable().noCollission().strength(100.0F)
+                    .lightLevel(state -> 10)
+                    .pushReaction(PushReaction.DESTROY)
+                    .noLootTable()
+                    .liquid()
+                    .sound(SoundType.EMPTY));
 }

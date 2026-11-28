@@ -1,0 +1,8 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": [
+    "simpleflightring:cloud_sea"
+  ],
+  "features": "simpleflightring:starlight_pool",
+  "step": "lakes"
+}

@@ -385,5 +385,9 @@
   "block.simpleflightring.potted_cloud_bloom": "Potted Cloud Bloom",
   "block.simpleflightring.potted_aurora_bloom": "Potted Aurora Bloom",
   "block.simpleflightring.potted_sunlight_bloom": "Potted Sunlight Bloom",
-  "block.simpleflightring.potted_cloud_sapling": "Potted Cloud Sapling"
+  "block.simpleflightring.potted_cloud_sapling": "Potted Cloud Sapling",
+  "block.simpleflightring.liquid_starlight": "Liquid Starlight",
+  "fluid_type.simpleflightring.liquid_starlight": "Liquid Starlight",
+  "item.simpleflightring.liquid_starlight_bucket": "Liquid Starlight Bucket",
+  "item.simpleflightring.liquid_starlight_bucket.desc": "Glowing starlight, thick enough to hold you up"
 }

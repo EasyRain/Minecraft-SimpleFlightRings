@@ -4,6 +4,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Unit;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -320,4 +321,10 @@ public class ModItems {
 
     private ModItems() {
     }
+
+    /** 液态星光桶：能搬运/倒出液态星光，和原版桶一样一次性使用后退回空桶。 */
+    public static final DeferredItem<BucketItem> LIQUID_STARLIGHT_BUCKET = ITEMS.registerItem(
+            "liquid_starlight_bucket",
+            properties -> new BucketItem(ModFluids.LIQUID_STARLIGHT.get(),
+                    properties.stacksTo(1).craftRemainder(net.minecraft.world.item.Items.BUCKET)));
 }

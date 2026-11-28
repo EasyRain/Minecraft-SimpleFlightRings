@@ -10,6 +10,7 @@ import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
+import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
@@ -26,6 +27,8 @@ public class FlightRingMod {
 
     public FlightRingMod(IEventBus modEventBus) {
         ModItems.ITEMS.register(modEventBus);
+        ModFluids.FLUID_TYPES.register(modEventBus);
+        ModFluids.FLUIDS.register(modEventBus);
         ModBlocks.BLOCKS.register(modEventBus);
         ModDataComponents.COMPONENTS.register(modEventBus);
         ModLootFunctions.LOOT_FUNCTIONS.register(modEventBus);
@@ -57,6 +60,8 @@ public class FlightRingMod {
             modEventBus.addListener(RegisterKeyMappingsEvent.class, ModKeyMappings::onRegisterKeyMappings);
             // The mod's own soul fire particle (see ModParticles).
             modEventBus.addListener(RegisterParticleProvidersEvent.class, ClientParticles::onRegisterParticleProviders);
+            // Liquid starlight: fluid sprites (26.x uses fluid models, 1.21.1 client extensions).
+            modEventBus.addListener(RegisterClientExtensionsEvent.class, StarlightFluidClient::onRegisterExtensions);
         }
 
         // Network payloads (server -> client flight time sync).

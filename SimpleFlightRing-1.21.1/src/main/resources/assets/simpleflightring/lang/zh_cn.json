@@ -385,5 +385,9 @@
   "block.simpleflightring.potted_cloud_bloom": "云絮花盆栽",
   "block.simpleflightring.potted_aurora_bloom": "极光花盆栽",
   "block.simpleflightring.potted_sunlight_bloom": "阳光花盆栽",
-  "block.simpleflightring.potted_cloud_sapling": "云树苗盆栽"
+  "block.simpleflightring.potted_cloud_sapling": "云树苗盆栽",
+  "block.simpleflightring.liquid_starlight": "液态星光",
+  "fluid_type.simpleflightring.liquid_starlight": "液态星光",
+  "item.simpleflightring.liquid_starlight_bucket": "液态星光桶",
+  "item.simpleflightring.liquid_starlight_bucket.desc": "像熔岩一样发光的星液，泡在里面会被轻轻托起"
 }
