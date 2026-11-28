@@ -50,7 +50,7 @@ public final class StarlightFluidClient {
      * 星液本体是"黑色占大头 + 稀疏白星"，所以地图上给一个**很深的灰蓝**（不是水蓝、也不是亮紫）：
      * 在一片浅灰白的云块中间，深色池子反而最像它本身。
      */
-    private static final int MAP_TINT = 0xFF23232B;
+    private static final int MAP_TINT = 0xFFFF0000;   // 诊断：纯红
 
 
     /** 诊断用：第一次见到某个"重载 + getter 类型"组合时打一行日志，方便定位地图取色走的是哪条。 */

@@ -405,7 +405,7 @@ public final class ModBlocks {
     public static final DeferredBlock<LiquidBlock> LIQUID_STARLIGHT = BLOCKS.registerBlock(
             "liquid_starlight",
             properties -> new LiquidBlock(ModFluids.LIQUID_STARLIGHT.get(), properties),
-            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.COLOR_BLACK)
+            properties -> properties.mapColor(net.minecraft.world.level.material.MapColor.COLOR_LIGHT_GREEN)   // 诊断：亮绿
                     .replaceable().noCollision().strength(100.0F)
                     .lightLevel(state -> 10)
                     .pushReaction(PushReaction.DESTROY)
