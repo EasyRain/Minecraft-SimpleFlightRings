@@ -74,19 +74,19 @@ public final class StarlightFluidClient {
 
         @Override
         public int colorInWorld(BlockState blockState, BlockAndTintGetter getter, BlockPos pos) {
-            // 诊断：按坐标给四档颜色，一次看清"多暗会被过滤掉"
+            // 诊断第二轮：全部"暗但高饱和"，四种不同色相，一次看清是"亮度"还是"饱和度"在起作用
             boolean evenX = (pos.getX() & 1) == 0;
             boolean evenZ = (pos.getZ() & 1) == 0;
             if (evenX && evenZ) {
-                return 0xFFFF0000;   // 对照组
+                return 0xFF1A1A70;   // 很暗的靛蓝（高饱和）
             }
             if (evenX) {
-                return 0xFF23232B;   // 很暗
+                return 0xFF2A2A8C;   // 暗靛蓝
             }
             if (evenZ) {
-                return 0xFF3A3A44;   // 中暗
+                return 0xFF3C7A3C;   // 暗绿（换色相，便于辨认）
             }
-            return 0xFF50505C;       // 偏暗灰
+            return 0xFF7A3C3C;       // 暗红棕（换色相，便于辨认）
         }
 
         // 带 FluidState 的那个：流体渲染走这条，必须不染色，否则星点会被乘掉
