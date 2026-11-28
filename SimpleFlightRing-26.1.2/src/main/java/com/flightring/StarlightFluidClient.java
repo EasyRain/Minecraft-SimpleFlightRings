@@ -28,16 +28,6 @@ public final class StarlightFluidClient {
             Identifier.fromNamespaceAndPath(FlightRingMod.MODID, "block/liquid_starlight_flow"));
 
     /**
-     * 屏幕内覆盖材质（眼睛浸在液体里时贴在镜头上）。
-     * <p>
-     * 原先给的是 null；对照 AAE 的量子灌注液发现它<b>非 null</b>（直接用原版 water_overlay）——
-     * 而 map mod 很可能就是靠"有没有 overlay"来判断"这是可以染色的水类流体"。
-     * 这里先用原版 water_overlay 试，确认机制后再换成自己的。
-     */
-    private static final Material OVERLAY = new Material(
-            Identifier.withDefaultNamespace("block/water_overlay"));
-
-    /**
      * 显式的染色源。
      * <p>
      * 这一个值有<b>两个消费者</b>，必须区分开：
@@ -73,7 +63,7 @@ public final class StarlightFluidClient {
      * 结论：给一个<b>高饱和的深靛蓝</b>——既过得了饱和度门槛，色相上也最接近夜空，
      * 和原版水的青蓝、ATM 那种紫都能区分开。
      */
-    private static final int MAP_TINT = 0xFF7362D3;   // 先照抄 AAE 量子灌注液的值做对照
+    private static final int MAP_TINT = 0xFF3A2A9C;
 
 
     private static final FluidTintSource STARLIGHT_TINT = new FluidTintSource() {
@@ -107,7 +97,7 @@ public final class StarlightFluidClient {
 
     public static void onRegisterFluidModels(RegisterFluidModelsEvent event) {
         // 源与流动两种流体共用同一套贴图
-        event.register(new FluidModel.Unbaked(STILL, FLOWING, OVERLAY, STARLIGHT_TINT), ModFluids.LIQUID_STARLIGHT);
-        event.register(new FluidModel.Unbaked(STILL, FLOWING, OVERLAY, STARLIGHT_TINT), ModFluids.FLOWING_LIQUID_STARLIGHT);
+        event.register(new FluidModel.Unbaked(STILL, FLOWING, null, STARLIGHT_TINT), ModFluids.LIQUID_STARLIGHT);
+        event.register(new FluidModel.Unbaked(STILL, FLOWING, null, STARLIGHT_TINT), ModFluids.FLOWING_LIQUID_STARLIGHT);
     }
 }
