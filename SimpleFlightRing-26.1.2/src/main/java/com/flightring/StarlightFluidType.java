@@ -12,6 +12,15 @@ import net.neoforged.neoforge.fluids.FluidType;
  */
 public final class StarlightFluidType extends FluidType {
 
+    /** 每"浸没 1 格"给多少向上的速度。 */
+    private static final double BUOYANCY_PER_BLOCK = 0.012D;
+
+    /** 浮力上限：压住它，否则深池里会像弹簧一样把人弹飞。 */
+    private static final double BUOYANCY_MAX = 0.035D;
+
+    /** 竖直速度封顶，保证是"慢慢浮起来"而不是"窜上去"。 */
+    private static final double MAX_RISE = 0.06D;
+
     public StarlightFluidType(Properties properties) {
         super(properties);
     }
@@ -30,8 +39,10 @@ public final class StarlightFluidType extends FluidType {
      * {@code isInWater()}/{@code isInLava()} 两个分支，而我们的流体两者都不成立，
      * 于是**没有任何移动代码被执行**，玩家一进去就完全定住（物品走别的路径所以正常）。
      * <p>
-     * 这里用的是原版水里的参数：缓慢阻尼 0.8（冲刺 0.9）、速度 0.02、
-     * 受"水中移动效率"与 SWIM_SPEED 属性影响、出水时给一个 0.3 的向上助推。
+     * 这里用的是"水与熔岩之间"的参数：阻尼 0.62（冲刺 0.72）、推进 0.014、
+     * 受"水中移动效率"与 SWIM_SPEED 属性影响、出水时给一个 0.3 的向上助推；
+     * 另外加了一层<b>浮力</b>：按浸没深度给 0.012/格（上限 0.035）的向上速度，
+     * 竖直速度封顶 0.06 ⇒ 泡在里面会慢慢浮到液面，而不会被弹飞。
      */
     private static void moveLikeWater(LivingEntity entity, Vec3 input, double gravity) {
         boolean falling = entity.getDeltaMovement().y <= 0.0D;
@@ -59,6 +70,14 @@ public final class StarlightFluidType extends FluidType {
         }
         movement = movement.multiply(slowDown, 0.72F, slowDown);
 
+        // 浮力：按"浸没深度"给上升速度（越深托得越明显），但压上限，
+        // 于是手感是"在稠液里慢慢浮上去"，而不是被弹出去。
+        double submerged = entity.getFluidTypeHeight(ModFluids.LIQUID_STARLIGHT_TYPE.get());
+        if (submerged > 0.0D) {
+            double lift = Math.min(submerged * BUOYANCY_PER_BLOCK, BUOYANCY_MAX);
+            movement = movement.add(0.0D, lift, 0.0D);
+        }
+
         // 原版 LivingEntity#getFluidFallingAdjustedMovement 的等价实现（那个方法是 protected 的）
         if (!entity.isNoGravity() && !entity.isSprinting()) {
             double dy;
@@ -68,6 +87,9 @@ public final class StarlightFluidType extends FluidType {
                 dy = movement.y - gravity / 16.0D;
             }
             movement = new Vec3(movement.x, dy, movement.z);
+        }
+        if (movement.y > MAX_RISE) {
+            movement = new Vec3(movement.x, MAX_RISE, movement.z);
         }
         entity.setDeltaMovement(movement);
 
