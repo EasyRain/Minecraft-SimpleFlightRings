@@ -68,9 +68,10 @@ public final class ModFluids {
         return new BaseFlowingFluid.Properties(LIQUID_STARLIGHT_TYPE, LIQUID_STARLIGHT, FLOWING_LIQUID_STARLIGHT)
                 .block(ModBlocks.LIQUID_STARLIGHT)
                 .bucket(ModItems.LIQUID_STARLIGHT_BUCKET)
-                .slopeFindDistance(4)
+                // 扩散也取"水与熔岩之间"：水是 4/1/5，熔岩是 2/2/30
+                .slopeFindDistance(3)
                 .levelDecreasePerBlock(2)
-                .tickRate(20)
+                .tickRate(25)
                 .explosionResistance(100.0F);
     }
 }

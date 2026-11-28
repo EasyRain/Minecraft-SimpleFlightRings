@@ -37,8 +37,9 @@ public final class StarlightFluidType extends FluidType {
         boolean falling = entity.getDeltaMovement().y <= 0.0D;
         double oldY = entity.getY();
 
-        float slowDown = entity.isSprinting() ? 0.9F : 0.8F;
-        float speed = 0.02F;
+        // 粘度取"水(0.8/0.02) 与 熔岩(0.5/0.02) 之间"：阻尼更大、推进更弱，动起来有明显"稠"的感觉
+        float slowDown = entity.isSprinting() ? 0.72F : 0.62F;
+        float speed = 0.014F;
         float efficiency = (float) entity.getAttributeValue(Attributes.WATER_MOVEMENT_EFFICIENCY);
         if (!entity.onGround()) {
             efficiency *= 0.5F;
@@ -56,7 +57,7 @@ public final class StarlightFluidType extends FluidType {
         if (entity.horizontalCollision && entity.onClimbable()) {
             movement = new Vec3(movement.x, 0.2D, movement.z);
         }
-        movement = movement.multiply(slowDown, 0.8F, slowDown);
+        movement = movement.multiply(slowDown, 0.72F, slowDown);
 
         // 原版 LivingEntity#getFluidFallingAdjustedMovement 的等价实现（那个方法是 protected 的）
         if (!entity.isNoGravity() && !entity.isSprinting()) {
