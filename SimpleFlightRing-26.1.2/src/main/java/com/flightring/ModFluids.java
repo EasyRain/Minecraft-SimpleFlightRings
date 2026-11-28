@@ -47,9 +47,9 @@ public final class ModFluids {
                     // 之前填 0.6（43 倍）导致池子里被水流按着动不了、边缘像弹簧。
                     .canPushEntity(false)
                     .motionScale(0.014D)   // = 原版 Entity.WATER_FLOW_SCALE（1.21.1 里是 private，写字面量）
-                    // 26.x 专属：让"眼睛在水里"这类判定也把我们当液体（水下挖掘速度、游泳姿势）。
-                    // 真正的移动逻辑由 StarlightFluidType#move 提供（默认实现返回 false ⇒ 玩家会完全定住）。
-                    .isWaterLike(true)
+                    // 注意：**不要**设 isWaterLike(true)。移动与游泳已由 StarlightFluidType#move 提供，
+                    // 而 isWaterLike 会让我们在其它 mod 眼里"就是水"（实测：Xaero 地图把整个池子
+                    // 画成原版水的蓝色）。去掉后移动不变，地图才有机会按 mapColor 上色。
                     .supportsBoating(false)
                     .canConvertToSource(false)
                     // 掉进去不受摔落伤害
