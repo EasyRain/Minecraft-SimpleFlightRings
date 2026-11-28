@@ -81,7 +81,19 @@ public final class StarlightFluidClient {
 
         @Override
         public int colorInWorld(BlockState blockState, BlockAndTintGetter getter, BlockPos pos) {
-            return MAP_TINT;
+            // 第三轮诊断：把 AAE 的值也放进来做同一张图对比
+            boolean evenX = (pos.getX() & 1) == 0;
+            boolean evenZ = (pos.getZ() & 1) == 0;
+            if (evenX && evenZ) {
+                return 0xFF7362D3;   // AAE 量子灌注液用的值（它的地图显示是深紫）
+            }
+            if (evenX) {
+                return 0xFF5A4AB8;   // 比 AAE 暗一档
+            }
+            if (evenZ) {
+                return 0xFF453A96;   // 再暗一档
+            }
+            return 0xFF3A2A9C;       // 我们上一版（显示成亮蓝的那个）
         }
 
         // 带 FluidState 的那个：流体渲染走这条，必须不染色，否则星点会被乘掉
