@@ -28,9 +28,14 @@ public final class StarlightFogClient {
     private static final float FOG_GREEN = 0.06F;
     private static final float FOG_BLUE = 0.13F;
 
-    /** 雾的距离：很浓（原版水约 96 格可见），20 格外基本看不见，符合"稠液"的手感。 */
-    private static final float FOG_NEAR = 0.4F;
-    private static final float FOG_FAR = 20.0F;
+    /**
+     * 雾的距离：照熔岩那种"潜下去几乎什么都看不见"的浓度。
+     * 原版对照 —— 水约 96 格；熔岩 near 0.25 / far **1.0**（穿戴抗火药水才 5 格）。
+     * 这里取 near 0.2 / far 4.0：身边几格勉强能看清，再远全是雾和星点的残影，
+     * 但又不至于像熔岩那样只剩 1 格（不然池子里那些星点就白做了）。
+     */
+    private static final float FOG_NEAR = 0.2F;
+    private static final float FOG_FAR = 4.0F;
 
     private StarlightFogClient() {
     }
