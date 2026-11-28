@@ -30,21 +30,39 @@ public final class StarlightFluidClient {
     /**
      * 显式的染色源。
      * <p>
-     * <b>世界内不染色</b>（{@code colorInWorld} 返回不透明白）—— 贴图本身已经是深蓝黑 + 星点；
-     * <b>无坐标查询才给颜色</b>（{@code color}）—— Xaero 之类的 map mod 就是这样取色：
-     * {@code BlockTintProvider} 只在 {@code state instanceof LiquidBlock} 时去问
-     * {@code FluidModel#tintSource()}，没有 tint 源时它会退化成"当水处理"、套生物群系水色。
+     * Xaero 之类的地图 mod 对 {@code LiquidBlock} 取色的实际分支是
+     * <pre>
+     *   BlockTintSource tint = FluidStateModelSet.get(fluidState).tintSource();
+     *   if (tint == null) return -1;                       // 没有 tint ⇒ 走"当水"的兜底
+     *   return tint.colorInWorld(state, getter, pos);      // ← 注意是**带坐标**的这个重载
+     * </pre>
+     * 所以四个重载必须给同一个颜色，只控制无坐标那个没用（那是上一版的错误）。
+     * <p>
+     * 颜色取"淡星光白蓝"：它同时是游戏内染色的乘数，太暗会把贴图压黑，
+     * 淡色几乎不改变世界里的观感，却能让地图上明显不是水的蓝。
      */
+    private static final int STARLIGHT_TINT_COLOR = 0xFFD8E2FF;
+
     private static final FluidTintSource STARLIGHT_TINT = new FluidTintSource() {
         @Override
         public int color(FluidState state) {
-            return 0xFF10142A;
+            return STARLIGHT_TINT_COLOR;
+        }
+
+        @Override
+        public int color(BlockState state) {
+            return STARLIGHT_TINT_COLOR;
         }
 
         @Override
         public int colorInWorld(FluidState state, BlockState blockState,
                                 BlockAndTintGetter getter, BlockPos pos) {
-            return 0xFFFFFFFF;
+            return STARLIGHT_TINT_COLOR;
+        }
+
+        @Override
+        public int colorInWorld(BlockState blockState, BlockAndTintGetter getter, BlockPos pos) {
+            return STARLIGHT_TINT_COLOR;
         }
     };
 
