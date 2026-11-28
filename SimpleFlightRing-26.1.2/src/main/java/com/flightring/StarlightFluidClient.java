@@ -51,12 +51,19 @@ public final class StarlightFluidClient {
      * 在一片浅灰白的云块中间，深色池子反而最像它本身。
      */
     /**
-     * 地图上的颜色。
+     * 地图上的颜色（实测结论见下）。
      * <p>
-     * 星液本体是"黑色占大头 + 稀疏白星"，所以地图上给一个**很深的灰蓝**：
-     * 在一片浅灰白的云块中间，深色池子反而最像它本身。
+     * Xaero 会对这个颜色做两步处理，靠两轮对照实验摸出来的：
+     * <ol>
+     *   <li><b>低饱和度（近灰）的颜色会被丢弃</b>，回退成生物群系水色（就是原版水蓝）。
+     *       实测：纯红保留；三档灰 {@code 0x23232B/0x3A3A44/0x50505C} 全变水蓝；
+     *       饱和 50~77% 的靛蓝/绿/红棕全部保留。</li>
+     *   <li><b>颜色会被整体提亮</b>（暗棕→粉、暗绿→亮绿），所以"地图上是纯黑"做不到。</li>
+     * </ol>
+     * 结论：给一个<b>高饱和的深靛蓝</b>——既过得了饱和度门槛，色相上也最接近夜空，
+     * 和原版水的青蓝、ATM 那种紫都能区分开。
      */
-    private static final int MAP_TINT = 0xFF23232B;
+    private static final int MAP_TINT = 0xFF3A2A9C;
 
 
     private static final FluidTintSource STARLIGHT_TINT = new FluidTintSource() {
@@ -74,19 +81,7 @@ public final class StarlightFluidClient {
 
         @Override
         public int colorInWorld(BlockState blockState, BlockAndTintGetter getter, BlockPos pos) {
-            // 诊断第二轮：全部"暗但高饱和"，四种不同色相，一次看清是"亮度"还是"饱和度"在起作用
-            boolean evenX = (pos.getX() & 1) == 0;
-            boolean evenZ = (pos.getZ() & 1) == 0;
-            if (evenX && evenZ) {
-                return 0xFF1A1A70;   // 很暗的靛蓝（高饱和）
-            }
-            if (evenX) {
-                return 0xFF2A2A8C;   // 暗靛蓝
-            }
-            if (evenZ) {
-                return 0xFF3C7A3C;   // 暗绿（换色相，便于辨认）
-            }
-            return 0xFF7A3C3C;       // 暗红棕（换色相，便于辨认）
+            return MAP_TINT;
         }
 
         // 带 FluidState 的那个：流体渲染走这条，必须不染色，否则星点会被乘掉
